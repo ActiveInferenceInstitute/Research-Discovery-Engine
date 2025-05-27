@@ -1,0 +1,28 @@
+{
+  "name": "de-basic-usage-example",
+  "version": "1.0.0",
+  "description": "Basic usage examples for the Research Discovery Engine",
+  "main": "index.js",
+  "type": "module",
+  "scripts": {
+    "demo": "node index.js",
+    "search-demo": "node examples/search-example.js",
+    "concept-demo": "node examples/concept-example.js",
+    "agent-demo": "node examples/agent-example.js"
+  },
+  "dependencies": {
+    "node-fetch": "^3.3.2"
+  },
+  "devDependencies": {
+    "@types/node": "^20.0.0"
+  },
+  "author": "Research Discovery Engine Team",
+  "license": "MIT",
+  "keywords": [
+    "research",
+    "discovery-engine",
+    "knowledge-graph",
+    "ai",
+    "api-client"
+  ]
+} 

@@ -1,0 +1,573 @@
+{
+  "execution_id": "orchestrator-1748379524",
+  "start_time": "2025-05-27T13:58:24.196033",
+  "end_time": "2025-05-27T13:58:44.078568",
+  "duration_seconds": 19,
+  "scripts": {
+    "fast-setup": {
+      "status": "completed",
+      "description": "Fast setup and dependency installation for DE",
+      "category": "setup",
+      "optional": false,
+      "dependencies": []
+    },
+    "verify-de-ready": {
+      "status": "completed",
+      "description": "Final verification that DE is ready and show launch instructions",
+      "category": "setup",
+      "optional": false,
+      "dependencies": [
+        "fast-setup"
+      ]
+    },
+    "import-concepts": {
+      "status": "completed",
+      "description": "Import concept data into knowledge graph (demo mode)",
+      "category": "data",
+      "optional": true,
+      "dependencies": [
+        "verify-de-ready"
+      ]
+    },
+    "research-pipeline": {
+      "status": "completed",
+      "description": "Run complete research discovery pipeline (demo mode)",
+      "category": "workflow",
+      "optional": true,
+      "dependencies": [
+        "verify-de-ready"
+      ]
+    },
+    "export-graph": {
+      "status": "skipped",
+      "description": "Export knowledge graph in multiple formats",
+      "category": "data",
+      "optional": true,
+      "dependencies": [
+        "verify-de-ready"
+      ]
+    },
+    "deploy": {
+      "status": "skipped",
+      "description": "Deploy to production environment",
+      "category": "deployment",
+      "optional": true,
+      "dependencies": [
+        "verify-de-ready"
+      ]
+    }
+  },
+  "execution_log": [
+    {
+      "timestamp": "13:58:24",
+      "emoji": "\ud83c\udfac",
+      "message": "Starting execution of 6 scripts...",
+      "level": "INFO"
+    },
+    {
+      "timestamp": "13:58:24",
+      "emoji": "\ud83d\udccb",
+      "message": "PHASE 1/6: FAST-SETUP",
+      "level": "INFO"
+    },
+    {
+      "timestamp": "13:58:24",
+      "emoji": "\ud83d\udcdd",
+      "message": "Description: Fast setup and dependency installation for DE",
+      "level": "INFO"
+    },
+    {
+      "timestamp": "13:58:24",
+      "emoji": "\ud83d\udcc2",
+      "message": "Category: SETUP",
+      "level": "INFO"
+    },
+    {
+      "timestamp": "13:58:24",
+      "emoji": "\u2699\ufe0f",
+      "message": "Required: Yes",
+      "level": "INFO"
+    },
+    {
+      "timestamp": "13:58:24",
+      "emoji": "\ud83d\udd17",
+      "message": "No dependencies required",
+      "level": "INFO"
+    },
+    {
+      "timestamp": "13:58:24",
+      "emoji": "\ud83d\udccd",
+      "message": "Script location: /home/trim/Documents/GitHub/Research-Discovery-Engine/src/scripts/setup/fast-setup.sh",
+      "level": "INFO"
+    },
+    {
+      "timestamp": "13:58:24",
+      "emoji": "\ud83d\ude80",
+      "message": "Executing: fast-setup",
+      "level": "INFO"
+    },
+    {
+      "timestamp": "13:58:24",
+      "emoji": "\ud83d\udcdd",
+      "message": "Command: /home/trim/Documents/GitHub/Research-Discovery-Engine/src/scripts/setup/fast-setup.sh",
+      "level": "INFO"
+    },
+    {
+      "timestamp": "13:58:24",
+      "emoji": "\ud83d\udce4",
+      "message": "  \u001b[0;32m[SUCCESS]\u001b[0m Node.js 22.14.0 found",
+      "level": "INFO"
+    },
+    {
+      "timestamp": "13:58:24",
+      "emoji": "\ud83d\udce4",
+      "message": "  \u001b[0;32m[SUCCESS]\u001b[0m npm 11.2.0 found",
+      "level": "INFO"
+    },
+    {
+      "timestamp": "13:58:24",
+      "emoji": "\ud83d\udce4",
+      "message": "  \u001b[0;32m[SUCCESS]\u001b[0m Dependencies already installed",
+      "level": "INFO"
+    },
+    {
+      "timestamp": "13:58:24",
+      "emoji": "\ud83d\udce4",
+      "message": "  \u001b[0;32m[SUCCESS]\u001b[0m Environment configuration already exists",
+      "level": "INFO"
+    },
+    {
+      "timestamp": "13:58:34",
+      "emoji": "\ud83d\udce4",
+      "message": "  \u001b[0;32m[SUCCESS]\u001b[0m Build test passed",
+      "level": "INFO"
+    },
+    {
+      "timestamp": "13:58:34",
+      "emoji": "\ud83d\udce4",
+      "message": "  \u001b[0;32m[SUCCESS]\u001b[0m Discovery Engine setup completed",
+      "level": "INFO"
+    },
+    {
+      "timestamp": "13:58:34",
+      "emoji": "\ud83d\udce4",
+      "message": "  \u001b[0;32m[SUCCESS]\u001b[0m \u2713 GraphVisualization component found",
+      "level": "INFO"
+    },
+    {
+      "timestamp": "13:58:34",
+      "emoji": "\ud83d\udce4",
+      "message": "  \u001b[0;32m[SUCCESS]\u001b[0m \u2713 ConceptDesigner component found",
+      "level": "INFO"
+    },
+    {
+      "timestamp": "13:58:34",
+      "emoji": "\ud83d\udce4",
+      "message": "  \u001b[0;32m[SUCCESS]\u001b[0m \u2713 AgentConsole component found",
+      "level": "INFO"
+    },
+    {
+      "timestamp": "13:58:34",
+      "emoji": "\ud83d\udce4",
+      "message": "  \u001b[0;32m[SUCCESS]\u001b[0m \u2713 Knowledge Graph data found (9 files)",
+      "level": "INFO"
+    },
+    {
+      "timestamp": "13:58:34",
+      "emoji": "\ud83d\udce4",
+      "message": "  \u001b[0;32m[SUCCESS]\u001b[0m \u2713 Dev script available",
+      "level": "INFO"
+    },
+    {
+      "timestamp": "13:58:34",
+      "emoji": "\ud83d\udce4",
+      "message": "  \u001b[0;32m[SUCCESS]\u001b[0m \u2713 Build script available",
+      "level": "INFO"
+    },
+    {
+      "timestamp": "13:58:34",
+      "emoji": "\ud83d\udce4",
+      "message": "  \u001b[0;32m[SUCCESS]\u001b[0m DE Function Verification Complete!",
+      "level": "INFO"
+    },
+    {
+      "timestamp": "13:58:34",
+      "emoji": "\ud83d\udce4",
+      "message": "  \u001b[0;32m[SUCCESS]\u001b[0m Start script created: ./start-de.sh",
+      "level": "INFO"
+    },
+    {
+      "timestamp": "13:58:34",
+      "emoji": "\ud83d\udce4",
+      "message": "  \u001b[0;32m[SUCCESS]\u001b[0m \ud83c\udf89 Fast setup completed successfully!",
+      "level": "INFO"
+    },
+    {
+      "timestamp": "13:58:34",
+      "emoji": "\ud83d\udce4",
+      "message": "  \u001b[0;32m[SUCCESS]\u001b[0m \u2705 Setup completed successfully!",
+      "level": "INFO"
+    },
+    {
+      "timestamp": "13:58:34",
+      "emoji": "\u2705",
+      "message": "Completed: fast-setup (in 9.9s)",
+      "level": "SUCCESS"
+    },
+    {
+      "timestamp": "13:58:34",
+      "emoji": "\ud83c\udf89",
+      "message": "Discovery Engine setup completed - components ready!",
+      "level": "INFO"
+    },
+    {
+      "timestamp": "13:58:34",
+      "emoji": "\ud83d\udccb",
+      "message": "PHASE 2/6: VERIFY-DE-READY",
+      "level": "INFO"
+    },
+    {
+      "timestamp": "13:58:34",
+      "emoji": "\ud83d\udcdd",
+      "message": "Description: Final verification that DE is ready and show launch instructions",
+      "level": "INFO"
+    },
+    {
+      "timestamp": "13:58:34",
+      "emoji": "\ud83d\udcc2",
+      "message": "Category: SETUP",
+      "level": "INFO"
+    },
+    {
+      "timestamp": "13:58:34",
+      "emoji": "\u2699\ufe0f",
+      "message": "Required: Yes",
+      "level": "INFO"
+    },
+    {
+      "timestamp": "13:58:34",
+      "emoji": "\ud83d\udd17",
+      "message": "Dependencies: fast-setup",
+      "level": "INFO"
+    },
+    {
+      "timestamp": "13:58:34",
+      "emoji": "\u2705",
+      "message": "All dependencies satisfied",
+      "level": "INFO"
+    },
+    {
+      "timestamp": "13:58:34",
+      "emoji": "\ud83d\udccd",
+      "message": "Script location: /home/trim/Documents/GitHub/Research-Discovery-Engine/src/scripts/setup/verify-de-ready.sh",
+      "level": "INFO"
+    },
+    {
+      "timestamp": "13:58:34",
+      "emoji": "\ud83d\ude80",
+      "message": "Executing: verify-de-ready",
+      "level": "INFO"
+    },
+    {
+      "timestamp": "13:58:34",
+      "emoji": "\ud83d\udcdd",
+      "message": "Command: /home/trim/Documents/GitHub/Research-Discovery-Engine/src/scripts/setup/verify-de-ready.sh",
+      "level": "INFO"
+    },
+    {
+      "timestamp": "13:58:34",
+      "emoji": "\ud83d\udce4",
+      "message": "  \u001b[0;32m[SUCCESS]\u001b[0m \u2705 Discovery Engine directory found",
+      "level": "INFO"
+    },
+    {
+      "timestamp": "13:58:34",
+      "emoji": "\ud83d\udce4",
+      "message": "  \u001b[0;32m[SUCCESS]\u001b[0m \u2705 Dependencies installed",
+      "level": "INFO"
+    },
+    {
+      "timestamp": "13:58:34",
+      "emoji": "\ud83d\udce4",
+      "message": "  \u001b[0;32m[SUCCESS]\u001b[0m \u2705 Key components available",
+      "level": "INFO"
+    },
+    {
+      "timestamp": "13:58:43",
+      "emoji": "\ud83d\udce4",
+      "message": "  \u001b[0;32m[SUCCESS]\u001b[0m \u2705 Build process working",
+      "level": "INFO"
+    },
+    {
+      "timestamp": "13:58:43",
+      "emoji": "\ud83d\udce4",
+      "message": "  \u001b[0;32m[SUCCESS]\u001b[0m \u2705 Development server ready",
+      "level": "INFO"
+    },
+    {
+      "timestamp": "13:58:43",
+      "emoji": "\ud83d\udce4",
+      "message": "  \u001b[0;32m[SUCCESS]\u001b[0m \ud83c\udfaf All systems are GO! The Research Discovery Engine is ready.",
+      "level": "INFO"
+    },
+    {
+      "timestamp": "13:58:43",
+      "emoji": "\u2705",
+      "message": "Completed: verify-de-ready (in 9.8s)",
+      "level": "SUCCESS"
+    },
+    {
+      "timestamp": "13:58:43",
+      "emoji": "\ud83d\ude80",
+      "message": "DE verification complete - ready to launch!",
+      "level": "INFO"
+    },
+    {
+      "timestamp": "13:58:43",
+      "emoji": "\ud83d\udccb",
+      "message": "PHASE 3/6: IMPORT-CONCEPTS",
+      "level": "INFO"
+    },
+    {
+      "timestamp": "13:58:43",
+      "emoji": "\ud83d\udcdd",
+      "message": "Description: Import concept data into knowledge graph (demo mode)",
+      "level": "INFO"
+    },
+    {
+      "timestamp": "13:58:43",
+      "emoji": "\ud83d\udcc2",
+      "message": "Category: DATA",
+      "level": "INFO"
+    },
+    {
+      "timestamp": "13:58:43",
+      "emoji": "\u2699\ufe0f",
+      "message": "Required: No (Optional)",
+      "level": "INFO"
+    },
+    {
+      "timestamp": "13:58:43",
+      "emoji": "\ud83d\udd17",
+      "message": "Dependencies: verify-de-ready",
+      "level": "INFO"
+    },
+    {
+      "timestamp": "13:58:43",
+      "emoji": "\u2705",
+      "message": "All dependencies satisfied",
+      "level": "INFO"
+    },
+    {
+      "timestamp": "13:58:43",
+      "emoji": "\ud83d\udccd",
+      "message": "Script location: /home/trim/Documents/GitHub/Research-Discovery-Engine/src/scripts/data/import-concepts.sh",
+      "level": "INFO"
+    },
+    {
+      "timestamp": "13:58:43",
+      "emoji": "\ud83d\ude80",
+      "message": "Executing: import-concepts",
+      "level": "INFO"
+    },
+    {
+      "timestamp": "13:58:43",
+      "emoji": "\ud83d\udcdd",
+      "message": "Command: /home/trim/Documents/GitHub/Research-Discovery-Engine/src/scripts/data/import-concepts.sh --dry-run DE/KG/materials.md",
+      "level": "INFO"
+    },
+    {
+      "timestamp": "13:58:44",
+      "emoji": "\ud83d\udce4",
+      "message": "  \u001b[0;32m[SUCCESS]\u001b[0m Concept import process completed!",
+      "level": "INFO"
+    },
+    {
+      "timestamp": "13:58:44",
+      "emoji": "\u2705",
+      "message": "Completed: import-concepts (in 0.1s)",
+      "level": "SUCCESS"
+    },
+    {
+      "timestamp": "13:58:44",
+      "emoji": "\ud83d\udcca",
+      "message": "Data import completed successfully",
+      "level": "INFO"
+    },
+    {
+      "timestamp": "13:58:44",
+      "emoji": "\ud83d\udccb",
+      "message": "PHASE 4/6: RESEARCH-PIPELINE",
+      "level": "INFO"
+    },
+    {
+      "timestamp": "13:58:44",
+      "emoji": "\ud83d\udcdd",
+      "message": "Description: Run complete research discovery pipeline (demo mode)",
+      "level": "INFO"
+    },
+    {
+      "timestamp": "13:58:44",
+      "emoji": "\ud83d\udcc2",
+      "message": "Category: WORKFLOW",
+      "level": "INFO"
+    },
+    {
+      "timestamp": "13:58:44",
+      "emoji": "\u2699\ufe0f",
+      "message": "Required: No (Optional)",
+      "level": "INFO"
+    },
+    {
+      "timestamp": "13:58:44",
+      "emoji": "\ud83d\udd17",
+      "message": "Dependencies: verify-de-ready",
+      "level": "INFO"
+    },
+    {
+      "timestamp": "13:58:44",
+      "emoji": "\u2705",
+      "message": "All dependencies satisfied",
+      "level": "INFO"
+    },
+    {
+      "timestamp": "13:58:44",
+      "emoji": "\ud83d\udccd",
+      "message": "Script location: /home/trim/Documents/GitHub/Research-Discovery-Engine/src/scripts/workflows/research-pipeline.sh",
+      "level": "INFO"
+    },
+    {
+      "timestamp": "13:58:44",
+      "emoji": "\ud83d\ude80",
+      "message": "Executing: research-pipeline",
+      "level": "INFO"
+    },
+    {
+      "timestamp": "13:58:44",
+      "emoji": "\ud83d\udcdd",
+      "message": "Command: /home/trim/Documents/GitHub/Research-Discovery-Engine/src/scripts/workflows/research-pipeline.sh --dry-run materials-science",
+      "level": "INFO"
+    },
+    {
+      "timestamp": "13:58:44",
+      "emoji": "\u2705",
+      "message": "Completed: research-pipeline (in 0.0s)",
+      "level": "SUCCESS"
+    },
+    {
+      "timestamp": "13:58:44",
+      "emoji": "\ud83d\udd2c",
+      "message": "Research pipeline execution completed",
+      "level": "INFO"
+    },
+    {
+      "timestamp": "13:58:44",
+      "emoji": "\ud83d\udccb",
+      "message": "PHASE 5/6: EXPORT-GRAPH",
+      "level": "INFO"
+    },
+    {
+      "timestamp": "13:58:44",
+      "emoji": "\ud83d\udcdd",
+      "message": "Description: Export knowledge graph in multiple formats",
+      "level": "INFO"
+    },
+    {
+      "timestamp": "13:58:44",
+      "emoji": "\ud83d\udcc2",
+      "message": "Category: DATA",
+      "level": "INFO"
+    },
+    {
+      "timestamp": "13:58:44",
+      "emoji": "\u2699\ufe0f",
+      "message": "Required: No (Optional)",
+      "level": "INFO"
+    },
+    {
+      "timestamp": "13:58:44",
+      "emoji": "\ud83d\udd17",
+      "message": "Dependencies: verify-de-ready",
+      "level": "INFO"
+    },
+    {
+      "timestamp": "13:58:44",
+      "emoji": "\u2705",
+      "message": "All dependencies satisfied",
+      "level": "INFO"
+    },
+    {
+      "timestamp": "13:58:44",
+      "emoji": "\u26a0\ufe0f",
+      "message": "Backend API not available - skipping export-graph",
+      "level": "WARNING"
+    },
+    {
+      "timestamp": "13:58:44",
+      "emoji": "\u23ed\ufe0f",
+      "message": "Prerequisites not met for export-graph - skipping",
+      "level": "WARNING"
+    },
+    {
+      "timestamp": "13:58:44",
+      "emoji": "\ud83d\udccb",
+      "message": "PHASE 6/6: DEPLOY",
+      "level": "INFO"
+    },
+    {
+      "timestamp": "13:58:44",
+      "emoji": "\ud83d\udcdd",
+      "message": "Description: Deploy to production environment",
+      "level": "INFO"
+    },
+    {
+      "timestamp": "13:58:44",
+      "emoji": "\ud83d\udcc2",
+      "message": "Category: DEPLOYMENT",
+      "level": "INFO"
+    },
+    {
+      "timestamp": "13:58:44",
+      "emoji": "\u2699\ufe0f",
+      "message": "Required: No (Optional)",
+      "level": "INFO"
+    },
+    {
+      "timestamp": "13:58:44",
+      "emoji": "\ud83d\udd17",
+      "message": "Dependencies: verify-de-ready",
+      "level": "INFO"
+    },
+    {
+      "timestamp": "13:58:44",
+      "emoji": "\u2705",
+      "message": "All dependencies satisfied",
+      "level": "INFO"
+    },
+    {
+      "timestamp": "13:58:44",
+      "emoji": "\u26a0\ufe0f",
+      "message": "Vercel CLI not installed - skipping deploy",
+      "level": "WARNING"
+    },
+    {
+      "timestamp": "13:58:44",
+      "emoji": "\ud83d\udca1",
+      "message": "Install with: npm i -g vercel",
+      "level": "INFO"
+    },
+    {
+      "timestamp": "13:58:44",
+      "emoji": "\u23ed\ufe0f",
+      "message": "Prerequisites not met for deploy - skipping",
+      "level": "WARNING"
+    }
+  ],
+  "summary": {
+    "total_scripts": 6,
+    "completed": 4,
+    "failed": 0,
+    "skipped": 2,
+    "success_rate": 100.0
+  }
+}
