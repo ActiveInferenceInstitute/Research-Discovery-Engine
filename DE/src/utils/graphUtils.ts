@@ -1,16 +1,41 @@
-// src/utils/graphUtils.ts
-// Helper functions for graph manipulation and analysis.
+/**
+ * @fileoverview Graph Utility Functions
+ * 
+ * Collection of utility functions for manipulating and analyzing knowledge graph data.
+ * Includes functions for finding neighbors, filtering data, generating mock content,
+ * and performing graph-based computations.
+ */
 
-import { GraphData, NodeObject, LinkObject, CSSVector } from '../types';
+import { GraphData, NodeObject, LinkObject } from '../types';
+import type { CSSVector } from '../types/css';
 import { cloneDeep } from 'lodash';
 
-// Find all neighbors of a given node up to a certain depth
+/**
+ * Finds all nodes and links within a specified distance from a given node
+ * 
+ * @param graphData - Complete graph data to search within
+ * @param nodeId - ID of the central node to start from
+ * @param depth - Maximum distance to traverse (default: 1)
+ * @returns Object containing sets of connected nodes and their connecting links
+ * 
+ * @example
+ * ```typescript
+ * const graph = { nodes: [...], links: [...] };
+ * const { nodes, links } = getNeighbors(graph, 'neural-networks', 2);
+ * console.log(`Found ${nodes.size} neighbors within distance 2`);
+ * ```
+ */
 export function getNeighbors(graphData: GraphData, nodeId: string, depth: number = 1): { nodes: Set<NodeObject>, links: Set<LinkObject> } {
   const nodes = new Set<NodeObject>();
   const links = new Set<LinkObject>();
   const visitedNodes = new Set<string>();
   const queue: { id: string, d: number }[] = [{ id: nodeId, d: 0 }];
 
+  /**
+   * Helper function to find a node by its ID
+   * @param id - Node identifier to search for
+   * @returns NodeObject if found, undefined otherwise
+   */
   const getNode = (id: string): NodeObject | undefined => 
     graphData.nodes.find(n => n.id === id);
 
@@ -28,8 +53,8 @@ export function getNeighbors(graphData: GraphData, nodeId: string, depth: number
     if (d < depth) {
       graphData.links.forEach(link => {
         try {
-          const sourceId = typeof link.source === 'object' ? link.source.id : String(link.source);
-          const targetId = typeof link.target === 'object' ? link.target.id : String(link.target);
+          const sourceId = typeof link.source === 'object' ? (link.source as NodeObject).id : String(link.source);
+          const targetId = typeof link.target === 'object' ? (link.target as NodeObject).id : String(link.target);
 
           if (sourceId === id) {
             const targetNode = getNode(targetId);
@@ -62,7 +87,25 @@ export function getNeighbors(graphData: GraphData, nodeId: string, depth: number
   return { nodes, links };
 }
 
-// Filter graph data based on search query
+/**
+ * Filters graph data based on a search query, including semantic expansion
+ * 
+ * @param graphData - Complete graph data to filter
+ * @param searchQuery - Search terms to match against node content
+ * @returns Filtered graph containing only relevant nodes and their connections
+ * 
+ * @description This function performs a multi-stage filtering process:
+ * 1. Direct text matching against node properties
+ * 2. Neighbor expansion to include related nodes
+ * 3. Link filtering to maintain graph connectivity
+ * 
+ * @example
+ * ```typescript
+ * const fullGraph = await loadGraphData();
+ * const filtered = filterGraphData(fullGraph, 'neural networks');
+ * console.log(`Filtered to ${filtered.nodes.length} relevant nodes`);
+ * ```
+ */
 export function filterGraphData(graphData: GraphData, searchQuery: string): GraphData {
   if (!graphData || !graphData.nodes || !graphData.links) {
     console.warn("filterGraphData: Missing or empty graph data");
@@ -131,7 +174,29 @@ export function filterGraphData(graphData: GraphData, searchQuery: string): Grap
   return { nodes: filteredNodes, links: filteredLinks };
 }
 
-// Simulate generating suggestions based on a partial CSS vector
+/**
+ * Generates mock AI suggestions for concept design based on current state
+ * 
+ * @param conceptState - Partial CSS vector representing current concept
+ * @param cnmData - Complete knowledge graph for finding suggestions
+ * @returns Array of suggestion objects with field paths and recommendation data
+ * 
+ * @description Creates realistic AI suggestions by analyzing the concept state
+ * and finding relevant nodes in the knowledge graph. Used for development
+ * and testing when backend AI services are unavailable.
+ * 
+ * @example
+ * ```typescript
+ * const suggestions = generateMockSuggestions(
+ *   { context: { material_primary: ['graphene'] } },
+ *   graphData
+ * );
+ * suggestions.forEach(suggestion => {
+ *   console.log(`Field: ${suggestion.fieldPath}`);
+ *   suggestion.suggestions.forEach(s => console.log(`  - ${s.value}`));
+ * });
+ * ```
+ */
 export function generateMockSuggestions(conceptState: Partial<CSSVector>, cnmData: GraphData): { fieldPath: string, suggestions: { value: string; node?: NodeObject; explanation: string; action?: any }[] }[] {
   if (!cnmData || !cnmData.nodes || cnmData.nodes.length === 0) {
     console.warn("generateMockSuggestions: Missing or empty graph data");
@@ -142,7 +207,11 @@ export function generateMockSuggestions(conceptState: Partial<CSSVector>, cnmDat
   const currentCSS = conceptState || {};
   const nodes = cnmData.nodes;
 
-  // Find node helper
+  /**
+   * Helper function to find nodes matching a condition
+   * @param condition - Predicate function to test nodes
+   * @returns First matching node or undefined
+   */
   const findNode = (condition: (node: NodeObject) => boolean): NodeObject | undefined => 
     nodes.find(condition);
 
@@ -225,7 +294,26 @@ export function generateMockSuggestions(conceptState: Partial<CSSVector>, cnmDat
   return suggestions;
 }
 
-// Generate a protocol outline from a CSS vector
+/**
+ * Generates a mock experimental protocol based on concept design state
+ * 
+ * @param conceptState - Partial CSS vector describing the concept
+ * @returns Formatted protocol string in markdown format
+ * 
+ * @description Creates a structured experimental protocol that includes
+ * setup procedures, measurement protocols, and analysis steps based on
+ * the components and configuration specified in the concept state.
+ * 
+ * @example
+ * ```typescript
+ * const concept = {
+ *   context: { material_primary: ['graphene'], energy_source_primary: 'electrical' },
+ *   dynamics: { computational_power: '100 TOPS/W' }
+ * };
+ * const protocol = generateMockProtocol(concept);
+ * console.log(protocol);
+ * ```
+ */
 export function generateMockProtocol(conceptState: Partial<CSSVector>): string {
   const css = conceptState || {};
   let protocol = `# Experimental Protocol Outline\n\n`;

@@ -1,0 +1,140 @@
+{
+  "materialsCognitionSystem": {
+    "name": "Materials Cognition System Extraction",
+    "version": "1.0",
+    "description": "Template for extracting structured information about material systems with cognitive-like properties",
+    "targetPaperTypes": ["experimental", "theoretical", "review"],
+    "outputSchema": {
+      "systemNode": {
+        "id": "string", 
+        "type": "System",
+        "description": "string",
+        "domain": ["string"],
+        "primaryFocus": ["string"],
+        "scale": "number|string",
+        "status": "Proposed|Simulated|ValidatedExperimental|Published"
+      },
+      "components": {
+        "materials": [
+          {
+            "id": "string",
+            "category": "Polymer|Composite|Biological|Inorganic|Fluid|LC",
+            "keyProperties": ["string"],
+            "description": "string"
+          }
+        ],
+        "mechanisms": [
+          {
+            "id": "string", 
+            "category": "Sensing|Computation|Memory|Adaptation|Actuation|Self-Organization|Energy",
+            "timescale": "string",
+            "energyDomain": "string",
+            "description": "string"
+          }
+        ],
+        "methods": [
+          {
+            "id": "string",
+            "category": "Fabrication|Actuation|Characterization|Simulation|Analysis|Synthesis|Control", 
+            "outputType": "string",
+            "description": "string"
+          }
+        ]
+      },
+      "cssVector": {
+        "meta": {
+          "classification": "string",
+          "analysis_date": "ISO-string",
+          "source_keys": ["string"]
+        },
+        "context": {
+          "material_primary": ["string"],
+          "fabrication_primary": ["string"],
+          "energy_source_primary": "string"
+        },
+        "dynamics": {
+          "mechanism_primary": ["string"],
+          "timescale": "string|number",
+          "computational_power": "string|number"
+        }
+      }
+    },
+    "extractionPrompts": {
+      "systemIdentification": "Identify the main system described in this paper. Extract: system type, domain, primary focus, and operational scale.",
+      "materialExtraction": "List all materials mentioned with their key properties and categories. Focus on functional materials, not just substrates.",
+      "mechanismIdentification": "Identify the key mechanisms that enable system functionality. Categorize by function (sensing, computation, etc.).",
+      "methodExtraction": "Extract all experimental, computational, and analytical methods used or proposed.",
+      "cssVectorMapping": "Map the extracted information to the CSS vector representation focusing on context, dynamics, and performance characteristics."
+    },
+    "validationRules": [
+      {
+        "rule": "systemNode.id must be unique and descriptive",
+        "severity": "error"
+      },
+      {
+        "rule": "At least one material and one mechanism must be identified",
+        "severity": "warning"
+      },
+      {
+        "rule": "CSS vector must have at least meta and context sections populated", 
+        "severity": "error"
+      }
+    ]
+  },
+  "neuomorphicComputing": {
+    "name": "Neuromorphic Computing System Extraction",
+    "version": "1.0", 
+    "description": "Template specialized for neuromorphic and brain-inspired computing systems",
+    "targetPaperTypes": ["experimental", "theoretical"],
+    "outputSchema": {
+      "systemNode": {
+        "id": "string",
+        "type": "System",
+        "description": "string",
+        "domain": ["Neuromorphic Computing", "Brain-Inspired Systems"],
+        "primaryFocus": ["Computation", "Memory", "Learning"],
+        "scale": "number|string"
+      },
+      "neuomorphicSpecific": {
+        "neuronModel": "string",
+        "synapseType": "string", 
+        "learningRule": "string",
+        "networkTopology": "string",
+        "energyEfficiency": "number|string"
+      }
+    },
+    "extractionPrompts": {
+      "neuronCharacterization": "Describe the neuron model used (LIF, AdEx, etc.) and its key parameters",
+      "synapticMechanisms": "Identify synaptic mechanisms and plasticity rules",
+      "networkArchitecture": "Extract network topology and connectivity patterns",
+      "performanceMetrics": "Identify key performance metrics (accuracy, energy, speed)"
+    }
+  },
+  "softRobotics": {
+    "name": "Soft Robotics System Extraction", 
+    "version": "1.0",
+    "description": "Template for soft robotics and bio-inspired actuation systems",
+    "targetPaperTypes": ["experimental", "theoretical"],
+    "outputSchema": {
+      "systemNode": {
+        "id": "string",
+        "type": "System", 
+        "description": "string",
+        "domain": ["Soft Robotics", "Bio-Inspired Systems"],
+        "primaryFocus": ["Actuation", "Sensing", "Locomotion"]
+      },
+      "actuationSpecific": {
+        "actuatorType": "string",
+        "stimulusType": "string",
+        "responseTime": "number|string",
+        "forceOutput": "number|string",
+        "controlStrategy": "string"
+      }
+    },
+    "extractionPrompts": {
+      "actuatorCharacterization": "Describe the actuation mechanism and stimulus-response characteristics",
+      "materialProperties": "Extract key material properties enabling actuation (elasticity, conductivity, etc.)",
+      "controlSystems": "Identify control strategies and feedback mechanisms"
+    }
+  }
+} 
