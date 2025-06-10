@@ -1,5 +1,5 @@
 // src/App.tsx
-import React, { useState, useEffect, useCallback, useMemo } from 'react';
+import React, { useState, useEffect, useCallback, useMemo, Suspense } from 'react';
 import { Sun, Moon, Search, Lightbulb, Compass, Layers, Upload, AlertCircle, Loader, Menu, X as CloseIcon, Brain, FlaskConical, Zap, Activity, Target, HelpCircle, BookOpen } from 'lucide-react';
 import Navbar from './components/Navbar';
 import GraphVisualization from './components/GraphVisualization/GraphVisualization';
@@ -9,13 +9,71 @@ import AgentConsole from './components/AgentConsole/AgentConsole';
 import PDFUploader from './components/Modals/PDFUploader';
 import ContextPanel from './components/ContextPanel/ContextPanel';
 import KnowledgeBrowserSidebar from './components/KnowledgeBrowserSidebar';
-import BreadcrumbPanel from './components/BreadcrumbPanel'; // <<<<<<<<<<<<<<<<<<< IMPORT ADDED HERE
+import BreadcrumbPanel from './components/BreadcrumbPanel';
 
 import { GraphData, NodeObject, AgentMessage, ConceptDesignState, LinkObject, BreadcrumbItem } from './types';
 import { useGraphData } from './hooks/useGraphData';
 import { useConceptDesign } from './hooks/useConceptDesign';
 import { cloneDeep } from 'lodash';
 import { slugify } from './utils/markdownParser';
+
+// Error boundary component
+class ErrorBoundary extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = { hasError: false, error: null };
+  }
+
+  static getDerivedStateFromError(error) {
+    return { hasError: true, error: error.message };
+  }
+
+  componentDidCatch(error, errorInfo) {
+    console.error('Discovery Engine Error:', error, errorInfo);
+  }
+
+  render() {
+    if (this.state.hasError) {
+      return (
+        <div style={{ padding: '20px', background: '#ffe6e6', margin: '20px', borderRadius: '8px' }}>
+          <h2>🚫 Component Error</h2>
+          <p>Error: {this.state.error}</p>
+          <button onClick={() => this.setState({ hasError: false, error: null })}>
+            Try Again
+          </button>
+        </div>
+      );
+    }
+    return this.props.children;
+  }
+}
+
+// Lazy loading components with error boundaries
+const LazyNavbar = React.lazy(() => import('./components/Navbar').catch(() => ({ default: () => <div>Navbar Error</div> })));
+const LazyGraphVisualization = React.lazy(() => import('./components/GraphVisualization/GraphVisualization').catch(() => ({ default: () => <div>Graph Error</div> })));
+const LazyGraphControls = React.lazy(() => import('./components/GraphVisualization/GraphControls').catch(() => ({ default: () => <div>Controls Error</div> })));
+const LazyConceptDesigner = React.lazy(() => import('./components/ConceptDesigner/ConceptDesigner').catch(() => ({ default: () => <div>Designer Error</div> })));
+const LazyAgentConsole = React.lazy(() => import('./components/AgentConsole/AgentConsole').catch(() => ({ default: () => <div>Agent Error</div> })));
+const LazyContextPanel = React.lazy(() => import('./components/ContextPanel/ContextPanel').catch(() => ({ default: () => <div>Context Error</div> })));
+
+// Simple fallback components for critical missing pieces
+const FallbackBreadcrumb = ({ path, onNavigate }) => (
+  <div style={{ padding: '10px', background: '#f0f0f0', marginBottom: '10px' }}>
+    Breadcrumb: {path?.map(p => p.label).join(' > ') || 'Home'}
+  </div>
+);
+
+const FallbackSidebar = ({ onSelectNode }) => (
+  <div style={{ width: '250px', background: '#f8f9fa', padding: '15px', height: '100%' }}>
+    <h3>📚 Knowledge Browser</h3>
+    <p>Loading knowledge graph...</p>
+    <div style={{ marginTop: '20px' }}>
+      <button onClick={() => onSelectNode?.({ id: 'test', label: 'Test Node', type: 'Material' })}>
+        Sample Material
+      </button>
+    </div>
+  </div>
+);
 
 export const WIKI_BROWSER_CONFIG = [
     { key: 'mechanisms', label: 'Mechanisms', icon: Brain, file: 'KG/mechanisms.md', indexSectionTitleSlug: "index-of-mechanisms"},
@@ -27,7 +85,6 @@ export const WIKI_BROWSER_CONFIG = [
     { key: 'css', label: 'Schema (CSS)', icon: BookOpen, file: 'KG/css.md', indexSectionTitleSlug: "conceptual-nexus-model-cnm-core-schema-specification-css"},
     { key: 'process', label: 'Discovery Process', icon: Layers, file: 'process.md', indexSectionTitleSlug: "discovery-engine-process-for-creating-new-knowledge-system-protocol"},
 ];
-
 
 function App() {
   const [darkMode, setDarkMode] = useState(true);
@@ -337,7 +394,11 @@ function App() {
 
   return (
     <div className={`h-screen flex flex-col transition-colors duration-300 ${darkMode ? 'bg-slate-900 text-slate-100' : 'bg-slate-50 text-slate-900'}`}>
-      <Navbar darkMode={darkMode} toggleDarkMode={toggleDarkMode} />
+      <ErrorBoundary>
+        <Suspense fallback={<div style={{ padding: '10px', background: darkMode ? '#374151' : '#e5e7eb' }}>Loading Navigation...</div>}>
+          <LazyNavbar darkMode={darkMode} toggleDarkMode={toggleDarkMode} />
+        </Suspense>
+      </ErrorBoundary>
       <div className="flex flex-col flex-grow overflow-hidden container mx-auto px-2 sm:px-4 py-4 space-y-2">
         <div className="flex flex-wrap items-center justify-between mb-2 flex-shrink-0 gap-y-2 gap-x-4">
            <div className="flex items-center space-x-2 sm:space-x-4 flex-wrap gap-y-2">
@@ -355,22 +416,35 @@ function App() {
         </div>
         
         {activeMode === 'explore' && breadcrumbPath.length > 0 && (
-            <BreadcrumbPanel darkMode={darkMode} path={breadcrumbPath} onNavigate={handleBreadcrumbNavigate} />
+            <ErrorBoundary>
+                <FallbackBreadcrumb path={breadcrumbPath} onNavigate={handleBreadcrumbNavigate} />
+            </ErrorBoundary>
         )}
 
         <div className="flex flex-1 space-x-4 overflow-hidden">
             {isBrowserSidebarOpen && activeMode === 'explore' && (
                 <div className="w-60 md:w-72 flex-shrink-0 h-full overflow-hidden">
-                    <KnowledgeBrowserSidebar
-                        darkMode={darkMode}
-                        onSelectNode={handleNodeSelect} 
-                        graphData={graphData} 
-                    />
+                    <ErrorBoundary>
+                        <FallbackSidebar onSelectNode={handleNodeSelect} />
+                    </ErrorBoundary>
                 </div>
             )}
 
             <div className="w-64 md:w-72 xl:w-80 flex-shrink-0 h-full overflow-hidden">
-                <AgentConsole darkMode={darkMode} messages={agentMessages} cnmData={graphData} activeMode={activeMode} conceptDesignState={conceptDesignState} selectedNodeId={selectedNodeId} onTriggerAgent={onTriggerAgent} onSelectNode={handleNodeSelect} />
+                <ErrorBoundary>
+                    <Suspense fallback={<div style={{ padding: '20px', background: darkMode ? '#374151' : '#e5e7eb', height: '100%' }}>Loading Agent Console...</div>}>
+                        <LazyAgentConsole
+                            darkMode={darkMode}
+                            messages={agentMessages}
+                            cnmData={graphData}
+                            activeMode={activeMode}
+                            conceptDesignState={conceptDesignState}
+                            selectedNodeId={selectedNodeId}
+                            onTriggerAgent={onTriggerAgent}
+                            onSelectNode={handleNodeSelect}
+                        />
+                    </Suspense>
+                </ErrorBoundary>
             </div>
 
             <div className="flex-grow relative h-full overflow-hidden flex flex-col">
@@ -378,41 +452,75 @@ function App() {
                 : graphError ? ( <div className={`p-6 rounded-lg ${darkMode ? 'bg-red-900/50 text-red-300' : 'bg-red-100 text-red-700'} flex flex-col items-center justify-center h-full text-center`}><AlertCircle className="w-12 h-12 mb-3"/>Graph Load Error: {graphError}</div> )
                 : activeMode === 'explore' ? (
                     <div className="relative rounded-lg overflow-hidden flex-grow">
-                        <GraphVisualization
-                            data={graphData} darkMode={darkMode} searchQuery={searchQuery}
-                            onNodeSelect={handleNodeSelect} showLabels={showLabels}
-                            showLinks={showLinks} enablePhysics={enablePhysics}
-                            showParticles={showParticles} selectedNodeId={selectedNodeId}
-                            conceptDesignState={conceptDesignState}
-                            onFilterComplete={handleSearchFilterComplete}
-                        />
-                        <GraphControls darkMode={darkMode} showLabels={showLabels} showLinks={showLinks} enablePhysics={enablePhysics} showParticles={showParticles} onToggleLabels={()=>setShowLabels(!showLabels)} onToggleLinks={()=>setShowLinks(!showLinks)} onTogglePhysics={()=>setEnablePhysics(!enablePhysics)} onToggleParticles={()=>setShowParticles(!showParticles)} />
+                        <ErrorBoundary>
+                            <Suspense fallback={<div style={{ padding: '50px', textAlign: 'center', height: '100%', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
+                                <Loader className="w-10 h-10 animate-spin text-blue-500 mb-3 mx-auto" />
+                                <p>Loading 3D Knowledge Graph...</p>
+                            </div>}>
+                                <LazyGraphVisualization
+                                    data={graphData} darkMode={darkMode} searchQuery={searchQuery}
+                                    onNodeSelect={handleNodeSelect} showLabels={showLabels}
+                                    showLinks={showLinks} enablePhysics={enablePhysics}
+                                    showParticles={showParticles} selectedNodeId={selectedNodeId}
+                                    conceptDesignState={conceptDesignState}
+                                    onFilterComplete={handleSearchFilterComplete}
+                                />
+                            </Suspense>
+                        </ErrorBoundary>
+                        <ErrorBoundary>
+                            <Suspense fallback={<div>Loading controls...</div>}>
+                                <LazyGraphControls
+                                    darkMode={darkMode}
+                                    showLabels={showLabels}
+                                    showLinks={showLinks}
+                                    enablePhysics={enablePhysics}
+                                    showParticles={showParticles}
+                                    onToggleLabels={()=>setShowLabels(!showLabels)}
+                                    onToggleLinks={()=>setShowLinks(!showLinks)}
+                                    onTogglePhysics={()=>setEnablePhysics(!enablePhysics)}
+                                    onToggleParticles={()=>setShowParticles(!showParticles)}
+                                />
+                            </Suspense>
+                        </ErrorBoundary>
                     </div>
                 ) : ( 
                     <div className="h-full overflow-hidden rounded-lg">
-                        <ConceptDesigner
-                            darkMode={darkMode} designState={conceptDesignState} graphData={graphData}
-                            onUpdateObjective={updateObjective}
-                            onUpdateComponentSelection={updateComponentSelection}
-                            onUpdateCssField={updateCssField}
-                            onAcceptSuggestion={(fp, val) => onTriggerAgent('accept-suggestion', {field: fp, value: val})}
-                            onTriggerAgent={onTriggerAgent}
-                            agentMessages={agentMessages}
-                        />
+                        <ErrorBoundary>
+                            <Suspense fallback={<div style={{ padding: '50px', textAlign: 'center' }}>Loading Concept Designer...</div>}>
+                                <LazyConceptDesigner
+                                    darkMode={darkMode}
+                                    designState={conceptDesignState}
+                                    graphData={graphData}
+                                    onUpdateObjective={updateObjective}
+                                    onUpdateComponentSelection={updateComponentSelection}
+                                    onUpdateCssField={updateCssField}
+                                    onAcceptSuggestion={(fp, val) => onTriggerAgent('accept-suggestion', {field: fp, value: val})}
+                                    onTriggerAgent={onTriggerAgent}
+                                    agentMessages={agentMessages}
+                                />
+                            </Suspense>
+                        </ErrorBoundary>
                     </div>
                 )}
             </div>
 
             {isContextPanelVisible && (
                  <div className="w-80 xl:w-96 flex-shrink-0 h-full overflow-hidden">
-                     <ContextPanel
-                         darkMode={darkMode} activeMode={activeMode}
-                         selectedNodeId={selectedNodeId} conceptDesignState={conceptDesignState}
-                         graphData={graphData} onSelectNode={handleNodeSelect}
-                         onStartDesign={(nodeId) => onTriggerAgent('initiate-new-concept-from-selection', { nodeId })}
-                         onTriggerAgent={onTriggerAgent}
-                         onNavigateToWikiSection={handleNavigateToNodeViewTarget} 
-                     />
+                     <ErrorBoundary>
+                         <Suspense fallback={<div style={{ padding: '20px', background: darkMode ? '#374151' : '#e5e7eb', height: '100%' }}>Loading Context Panel...</div>}>
+                             <LazyContextPanel
+                                 darkMode={darkMode}
+                                 activeMode={activeMode}
+                                 selectedNodeId={selectedNodeId}
+                                 conceptDesignState={conceptDesignState}
+                                 graphData={graphData}
+                                 onSelectNode={handleNodeSelect}
+                                 onStartDesign={(nodeId) => onTriggerAgent('initiate-new-concept-from-selection', { nodeId })}
+                                 onTriggerAgent={onTriggerAgent}
+                                 onNavigateToWikiSection={handleNavigateToNodeViewTarget} 
+                             />
+                         </Suspense>
+                     </ErrorBoundary>
                 </div>
             )}
         </div>
@@ -422,4 +530,4 @@ function App() {
   );
 }
 
-export default App; // Added this export
+export default App;

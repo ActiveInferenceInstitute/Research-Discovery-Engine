@@ -159,8 +159,8 @@ export function filterGraphData(graphData: GraphData, searchQuery: string): Grap
     try {
       if (!link || !link.source || !link.target) return false;
       
-      const sourceId = typeof link.source === 'object' ? link.source.id : String(link.source);
-      const targetId = typeof link.target === 'object' ? link.target.id : String(link.target);
+      const sourceId = typeof link.source === 'object' ? (link.source as NodeObject).id : String(link.source);
+      const targetId = typeof link.target === 'object' ? (link.target as NodeObject).id : String(link.target);
       
       return sourceId && targetId && 
              filteredNodeIds.has(sourceId) && 

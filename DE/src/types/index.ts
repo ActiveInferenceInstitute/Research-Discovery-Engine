@@ -7,6 +7,9 @@
 
 import { CSSVector } from './css';
 
+// Re-export CSSVector so it can be imported from the main types module
+export type { CSSVector } from './css';
+
 /**
  * Core node types representing fundamental knowledge entities in the CNM
  */
@@ -282,9 +285,7 @@ export interface ConceptDesignState {
 }
 
 /**
- * Breadcrumb navigation item for hierarchical navigation
- * 
- * @interface BreadcrumbItem
+ * Represents a breadcrumb item for hierarchical navigation
  */
 export interface BreadcrumbItem {
   /** Node or section identifier */
@@ -295,4 +296,23 @@ export interface BreadcrumbItem {
   
   /** Node type for styling context */
   type?: NodeType;
+}
+
+// Export commonly needed additional interfaces
+export interface FormattedNodeData {
+  id: string;
+  label: string;
+  description: string;
+  theoreticalConcepts: Array<{ text: string; type: string; }>;
+  [key: string]: any;
+}
+
+export interface ParsedNodeDetails {
+  id: string;
+  label: string;
+  description: string;
+  input: string;
+  output: string;
+  metadata?: { [key: string]: any };
+  connections?: Array<{ id: string; type: string; label: string; }>;
 }

@@ -1,15 +1,80 @@
-// src/hooks/useGraphData.ts
+/**
+ * @fileoverview Custom React Hook for Knowledge Graph Data Management
+ * 
+ * This hook manages the loading, caching, and state of knowledge graph data
+ * from the Discovery Engine backend. It provides reactive access to graph
+ * data with loading states and error handling.
+ */
+
 import { useState, useEffect } from 'react';
 import { GraphData } from '../types';
 import { buildCNMGraph } from '../utils/cnmBuilder';
-import { parseMarkdownToSections } from '../utils/markdownParser';
 
+/**
+ * Custom hook for managing knowledge graph data with loading states
+ * 
+ * @returns Object containing graph data, loading state, error state, and setter function
+ * 
+ * @description This hook handles the asynchronous loading of knowledge graph data
+ * from markdown files and provides reactive state management for the UI components.
+ * It automatically triggers data loading on mount and provides error handling.
+ * 
+ * @example
+ * ```typescript
+ * function GraphComponent() {
+ *   const { graphData, loading, error, setGraphData } = useGraphData();
+ *   
+ *   if (loading) return <div>Loading graph...</div>;
+ *   if (error) return <div>Error: {error}</div>;
+ *   
+ *   return (
+ *     <div>
+ *       <p>Loaded {graphData.nodes.length} nodes</p>
+ *       <button onClick={() => setGraphData({ nodes: [], links: [] })}>
+ *         Clear Graph
+ *       </button>
+ *     </div>
+ *   );
+ * }
+ * ```
+ * 
+ * @example
+ * ```typescript
+ * // Using in combination with other hooks
+ * function App() {
+ *   const { graphData, loading, error } = useGraphData();
+ *   const [selectedNode, setSelectedNode] = useState<string | null>(null);
+ *   
+ *   useEffect(() => {
+ *     if (!loading && graphData.nodes.length > 0) {
+ *       console.log('Graph loaded successfully');
+ *     }
+ *   }, [loading, graphData]);
+ *   
+ *   // ... rest of component
+ * }
+ * ```
+ */
 export const useGraphData = () => {
+  /** Current graph data state */
   const [graphData, setGraphData] = useState<GraphData>({ nodes: [], links: [] });
+  
+  /** Whether data is currently being loaded */
   const [loading, setLoading] = useState(true);
+  
+  /** Error message if data loading failed */
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
+    /**
+     * Asynchronously loads graph data from the backend/markdown files
+     * 
+     * @description This function handles the complete data loading process:
+     * 1. Sets loading state to true
+     * 2. Calls the CNM builder to process markdown files
+     * 3. Updates state with loaded data or error information
+     * 4. Clears loading state when complete
+     */
     let isMounted = true;
 
     async function loadData() {
@@ -55,5 +120,39 @@ export const useGraphData = () => {
     return () => { isMounted = false; console.log("[useGraphData] Component unmounted."); };
   }, []); // Empty dependency array ensures this runs only once on mount
 
-  return { graphData, loading, error, setGraphData };
+  return {
+    /** 
+     * The complete knowledge graph data containing nodes and links
+     * Will be empty until loading completes successfully
+     */
+    graphData,
+    
+    /** 
+     * Whether graph data is currently being loaded from the backend
+     * Use this to show loading indicators in the UI
+     */
+    loading,
+    
+    /** 
+     * Error message if graph loading failed, null if no error
+     * Use this to display error messages to users
+     */
+    error,
+    
+    /** 
+     * Function to manually update the graph data
+     * Useful for integrating user uploads or real-time updates
+     * 
+     * @param newData - Complete graph data to replace current state
+     * 
+     * @example
+     * ```typescript
+     * // Add new nodes from user upload
+     * const newNodes = [...graphData.nodes, ...uploadedNodes];
+     * const newLinks = [...graphData.links, ...uploadedLinks];
+     * setGraphData({ nodes: newNodes, links: newLinks });
+     * ```
+     */
+    setGraphData
+  };
 };
