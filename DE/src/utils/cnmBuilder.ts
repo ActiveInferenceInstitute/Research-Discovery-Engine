@@ -16,19 +16,30 @@ export async function buildCNMGraph(): Promise<GraphData> {
 
   const fetchAndParse = async (filePath: string): Promise<{ fileKey: string, parsedDoc: ParserOutput | null }> => {
       try {
-          const fetchPath = filePath.startsWith('/') ? filePath : `/${filePath}`;
+          // Use the correct path resolution for development
+          const fetchPath = filePath.startsWith('/') ? filePath : `/KG/${filePath.split('/').pop()}`;
           const fileKey = filePath.split('/').pop()?.replace('.md', '') || 'unknown_file';
+          console.log(`[CNMBuilder] Attempting to fetch: ${fetchPath}`);
+          
           const response = await fetch(fetchPath);
           if (!response.ok) {
-              if (response.status === 404) { console.warn(`[CNMBuilder fetch] 404: ${fetchPath} for fileKey ${fileKey}`); return { fileKey, parsedDoc: null }; }
+              if (response.status === 404) { 
+                  console.warn(`[CNMBuilder fetch] 404: ${fetchPath} for fileKey ${fileKey}`);
+                  return { fileKey, parsedDoc: null }; 
+              }
               throw new Error(`Fetch error ${response.status} for ${fetchPath}`);
           }
           const markdown = await response.text();
-          if (!markdown?.trim()) { console.warn(`[CNMBuilder fetch] Empty content for ${fileKey}`); return { fileKey, parsedDoc: { sections: [] } }; }
-          const parsedDocOutput = parseMarkdownToStructuredDocument(markdown, fileKey); // This itself calls extractReferences internally for sections
+          if (!markdown?.trim()) { 
+              console.warn(`[CNMBuilder fetch] Empty content for ${fileKey}`);
+              return { fileKey, parsedDoc: { sections: [] } }; 
+          }
+          console.log(`[CNMBuilder] Successfully fetched ${fileKey}, content length: ${markdown.length}`);
+          const parsedDocOutput = parseMarkdownToStructuredDocument(markdown, fileKey);
           return { fileKey, parsedDoc: parsedDocOutput };
       } catch (e) {
-          console.error(`[CNMBuilder fetchAndParse] CRITICAL ERROR for ${filePath}:`, e); errorOccurred = true;
+          console.error(`[CNMBuilder fetchAndParse] CRITICAL ERROR for ${filePath}:`, e); 
+          errorOccurred = true;
           return { fileKey: filePath.split('/').pop()?.replace('.md', '') || 'error_file', parsedDoc: null };
       }
   };

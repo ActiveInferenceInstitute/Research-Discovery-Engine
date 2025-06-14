@@ -88,6 +88,8 @@ const GraphVisualization: React.FC<GraphVisualizationProps> = ({
 }) => {
   const containerRef = useRef<HTMLDivElement>(null);
   const graphRef = useRef<any>(null);
+  const [graphError, setGraphError] = useState<string | null>(null);
+  const [isGraphInitialized, setIsGraphInitialized] = useState(false);
 
   const [hoveredNodeId, setHoveredNodeId] = useState<string | null>(null);
   const [neighborNodes, setNeighborNodes] = useState(new Set<string>());
@@ -188,9 +190,12 @@ const GraphVisualization: React.FC<GraphVisualizationProps> = ({
   }, [filteredData, onFilterComplete]); // Call ONLY when filteredData or onFilterComplete changes
 
 
+  // Initialize the 3D force graph
   useEffect(() => { 
     if (!containerRef.current || graphRef.current) return;
+    
     try {
+      console.log("[GraphVisualization] Initializing 3D force graph...");
       const graph = ForceGraph3D()
         .width(containerRef.current.clientWidth)
         .height(containerRef.current.clientHeight)
@@ -240,129 +245,161 @@ const GraphVisualization: React.FC<GraphVisualizationProps> = ({
 
       graphRef.current = graph;
       graphRef.current(containerRef.current);
-      const handleResize = () => { if (containerRef.current && graphRef.current) { graphRef.current.width(containerRef.current.clientWidth).height(containerRef.current.clientHeight); }};
-      window.addEventListener('resize', handleResize);
-      return () => window.removeEventListener('resize', handleResize);
-    } catch (error) { console.error("Error initializing 3D Force Graph:", error); }
-  }, []);
-
-
-  useEffect(() => { 
-    if (!graphRef.current || !filteredData.nodes) return;
-
-    graphRef.current.graphData(filteredData);
-
-    graphRef.current
-        .backgroundColor(darkMode ? '#1A202C' : '#F7FAFC')
-        .nodeVal((node: GraphNode) => {
-            let baseSize = node.type?.includes('_Category') ? 6 : 10;
-            if (node.type === 'Concept' || node.origin === 'concept_design') baseSize = 14;
-            if (node.status === 'Hypothetical' || node.status === 'Proposed') baseSize *= 1.1;
-            if (String(node.id) === selectedNodeId) return baseSize * 1.5;
-            if (hoveredNodeId === String(node.id)) return baseSize * 1.3;
-            if (neighborNodes.has(String(node.id))) return baseSize * 1.1;
-            return baseSize;
-         })
-        .nodeThreeObject((objNode: FGNodeObject) => {
-            const node = objNode as GraphNode;
-            const isSelected = selectedNodeId === String(node.id);
-            const isHovered = hoveredNodeId === String(node.id);
-            const isDirectNeighbor = neighborNodes.has(String(node.id)) && (hoveredNodeId !== null || selectedNodeId !== null);
-            const isContextActive = hoveredNodeId !== null || selectedNodeId !== null;
-            const isDimmed = isContextActive && !isSelected && !isHovered && !isDirectNeighbor;
-            const baseColorHex = node.color || NODE_TYPE_COLORS[node.type || 'Default'] || NODE_TYPE_COLORS['Default'];
-            let finalColor = new THREE.Color(baseColorHex);
-
-            if (showLabels || isSelected || isHovered) {
-                const sprite = new SpriteText(node.label || String(node.id));
-                sprite.color = isSelected || isHovered ? (darkMode ? '#000000' : '#FFFFFF') : (darkMode ? '#E2E8F0' : '#2D3748');
-                sprite.textHeight = isSelected ? 7 : isHovered ? 6 : 4;
-                let bgColorHex = baseColorHex;
-                if (isSelected) bgColorHex = '#F6E05E'; 
-                else if (isHovered) bgColorHex = '#ED64A6'; 
-                sprite.backgroundColor = new THREE.Color(bgColorHex).getStyle();
-                sprite.padding = isSelected ? 1.5 : isHovered ? 1 : 0.5; 
-                sprite.borderRadius = 2;
-                sprite.material.opacity = isDimmed ? 0.3 : 1.0;
-                sprite.material.depthWrite = false; 
-                sprite.material.transparent = true;
-                return sprite;
-            } else {
-                const geometrySize = Math.max(0.5, (graphRef.current.nodeVal()(node) as number) * 0.45); 
-                let geometry: THREE.BufferGeometry = new THREE.SphereGeometry(geometrySize, 16, 8); 
-                const sphereMaterial = new THREE.MeshLambertMaterial({
-                    color: finalColor, transparent: true,
-                    opacity: isDimmed ? 0.1 : (isDirectNeighbor ? 0.9 : 0.75)
-                });
-                return new THREE.Mesh(geometry, sphereMaterial);
-            }
-        })
-        .nodeThreeObjectExtend(true)
-        .linkVisibility(showLinks)
-        .linkWidth((link: GraphLink) => (neighborLinks.has(link) ? 2 : 0.7))
-        .linkColor((link: GraphLink) => { 
-            const defaultColor = darkMode ? '#4A5568' : '#A0AEC0'; 
-            const typeColor = LINK_TYPE_COLORS[link.type || 'Default'] || defaultColor;
-            return neighborLinks.has(link) ? (darkMode ? '#FACC15' : '#D97706') : typeColor; 
-        })
-        .linkMaterial((link: GraphLink) => {
-            const isHighlighted = neighborLinks.has(link);
-            const isDimmed = (hoveredNodeId !== null || selectedNodeId !== null) && !isHighlighted;
-            const color = isHighlighted ? (darkMode ? '#FACC15' : '#D97706') : (LINK_TYPE_COLORS[link.type || 'Default'] || (darkMode ? '#4A5568' : '#A0AEC0'));
-            return new THREE.MeshBasicMaterial({ color: color, transparent: true, opacity: isDimmed ? 0.08 : (isHighlighted ? 0.9 : 0.45) });
-        })
-        .linkDirectionalParticles(showParticles ? (link: GraphLink) => neighborLinks.has(link) ? 3 : 0 : 0)
-        .linkDirectionalParticleWidth(1.5)
-        .linkDirectionalParticleColor((_link: GraphLink) => (darkMode ? '#FFFFFF':'#000000'));
-
-    if (enablePhysics) {
-        graphRef.current.resumeAnimation();
-        if (d3 && graphRef.current.d3Force) { 
-            graphRef.current.d3Force('link', d3.forceLink().id((d:any) => d.id).distance((link: any) => link.type === 'categorizes' ? 80 : 150).strength(0.02));
-            graphRef.current.d3Force('charge', d3.forceManyBody().strength(-120).distanceMax(350));
-            graphRef.current.d3Force('center', d3.forceCenter(0,0,0).strength(0.003));
+      setIsGraphInitialized(true);
+      setGraphError(null);
+      
+      const handleResize = () => { 
+        if (containerRef.current && graphRef.current) { 
+          graphRef.current.width(containerRef.current.clientWidth).height(containerRef.current.clientHeight); 
         }
-        graphRef.current.d3AlphaDecay(0.0228); 
-        graphRef.current.cooldownTime(10000); 
-    } else {
-        graphRef.current.pauseAnimation();
-        filteredData.nodes.forEach((node: GraphNode) => {
-            if(node.x !== undefined && node.fx === undefined) { node.fx = node.x; node.fy = node.y; node.fz = node.z; }
-        });
+      };
+      window.addEventListener('resize', handleResize);
+      return () => {
+        window.removeEventListener('resize', handleResize);
+        if (graphRef.current) {
+          graphRef.current._destructor();
+          graphRef.current = null;
+        }
+      };
+    } catch (error) {
+      console.error("[GraphVisualization] Error initializing 3D Force Graph:", error);
+      setGraphError(error instanceof Error ? error.message : "Failed to initialize graph visualization");
+      setIsGraphInitialized(false);
+    }
+  }, [containerRef.current]); // Re-run when container is ready
+
+
+  // Update graph data and styling
+  useEffect(() => { 
+    if (!graphRef.current || !isGraphInitialized || !filteredData.nodes) {
+      console.log("[GraphVisualization] Skipping graph update - not ready:", {
+        hasGraph: !!graphRef.current,
+        isInitialized: isGraphInitialized,
+        hasNodes: !!filteredData.nodes
+      });
+      return;
     }
 
-    if (selectedNodeId) {
-        const node = filteredData.nodes.find(n => String(n.id) === selectedNodeId);
-        if (node) {
-            const currentLookAt = graphRef.current.cameraPosition().lookAt;
-            if (!currentLookAt || Math.abs(currentLookAt.x - (node.x||0)) > 1 || Math.abs(currentLookAt.y - (node.y||0)) > 1) { // only refocus if significantly different
-                const distance = 150;
-                const nodePos = { x: node.x || 0, y: node.y || 0, z: node.z || 0 };
-                const cameraLookAt = {x: nodePos.x, y: nodePos.y, z: nodePos.z};
-                const cameraPosition = {
-                    x: nodePos.x + distance * (Math.random() * 0.6 + 0.4) * (Math.random() > 0.5 ? 1: -1),
-                    y: nodePos.y + distance * (Math.random() * 0.2 + 0.1),
-                    z: nodePos.z + distance * (Math.random() * 0.6 + 0.4) * (Math.random() > 0.5 ? 1: -1)
-                };
-                graphRef.current.cameraPosition(cameraPosition, cameraLookAt, 700);
-            }
-        }
-    } else if (!hoveredNodeId && graphRef.current.cameraPosition().lookAt && (graphRef.current.cameraPosition().lookAt.x !==0 || graphRef.current.cameraPosition().lookAt.y !==0 || graphRef.current.cameraPosition().lookAt.z !==0 )) { 
+    try {
+      console.log("[GraphVisualization] Updating graph data...");
+      graphRef.current.graphData(filteredData);
+
+      graphRef.current
+          .backgroundColor(darkMode ? '#1A202C' : '#F7FAFC')
+          .nodeVal((node: GraphNode) => {
+              let baseSize = node.type?.includes('_Category') ? 6 : 10;
+              if (node.type === 'Concept' || node.origin === 'concept_design') baseSize = 14;
+              if (node.status === 'Hypothetical' || node.status === 'Proposed') baseSize *= 1.1;
+              if (String(node.id) === selectedNodeId) return baseSize * 1.5;
+              if (hoveredNodeId === String(node.id)) return baseSize * 1.3;
+              if (neighborNodes.has(String(node.id))) return baseSize * 1.1;
+              return baseSize;
+           })
+          .nodeThreeObject((objNode: FGNodeObject) => {
+              const node = objNode as GraphNode;
+              const isSelected = selectedNodeId === String(node.id);
+              const isHovered = hoveredNodeId === String(node.id);
+              const isDirectNeighbor = neighborNodes.has(String(node.id)) && (hoveredNodeId !== null || selectedNodeId !== null);
+              const isContextActive = hoveredNodeId !== null || selectedNodeId !== null;
+              const isDimmed = isContextActive && !isSelected && !isHovered && !isDirectNeighbor;
+              const baseColorHex = node.color || NODE_TYPE_COLORS[node.type || 'Default'] || NODE_TYPE_COLORS['Default'];
+              let finalColor = new THREE.Color(baseColorHex);
+
+              if (showLabels || isSelected || isHovered) {
+                  const sprite = new SpriteText(node.label || String(node.id));
+                  sprite.color = isSelected || isHovered ? (darkMode ? '#000000' : '#FFFFFF') : (darkMode ? '#E2E8F0' : '#2D3748');
+                  sprite.textHeight = isSelected ? 7 : isHovered ? 6 : 4;
+                  let bgColorHex = baseColorHex;
+                  if (isSelected) bgColorHex = '#F6E05E'; 
+                  else if (isHovered) bgColorHex = '#ED64A6'; 
+                  sprite.backgroundColor = new THREE.Color(bgColorHex).getStyle();
+                  sprite.padding = isSelected ? 1.5 : isHovered ? 1 : 0.5; 
+                  sprite.borderRadius = 2;
+                  sprite.material.opacity = isDimmed ? 0.3 : 1.0;
+                  sprite.material.depthWrite = false; 
+                  sprite.material.transparent = true;
+                  return sprite;
+              } else {
+                  const geometrySize = Math.max(0.5, (graphRef.current.nodeVal()(node) as number) * 0.45); 
+                  let geometry: THREE.BufferGeometry = new THREE.SphereGeometry(geometrySize, 16, 8); 
+                  const sphereMaterial = new THREE.MeshLambertMaterial({
+                      color: finalColor, transparent: true,
+                      opacity: isDimmed ? 0.1 : (isDirectNeighbor ? 0.9 : 0.75)
+                  });
+                  return new THREE.Mesh(geometry, sphereMaterial);
+              }
+          })
+          .nodeThreeObjectExtend(true)
+          .linkVisibility(showLinks)
+          .linkWidth((link: GraphLink) => (neighborLinks.has(link) ? 2 : 0.7))
+          .linkColor((link: GraphLink) => { 
+              const defaultColor = darkMode ? '#4A5568' : '#A0AEC0'; 
+              const typeColor = LINK_TYPE_COLORS[link.type || 'Default'] || defaultColor;
+              return neighborLinks.has(link) ? (darkMode ? '#FACC15' : '#D97706') : typeColor; 
+          })
+          .linkMaterial((link: GraphLink) => {
+              const isHighlighted = neighborLinks.has(link);
+              const isDimmed = (hoveredNodeId !== null || selectedNodeId !== null) && !isHighlighted;
+              const color = isHighlighted ? (darkMode ? '#FACC15' : '#D97706') : (LINK_TYPE_COLORS[link.type || 'Default'] || (darkMode ? '#4A5568' : '#A0AEC0'));
+              return new THREE.MeshBasicMaterial({ color: color, transparent: true, opacity: isDimmed ? 0.08 : (isHighlighted ? 0.9 : 0.45) });
+          })
+          .linkDirectionalParticles(showParticles ? (link: GraphLink) => neighborLinks.has(link) ? 3 : 0 : 0)
+          .linkDirectionalParticleWidth(1.5)
+          .linkDirectionalParticleColor((_link: GraphLink) => (darkMode ? '#FFFFFF':'#000000'));
+
+      if (enablePhysics) {
+          graphRef.current.resumeAnimation();
+          if (d3 && graphRef.current.d3Force) { 
+              graphRef.current.d3Force('link', d3.forceLink().id((d:any) => d.id).distance((link: any) => link.type === 'categorizes' ? 80 : 150).strength(0.02));
+              graphRef.current.d3Force('charge', d3.forceManyBody().strength(-120).distanceMax(350));
+              graphRef.current.d3Force('center', d3.forceCenter(0,0,0).strength(0.003));
+          }
+          graphRef.current.d3AlphaDecay(0.0228); 
+          graphRef.current.cooldownTime(10000); 
+      } else {
+          graphRef.current.pauseAnimation();
+          filteredData.nodes.forEach((node: GraphNode) => {
+              if(node.x !== undefined && node.fx === undefined) { node.fx = node.x; node.fy = node.y; node.fz = node.z; }
+          });
+      }
+
+      if (selectedNodeId) {
+          const node = filteredData.nodes.find(n => String(n.id) === selectedNodeId);
+          if (node) {
+              const currentLookAt = graphRef.current.cameraPosition().lookAt;
+              if (!currentLookAt || Math.abs(currentLookAt.x - (node.x||0)) > 1 || Math.abs(currentLookAt.y - (node.y||0)) > 1) {
+                  const distance = 150;
+                  const nodePos = { x: node.x || 0, y: node.y || 0, z: node.z || 0 };
+                  const cameraLookAt = {x: nodePos.x, y: nodePos.y, z: nodePos.z};
+                  const cameraPosition = {
+                      x: nodePos.x + distance * (Math.random() * 0.6 + 0.4) * (Math.random() > 0.5 ? 1: -1),
+                      y: nodePos.y + distance * (Math.random() * 0.2 + 0.1),
+                      z: nodePos.z + distance * (Math.random() * 0.6 + 0.4) * (Math.random() > 0.5 ? 1: -1)
+                  };
+                  graphRef.current.cameraPosition(cameraPosition, cameraLookAt, 700);
+              }
+          }
+      } else if (!hoveredNodeId && graphRef.current.cameraPosition().lookAt && (graphRef.current.cameraPosition().lookAt.x !==0 || graphRef.current.cameraPosition().lookAt.y !==0 || graphRef.current.cameraPosition().lookAt.z !==0 )) { 
         // Optional: Reset camera to a default overview if nothing is selected or hovered
         // graphRef.current.cameraPosition({ x: 0, y: 0, z: 300 }, {x:0,y:0,z:0}, 700); 
+      }
+    } catch (error) {
+      console.error("[GraphVisualization] Error updating graph:", error);
+      setGraphError(error instanceof Error ? error.message : "Failed to update graph visualization");
     }
-
-  }, [
-    filteredData, darkMode, showLabels, showLinks, enablePhysics, showParticles,
-    selectedNodeId, hoveredNodeId, neighborNodes, neighborLinks
-  ]);
+  }, [filteredData, darkMode, showLabels, showLinks, enablePhysics, showParticles, selectedNodeId, hoveredNodeId, neighborNodes, neighborLinks, isGraphInitialized]);
 
   return (
-    <div
-      ref={containerRef}
-      className="w-full h-full rounded-xl overflow-hidden"
-      style={{ border: `1px solid ${darkMode ? '#303742' : '#D1D5DB'}` }}
-    />
+    <div ref={containerRef} className="w-full h-full relative">
+      {graphError && (
+        <div className={`absolute inset-0 flex items-center justify-center ${darkMode ? 'bg-slate-900/90 text-red-300' : 'bg-slate-50/90 text-red-700'}`}>
+          <div className="text-center p-4">
+            <div className="text-xl font-semibold mb-2">Graph Visualization Error</div>
+            <div>{graphError}</div>
+          </div>
+        </div>
+      )}
+    </div>
   );
 };
 

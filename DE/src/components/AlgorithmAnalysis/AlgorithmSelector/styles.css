@@ -1,0 +1,132 @@
+.algorithm-selector {
+  margin-bottom: 1.5rem;
+}
+
+.algorithm-selector.dark {
+  --card-bg: #2d2d2d;
+  --card-hover: #3d3d3d;
+  --card-selected: #4d4d4d;
+  --text-color: #ffffff;
+  --text-secondary: #a0a0a0;
+  --border-color: #333333;
+  --checkbox-bg: #3d3d3d;
+  --checkbox-checked: #4CAF50;
+}
+
+.algorithm-selector.light {
+  --card-bg: #ffffff;
+  --card-hover: #f8f9fa;
+  --card-selected: #e9ecef;
+  --text-color: #333333;
+  --text-secondary: #6c757d;
+  --border-color: #e0e0e0;
+  --checkbox-bg: #f8f9fa;
+  --checkbox-checked: #28a745;
+}
+
+.algorithm-selector__category {
+  margin-bottom: 1.5rem;
+}
+
+.algorithm-selector__category-title {
+  margin: 0 0 1rem;
+  color: var(--text-color);
+  font-size: 1.125rem;
+  font-weight: 600;
+}
+
+.algorithm-selector__grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+  gap: 1rem;
+}
+
+.algorithm-card {
+  padding: 1rem;
+  border-radius: 6px;
+  background-color: var(--card-bg);
+  border: 1px solid var(--border-color);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.algorithm-card:hover {
+  background-color: var(--card-hover);
+  transform: translateY(-1px);
+}
+
+.algorithm-card.selected {
+  background-color: var(--card-selected);
+  border-color: var(--text-color);
+}
+
+.algorithm-card__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 0.5rem;
+}
+
+.algorithm-card__title {
+  margin: 0;
+  color: var(--text-color);
+  font-size: 1rem;
+  font-weight: 600;
+  flex: 1;
+}
+
+.algorithm-card__checkbox {
+  width: 20px;
+  height: 20px;
+  border-radius: 4px;
+  border: 2px solid var(--border-color);
+  background-color: var(--checkbox-bg);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+}
+
+.algorithm-card__checkbox.checked {
+  background-color: var(--checkbox-checked);
+  border-color: var(--checkbox-checked);
+}
+
+.algorithm-card__checkbox svg {
+  width: 14px;
+  height: 14px;
+  color: white;
+}
+
+.algorithm-card__description {
+  margin: 0 0 0.75rem;
+  color: var(--text-secondary);
+  font-size: 0.875rem;
+  line-height: 1.4;
+}
+
+.algorithm-card__footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.75rem;
+}
+
+.algorithm-card__category {
+  color: var(--text-secondary);
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.algorithm-card__parameter-count {
+  color: var(--text-secondary);
+  font-weight: 500;
+}
+
+.algorithm-selector__empty {
+  padding: 2rem;
+  text-align: center;
+  color: var(--text-secondary);
+  font-size: 0.875rem;
+} 

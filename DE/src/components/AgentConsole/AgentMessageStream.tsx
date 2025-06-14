@@ -6,13 +6,14 @@ import { AgentMessage, NodeObject } from '../../types';
 import { Info, Sparkles, Lightbulb, AlertTriangle, Brain, MessageSquare, ExternalLink } from 'lucide-react';
 import ReactMarkdown from 'react-markdown';
 import { format } from 'date-fns';
+import { AgentOperationType } from '../../types/api.types';
 
 interface AgentMessageStreamProps {
   darkMode: boolean;
   messages: AgentMessage[];
   cnmNodes: NodeObject[];
   onSelectNode?: (node: NodeObject) => void;
-  onTriggerAgent?: (action: string, payload?: any) => void;
+  onTriggerAgent?: (operationType: AgentOperationType, params: any) => Promise<void>;
 }
 
 const AgentMessageStream: React.FC<AgentMessageStreamProps> = ({
@@ -44,7 +45,8 @@ const AgentMessageStream: React.FC<AgentMessageStreamProps> = ({
       case 'suggestion': return <Lightbulb size={16} className="text-green-500" />;
       case 'warning': return <AlertTriangle size={16} className="text-orange-500" />;
       case 'error': return <AlertTriangle size={16} className="text-red-500" />;
-      case 'command': return <Brain size={16} className="text-purple-500" />;
+      case 'command_confirmation': return <Brain size={16} className="text-purple-500" />;
+      case 'user_query': return <MessageSquare size={16} className="text-blue-500" />;
       default: return <MessageSquare size={16} className={darkMode ? 'text-gray-400' : 'text-gray-600'} />;
     }
   };
@@ -110,7 +112,7 @@ const AgentMessageStream: React.FC<AgentMessageStreamProps> = ({
             <div className="mt-2 text-right">
               <button
                 className={`px-3 py-1 rounded-md text-xs ${darkMode ? 'bg-blue-600 hover:bg-blue-700' : 'bg-blue-500 hover:bg-blue-600'} text-white transition-colors`}
-                onClick={() => onTriggerAgent(msg.action!.type, msg.action!.payload)}
+                onClick={() => onTriggerAgent(msg.action!.type as AgentOperationType, msg.action!.payload)}
               >
                 {msg.action.type === 'view-details' ? 'View Details' : 'Perform Action'}
               </button>

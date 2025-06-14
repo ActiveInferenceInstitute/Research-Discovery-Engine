@@ -12,6 +12,7 @@ Welcome to the comprehensive documentation for the Research Discovery Engine (RD
 ### 🛠️ Development & Technical
 - **[Developer Guide](developer-guide.md)** - Technical architecture, APIs, and development setup
 - **[API Reference](api-reference.md)** - Complete API documentation and examples
+- **[Agent Service API](agent-service-api.md)** - AI-powered operation execution and graph updates
 - **[Deployment Guide](deployment.md)** - Production deployment options and configurations
 - **[Troubleshooting Guide](troubleshooting.md)** - Common issues and solutions
 - **[Contributing Guidelines](CONTRIBUTING.md)** - How to contribute to the project
@@ -66,6 +67,7 @@ docs/
 ├── user-guide.md                      # Complete user interface guide
 ├── developer-guide.md                 # Technical development guide
 ├── api-reference.md                   # API documentation
+├── agent-service-api.md              # Agent Service API documentation
 ├── deployment.md                      # Production deployment guide
 ├── troubleshooting.md                 # Common issues and solutions
 ├── CONTRIBUTING.md                    # Contribution guidelines
