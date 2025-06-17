@@ -1,6 +1,6 @@
 # ResNei
 
-Research Neighborhood
+**Research Neighborhood**
 
 ResNei supports the lateral growth of ideas through distributed, asynchronous, and often non-linear collaboration. Knowledge develops across disciplines and methods through shared, interconnected environments.
 
