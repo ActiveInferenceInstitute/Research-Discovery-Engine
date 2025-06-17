@@ -1,6 +1,6 @@
 # ResNei
 
-Building the future together.
+Research Neighborhood
 
 Rhizomes are interconnected rooted vegetables that grow laterally. Similarly our team grows ideas sideways—remotely, asynchronously, sometimes chaotically—but always connected through shared questions, determined inquiry, and the belief that knowledge grows better together.
 
