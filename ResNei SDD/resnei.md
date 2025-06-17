@@ -2,7 +2,7 @@
 
 Research Neighborhood
 
-Rhizomes are interconnected rooted vegetables that grow laterally. Similarly our team grows ideas sideways—remotely, asynchronously, sometimes chaotically—but always connected through shared questions, determined inquiry, and the belief that knowledge grows better together.
+Research Neighbourhoods support the lateral growth of ideas through distributed, asynchronous, and often non-linear collaboration. Knowledge develops across disciplines and methods through shared, interconnected environments.
 
 Version 1.0 ~ May 12, 2025 ~ 10.5281/zenodo.15389683  
 Contact: [blanket@activeinference.institute](mailto:blanket@activeinference.institute) ~ [http://resnei.activeinference.institute/](https://www.google.com/url?q=http://resnei.activeinference.institute/&sa=D&source=editors&ust=1750107609993463&usg=AOvVaw0LEl0z3-oJG1qVWPnNk8Q0) 
