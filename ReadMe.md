@@ -15,7 +15,7 @@ The Scientific Discovery Engine aims to overcome key limitations in traditional 
 - Information overload that hinders discovery of critical connections
 
 ## Interface
-![](Docs/Images/DE3.mov)
+![](/Docs/Images/DE3.mov)
 
 ## 🧠 Core Technology
 
