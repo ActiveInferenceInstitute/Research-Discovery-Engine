@@ -120,5 +120,5 @@ IntelliDE is being developed by a multidisciplinary team of researchers and engi
 ## 📧 Contact
 
 For questions, feedback, or collaboration opportunities, please contact us at:
-- Email: 
-- Twitter: 
+- Email: vbaulin@activeinference.institute
+
