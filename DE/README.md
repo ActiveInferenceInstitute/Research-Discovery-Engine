@@ -70,7 +70,7 @@ The Discovery Engine embodies a human-AI co-creation process. It leverages the s
 1.  **Clone the repository:**
     ```bash
     git clone <repository-url>
-    cd discovery-engine-platform 
+    cd discovery-engine-platform
     ```
 2.  **Install dependencies:**
     ```bash
