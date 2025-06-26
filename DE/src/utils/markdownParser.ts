@@ -18,7 +18,8 @@ export function slugify(text: string): string {
 
 export function extractReferences(text: string): string[] {
     const references: string[] = [];
-    const regex = /(?<![`[![#<A-Za-z0-9\-_~])\[([a-zA-Z0-9_-]+(?:_\d{4}(?:[a-zA-Z_-]\w*)?)?)\](?![(#])/g;
+    // Improved regex to better match citation keys like [author_year_title]
+    const regex = /(?<![`[![#<A-Za-z0-9\-_~])\[([a-zA-Z0-9_-]+(?:_\d{4}(?:[a-zA-Z0-9_-]*)?)?)\](?![(#\]])/g;
     let match;
     while ((match = regex.exec(text)) !== null) {
         if (match[1]) {

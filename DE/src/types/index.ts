@@ -49,7 +49,7 @@ export interface AgentMessage { /* ... (as before) ... */
   id: string; sourceAgent: string;
   type: 'info' | 'opportunity' | 'suggestion' | 'warning' | 'error' | 'command_confirmation' | 'user_query';
   content: string; timestamp: number; relatedNodeIds?: string[]; relatedFieldId?: string;
-  action?: { type: 'accept-suggestion' | 'view-details' | 'trigger-agent-action' | 'integrate-data' | 'explore-node'; label?: string; payload?: any; };
+  action?: { type: 'accept-suggestion' | 'view-details' | 'view-llm-result' | 'trigger-agent-action' | 'integrate-data' | 'explore-node'; label?: string; payload?: any; };
 }
 
 export interface ConceptDesignState {

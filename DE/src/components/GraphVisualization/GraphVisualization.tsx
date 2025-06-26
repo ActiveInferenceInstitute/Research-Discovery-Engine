@@ -1,18 +1,25 @@
 // src/components/GraphVisualization/GraphVisualization.tsx
 import React, { useRef, useEffect, useState, useMemo } from 'react';
-import ForceGraph3D, { NodeObject as FGNodeObject, LinkObject as FGLinkObject } from '3d-force-graph';
+import ForceGraph3D from '3d-force-graph';
 import SpriteText from 'three-spritetext';
 import * as THREE from 'three';
 import * as d3 from 'd3';
 import { cloneDeep } from 'lodash';
 import { GraphData, NodeObject, LinkObject as CNMLinkObject, ConceptDesignState, NodeType, EdgeType } from '../../types';
-import { getNeighbors } from '../../utils/graphUtils';
+import { getNeighbors, assignNodesToClusters } from '../../utils/graphUtils';
 
-interface GraphNode extends FGNodeObject, NodeObject {}
-interface GraphLink extends FGLinkObject {
+interface GraphNode extends NodeObject {
+  x?: number;
+  y?: number;
+  z?: number;
+  fx?: number;
+  fy?: number;
+  fz?: number;
+}
+
+interface GraphLink extends CNMLinkObject {
   source: string | GraphNode;
   target: string | GraphNode;
-  type?: CNMLinkObject['type'];
 }
 
 const NODE_TYPE_COLORS: Record<NodeType | 'Default', string> = {
@@ -39,6 +46,7 @@ const NODE_TYPE_COLORS: Record<NodeType | 'Default', string> = {
   'Documentation': '#D3D3D3', 
   'Default': '#A9A9A9', 
 };
+
 const LINK_TYPE_COLORS: Record<EdgeType | 'Default', string> = {
   'categorizes': '#A9A9A9',       
   'cites-source': '#6495ED',      
@@ -57,6 +65,7 @@ const LINK_TYPE_COLORS: Record<EdgeType | 'Default', string> = {
   'PackagedInArtifactEdge': '#E0FFFF',       
   'Default': '#708090',          
 };
+
 const WIKI_SOURCES_FOR_GV_GROUPING = [ 
     { typePrefix: 'Material', group: 1 }, { typePrefix: 'Mechanism', group: 2 },
     { typePrefix: 'Phenomenon', group: 3 }, { typePrefix: 'Documentation', group: 4 }, 
@@ -78,13 +87,15 @@ interface GraphVisualizationProps {
   selectedNodeId: string | null;
   conceptDesignState: ConceptDesignState;
   onFilterComplete?: (filteredNodeCount: number, filteredLinkCount: number) => void;
+  colorBy: 'type' | 'group' | 'status' | 'origin' | 'custom';
+  groupBy: 'none' | 'type' | 'status' | 'origin' | 'connections' | 'cluster';
 }
 
 const GraphVisualization: React.FC<GraphVisualizationProps> = ({
   data, darkMode, searchQuery, onNodeSelect,
   showLabels, showLinks, enablePhysics, showParticles,
   selectedNodeId, conceptDesignState,
-  onFilterComplete
+  onFilterComplete, colorBy, groupBy
 }) => {
   const containerRef = useRef<HTMLDivElement>(null);
   const graphRef = useRef<any>(null);
@@ -105,13 +116,83 @@ const GraphVisualization: React.FC<GraphVisualizationProps> = ({
     return { nodes: validNodes, links: validLinks };
   }, [data]);
 
-
   const combinedGraphData = useMemo(() => {
     if (safeData.nodes.length === 0 && conceptDesignState.status === 'empty') {
       return { nodes: [], links: [] } as { nodes: GraphNode[], links: GraphLink[] };
     }
     let currentNodes = cloneDeep(safeData.nodes) as GraphNode[];
     let currentLinks = cloneDeep(safeData.links) as GraphLink[];
+
+    // Apply grouping based on groupBy parameter
+    if (groupBy !== 'none') {
+      currentNodes = currentNodes.map(node => {
+        let groupValue = 0;
+        
+        switch (groupBy) {
+          case 'type':
+            // Group by node type
+            const typeGroup = WIKI_SOURCES_FOR_GV_GROUPING.find(
+              ws => node.type?.startsWith(ws.typePrefix)
+            );
+            groupValue = typeGroup?.group || 0;
+            break;
+            
+          case 'status':
+            // Group by status
+            const statusMap: Record<string, number> = {
+              'Hypothetical': 1,
+              'Proposed': 2,
+              'Validated': 3,
+              'Archived': 4,
+              'Identified': 5
+            };
+            groupValue = node.status ? statusMap[node.status] || 0 : 0;
+            break;
+            
+          case 'origin':
+            // Group by origin
+            const originMap: Record<string, number> = {
+              'wiki_section': 1,
+              'user_upload': 2,
+              'concept_design': 3,
+              'system_derived': 4
+            };
+            groupValue = node.origin ? originMap[node.origin] || 0 : 0;
+            break;
+            
+          case 'connections':
+            // Count connections
+            const connections = currentLinks.filter(link => {
+              const sourceId = typeof link.source === 'object' ? link.source.id : link.source;
+              const targetId = typeof link.target === 'object' ? link.target.id : link.target;
+              return sourceId === node.id || targetId === node.id;
+            }).length;
+            
+            // Group by connection count ranges
+            if (connections === 0) groupValue = 1;
+            else if (connections <= 2) groupValue = 2;
+            else if (connections <= 5) groupValue = 3;
+            else if (connections <= 10) groupValue = 4;
+            else groupValue = 5;
+            break;
+            
+          case 'cluster':
+            // Use force-directed clustering
+            const numClusters = Math.min(8, Math.max(3, Math.ceil(currentNodes.length / 10)));
+            const clusteredNodes = assignNodesToClusters(currentNodes, numClusters);
+            const clusteredNode = clusteredNodes.find(n => n.id === node.id);
+            if (clusteredNode && 'cluster' in clusteredNode) {
+              groupValue = (clusteredNode as any).cluster + 1;
+            }
+            break;
+        }
+        
+        return {
+          ...node,
+          group: groupValue
+        };
+      });
+    }
 
     if (conceptDesignState.status !== 'empty' && conceptDesignState.id) {
       const conceptNodeId = conceptDesignState.id;
@@ -147,7 +228,6 @@ const GraphVisualization: React.FC<GraphVisualizationProps> = ({
     }
     return { nodes: currentNodes, links: currentLinks };
   }, [safeData, conceptDesignState]);
-
 
   const filteredData = useMemo(() => {
     if (!searchQuery.trim()) return combinedGraphData;
@@ -187,7 +267,6 @@ const GraphVisualization: React.FC<GraphVisualizationProps> = ({
     }
   }, [filteredData, onFilterComplete]); // Call ONLY when filteredData or onFilterComplete changes
 
-
   useEffect(() => { 
     if (!containerRef.current || graphRef.current) return;
     try {
@@ -196,7 +275,7 @@ const GraphVisualization: React.FC<GraphVisualizationProps> = ({
         .height(containerRef.current.clientHeight)
         .enableNodeDrag(true)
         .showNavInfo(false)
-        .onNodeClick((node: FGNodeObject | null) => {
+        .onNodeClick((node: any | null) => {
             if (!node) {
                 onNodeSelect(null);
                 setNeighborNodes(new Set());
@@ -215,7 +294,7 @@ const GraphVisualization: React.FC<GraphVisualizationProps> = ({
             graphRef.current.cameraPosition(cameraPosition, cameraLookAt, 1000);
             onNodeSelect(appNode);
         })
-        .onNodeHover((node: FGNodeObject | null) => {
+        .onNodeHover((node: any | null) => {
             const appNode = node as GraphNode | null;
             setHoveredNodeId(appNode ? String(appNode.id) : null);
 
@@ -240,12 +319,17 @@ const GraphVisualization: React.FC<GraphVisualizationProps> = ({
 
       graphRef.current = graph;
       graphRef.current(containerRef.current);
-      const handleResize = () => { if (containerRef.current && graphRef.current) { graphRef.current.width(containerRef.current.clientWidth).height(containerRef.current.clientHeight); }};
+      const handleResize = () => { 
+        if (containerRef.current && graphRef.current) { 
+          graphRef.current.width(containerRef.current.clientWidth).height(containerRef.current.clientHeight); 
+        }
+      };
       window.addEventListener('resize', handleResize);
       return () => window.removeEventListener('resize', handleResize);
-    } catch (error) { console.error("Error initializing 3D Force Graph:", error); }
+    } catch (error) { 
+      console.error("Error initializing 3D Force Graph:", error); 
+    }
   }, []);
-
 
   useEffect(() => { 
     if (!graphRef.current || !filteredData.nodes) return;
@@ -263,25 +347,80 @@ const GraphVisualization: React.FC<GraphVisualizationProps> = ({
             if (neighborNodes.has(String(node.id))) return baseSize * 1.1;
             return baseSize;
          })
-        .nodeThreeObject((objNode: FGNodeObject) => {
+        .nodeThreeObject((objNode: any) => {
             const node = objNode as GraphNode;
             const isSelected = selectedNodeId === String(node.id);
             const isHovered = hoveredNodeId === String(node.id);
             const isDirectNeighbor = neighborNodes.has(String(node.id)) && (hoveredNodeId !== null || selectedNodeId !== null);
             const isContextActive = hoveredNodeId !== null || selectedNodeId !== null;
             const isDimmed = isContextActive && !isSelected && !isHovered && !isDirectNeighbor;
-            const baseColorHex = node.color || NODE_TYPE_COLORS[node.type || 'Default'] || NODE_TYPE_COLORS['Default'];
+            
+            // Determine node color based on colorBy parameter
+            let baseColorHex: string = '#A9A9A9';
+            
+            switch (colorBy) {
+              case 'type':
+                // Color by node type (default)
+                const nodeTypeKey = (node.type as NodeType) || 'Default';
+                baseColorHex = NODE_TYPE_COLORS[nodeTypeKey] || NODE_TYPE_COLORS['Default'];
+                break;
+                
+              case 'group':
+                // Color by group number
+                const groupColors = [
+                  '#1f77b4', '#ff7f0e', '#2ca02c', '#d62728', '#9467bd',
+                  '#8c564b', '#e377c2', '#7f7f7f', '#bcbd22', '#17becf',
+                  '#aec7e8', '#ffbb78', '#98df8a', '#ff9896', '#c5b0d5'
+                ];
+                const groupIndex = (node.group || 0) % groupColors.length;
+                baseColorHex = groupColors[groupIndex];
+                break;
+                
+              case 'status':
+                // Color by status
+                const statusColors: Record<string, string> = {
+                  'Hypothetical': '#FFD700', // Gold
+                  'Proposed': '#4682B4',    // Steel Blue
+                  'Validated': '#2E8B57',   // Sea Green
+                  'Archived': '#A9A9A9',    // Dark Gray
+                  'Identified': '#FF6347'   // Tomato
+                };
+                baseColorHex = node.status ? statusColors[node.status] || '#A9A9A9' : '#A9A9A9';
+                break;
+                
+              case 'origin':
+                // Color by origin
+                const originColors: Record<string, string> = {
+                  'wiki_section': '#4169E1',    // Royal Blue
+                  'user_upload': '#FF1493',     // Deep Pink
+                  'concept_design': '#32CD32',  // Lime Green
+                  'system_derived': '#FF8C00'   // Dark Orange
+                };
+                baseColorHex = node.origin ? originColors[node.origin] || '#A9A9A9' : '#A9A9A9';
+                break;
+                
+              case 'custom':
+                // Use node's custom color if available
+                baseColorHex = node.color || '#A9A9A9';
+                break;
+                
+              default:
+                // Fallback to type-based coloring
+                const fallbackTypeKey = (node.type as NodeType) || 'Default';
+                baseColorHex = NODE_TYPE_COLORS[fallbackTypeKey] || NODE_TYPE_COLORS['Default'];
+            }
+            
             let finalColor = new THREE.Color(baseColorHex);
 
             if (showLabels || isSelected || isHovered) {
                 const sprite = new SpriteText(node.label || String(node.id));
                 sprite.color = isSelected || isHovered ? (darkMode ? '#000000' : '#FFFFFF') : (darkMode ? '#E2E8F0' : '#2D3748');
-                sprite.textHeight = isSelected ? 7 : isHovered ? 6 : 4;
+                sprite.textHeight = isSelected ? 8 : isHovered ? 7 : 5;
                 let bgColorHex = baseColorHex;
                 if (isSelected) bgColorHex = '#F6E05E'; 
                 else if (isHovered) bgColorHex = '#ED64A6'; 
                 sprite.backgroundColor = new THREE.Color(bgColorHex).getStyle();
-                sprite.padding = isSelected ? 1.5 : isHovered ? 1 : 0.5; 
+                sprite.padding = isSelected ? 2 : isHovered ? 1.5 : 1; 
                 sprite.borderRadius = 2;
                 sprite.material.opacity = isDimmed ? 0.3 : 1.0;
                 sprite.material.depthWrite = false; 
@@ -289,9 +428,10 @@ const GraphVisualization: React.FC<GraphVisualizationProps> = ({
                 return sprite;
             } else {
                 const geometrySize = Math.max(0.5, (graphRef.current.nodeVal()(node) as number) * 0.45); 
-                let geometry: THREE.BufferGeometry = new THREE.SphereGeometry(geometrySize, 16, 8); 
+                let geometry = new THREE.SphereGeometry(geometrySize, 16, 8); 
                 const sphereMaterial = new THREE.MeshLambertMaterial({
-                    color: finalColor, transparent: true,
+                    color: finalColor, 
+                    transparent: true,
                     opacity: isDimmed ? 0.1 : (isDirectNeighbor ? 0.9 : 0.75)
                 });
                 return new THREE.Mesh(geometry, sphereMaterial);
@@ -302,13 +442,29 @@ const GraphVisualization: React.FC<GraphVisualizationProps> = ({
         .linkWidth((link: GraphLink) => (neighborLinks.has(link) ? 2 : 0.7))
         .linkColor((link: GraphLink) => { 
             const defaultColor = darkMode ? '#4A5568' : '#A0AEC0'; 
-            const typeColor = LINK_TYPE_COLORS[link.type || 'Default'] || defaultColor;
+            
+            // Determine link color based on type or connected nodes
+            let typeColor;
+            
+            // Use type-based coloring for links
+            typeColor = LINK_TYPE_COLORS[link.type || 'Default'] || defaultColor;
+            
             return neighborLinks.has(link) ? (darkMode ? '#FACC15' : '#D97706') : typeColor; 
         })
         .linkMaterial((link: GraphLink) => {
             const isHighlighted = neighborLinks.has(link);
             const isDimmed = (hoveredNodeId !== null || selectedNodeId !== null) && !isHighlighted;
-            const color = isHighlighted ? (darkMode ? '#FACC15' : '#D97706') : (LINK_TYPE_COLORS[link.type || 'Default'] || (darkMode ? '#4A5568' : '#A0AEC0'));
+            
+            // Determine link color based on type or connected nodes
+            let color;
+            
+            if (isHighlighted) {
+                color = darkMode ? '#FACC15' : '#D97706';
+            } else {
+                // Use type-based coloring for links
+                color = LINK_TYPE_COLORS[link.type || 'Default'] || (darkMode ? '#4A5568' : '#A0AEC0');
+            }
+            
             return new THREE.MeshBasicMaterial({ color: color, transparent: true, opacity: isDimmed ? 0.08 : (isHighlighted ? 0.9 : 0.45) });
         })
         .linkDirectionalParticles(showParticles ? (link: GraphLink) => neighborLinks.has(link) ? 3 : 0 : 0)
@@ -355,7 +511,7 @@ const GraphVisualization: React.FC<GraphVisualizationProps> = ({
   }, [
     filteredData, darkMode, showLabels, showLinks, enablePhysics, showParticles,
     selectedNodeId, hoveredNodeId, neighborNodes, neighborLinks
-  ]);
+  , colorBy, groupBy]);
 
   return (
     <div

@@ -60,8 +60,10 @@ export const preprocessMarkdownForDisplayUtil = (content: string, currentFileKey
         return `[${displayText || "link"}](${href})`;
     });
 
-    const citationRegex = /(?<![`[![#<A-Za-z0-9\-_~])\[([a-zA-Z0-9_-]+(?:_\d{4}(?:[a-zA-Z_-]\w*)?)?)\](?![(#])/g;
+    // Improved regex to better match citation keys like [author_year_title]
+    const citationRegex = /(?<![`[![#<A-Za-z0-9\-_~])\[([a-zA-Z0-9_-]+(?:_\d{4}(?:[a-zA-Z0-9_-]*)?)?)\](?![(#\]])/g;
     processed = processed.replace(citationRegex, (match, key) => {
+        // Create a proper citation link that will open the publication file
         return `[${key}](#CITATION__${key})`;
     });
     return processed;
@@ -70,7 +72,9 @@ export const preprocessMarkdownForDisplayUtil = (content: string, currentFileKey
 export interface ParsedNodeDetails {
   title: string;
   humanReadableTitle?: string;
+  idForDisplay?: string;
   description: string;
+  mainDescription?: string;
   input: string;
   output: string;
   processPrimitives: string;
@@ -87,7 +91,9 @@ export const parseNodeDetails = (node: NodeObject, allNodes: NodeObject[]): Pars
   const details: ParsedNodeDetails = {
     title: node.label || node.id,
     humanReadableTitle: undefined,
+    idForDisplay: node.id,
     description: '',
+    mainDescription: '',
     input: '',
     output: '',
     processPrimitives: '',
@@ -101,7 +107,7 @@ export const parseNodeDetails = (node: NodeObject, allNodes: NodeObject[]): Pars
   };
 
   if (!node.description) {
-    details.description = preprocessMarkdownForDisplayUtil(`*No detailed description available for ${node.label || node.id}.*`, node.sourceFileKey, allNodes);
+    details.mainDescription = preprocessMarkdownForDisplayUtil(`*No detailed description available for ${node.label || node.id}.*`, node.sourceFileKey, allNodes);
     return details;
   }
 
@@ -213,9 +219,17 @@ export const parseNodeDetails = (node: NodeObject, allNodes: NodeObject[]): Pars
     }
   }
   
-  if (!details.description.trim()) {
-    details.description = preprocessMarkdownForDisplayUtil(`*No primary description content found for ${node.label || node.id}.*`, node.sourceFileKey, allNodes);
+  // Ensure we always have a description
+  if (!details.mainDescription || !details.mainDescription.trim()) {
+    // Try to use the full node description if available
+    if (node.description && node.description.trim()) {
+      details.mainDescription = preprocessMarkdownForDisplayUtil(node.description, node.sourceFileKey, allNodes);
+    } else {
+      details.mainDescription = preprocessMarkdownForDisplayUtil(`*No primary description content found for ${node.label || node.id}.*`, node.sourceFileKey, allNodes);
+    }
   }
+  // Ensure mainDescription is set
+  details.mainDescription = details.description;
 
   return details;
 };

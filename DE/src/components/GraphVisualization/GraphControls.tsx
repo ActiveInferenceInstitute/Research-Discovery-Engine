@@ -1,7 +1,7 @@
 // Controls for the Graph Visualization view properties.
 
 import React, { useState } from 'react';
-import { ChevronsRight, ChevronsLeft, ZoomIn, ZoomOut, RefreshCw, Layers, Settings } from 'lucide-react';
+import { ChevronsRight, ChevronsLeft, ZoomIn, ZoomOut, RefreshCw, Layers, Settings, Palette, Group } from 'lucide-react';
 // Removed NodeObject import as it no longer displays node details
 
 interface GraphControlsProps {
@@ -15,6 +15,10 @@ interface GraphControlsProps {
   onToggleLinks: () => void;
   onTogglePhysics: () => void;
   onToggleParticles: () => void;
+  colorBy: 'type' | 'group' | 'status' | 'origin' | 'custom';
+  onChangeColorBy: (value: string) => void;
+  groupBy: 'none' | 'type' | 'status' | 'origin' | 'connections' | 'cluster';
+  onChangeGroupBy: (value: string) => void;
   // Add more controls as needed (e.g., filter, layout)
 }
 
@@ -28,6 +32,10 @@ const GraphControls: React.FC<GraphControlsProps> = ({
   onToggleLinks,
   onTogglePhysics,
   onToggleParticles,
+  colorBy,
+  onChangeColorBy,
+  groupBy,
+  onChangeGroupBy
 }) => {
   const [collapsed, setCollapsed] = useState(true);
 
@@ -105,6 +113,46 @@ const GraphControls: React.FC<GraphControlsProps> = ({
               </div>
             </div>
 
+            {/* Node Coloring Options */}
+            <div>
+              <h4 className="text-sm font-medium mb-2 flex items-center">
+                <Palette size={14} className="mr-1.5" /> Color Nodes By
+              </h4>
+              <select
+                value={colorBy}
+                onChange={(e) => onChangeColorBy(e.target.value)}
+                className={`w-full p-2 rounded-md text-sm ${
+                  darkMode ? 'bg-gray-700 text-white' : 'bg-gray-100 text-gray-900'
+                }`}
+              >
+                <option value="type">Node Type</option>
+                <option value="status">Status</option>
+                <option value="origin">Origin</option>
+                <option value="group">Group</option>
+                <option value="custom">Custom</option>
+              </select>
+            </div>
+
+            {/* Node Grouping Options */}
+            <div>
+              <h4 className="text-sm font-medium mb-2 flex items-center">
+                <Group size={14} className="mr-1.5" /> Group Nodes By
+              </h4>
+              <select
+                value={groupBy}
+                onChange={(e) => onChangeGroupBy(e.target.value)}
+                className={`w-full p-2 rounded-md text-sm ${
+                  darkMode ? 'bg-gray-700 text-white' : 'bg-gray-100 text-gray-900'
+                }`}
+              >
+                <option value="none">No Grouping</option>
+                <option value="type">Type</option>
+                <option value="status">Status</option>
+                <option value="origin">Origin</option>
+                <option value="connections">Connections</option>
+                <option value="cluster">Force Cluster</option>
+              </select>
+            </div>
             {/* Filtering Options (Examples) */}
              <div>
               <h4 className="text-sm font-medium mb-2">Filter Nodes</h4>

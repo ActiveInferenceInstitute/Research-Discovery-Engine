@@ -17,6 +17,44 @@ The platform aims to transform how researchers interact with and build upon scie
 
 This application is built with **React, TypeScript, Vite, and Tailwind CSS**, utilizing `3d-force-graph` for dynamic graph visualization.
 
+## LLM Integration
+
+The Research Discovery Engine now supports multiple LLM providers:
+
+### OpenAI Integration
+
+By default, the system uses OpenAI's API for LLM capabilities. To use OpenAI:
+
+1. Create a `.env` file with your OpenAI API key:
+   ```
+   API_PROVIDER=openai
+   OPENAI_API_KEY=your_openai_api_key_here
+   OPENAI_MODEL=gpt-4o-mini
+   ```
+
+### OpenRouter Integration
+
+The system also supports OpenRouter, which provides access to various models including Google's Gemini:
+
+1. Create a `.env` file with your OpenRouter API key:
+   ```
+   API_PROVIDER=openrouter
+   OPENROUTER_API_KEY=your_openrouter_api_key_here
+   OPENROUTER_MODEL=google/gemini-2.0-flash-exp:free
+   ```
+
+2. Available OpenRouter models:
+   - `google/gemini-2.0-flash-exp:free`
+   - `google/gemini-2.0-pro-exp-02-05:free`
+   - `google/gemini-2.0-flash-thinking-exp:free`
+   - `deepseek/deepseek-r1-distill-llama-70b:free`
+   - `openrouter/quasar-alpha`
+
+3. Test your OpenRouter connection:
+   ```bash
+   npx tsx scripts/openrouter-test.ts
+   ```
+
 ## Core Philosophy & Workflow
 
 The Discovery Engine embodies a human-AI co-creation process. It leverages the strengths of human expertise for ideation and critical evaluation, augmented by AI's capability for large-scale information processing, pattern recognition, and suggestion generation. The detailed workflow is described in `process.md` and involves:
@@ -51,6 +89,12 @@ The Discovery Engine embodies a human-AI co-creation process. It leverages the s
         *   `markdownParser.ts`: Parses raw markdown into a structured format (document title, preamble, hierarchical sections).
         *   `parseNodeData.ts`: Extracts and formats content from a `NodeObject`'s description for display in `NodeView`.
         *   `graphUtils.ts`: Graph-related helper functions.
+    *   **`llm/`**: LLM integration modules.
+        *   `LLMService.ts`: Core service for LLM interactions.
+        *   `services/`: Specialized LLM services.
+        *   `config/`: LLM configuration management.
+        *   `types/`: LLM-related type definitions.
+        *   `utils/`: LLM utility functions.
 *   **`README.md`**: This file.
 
 ## Key Functionalities
@@ -64,44 +108,160 @@ The Discovery Engine embodies a human-AI co-creation process. It leverages the s
     *   `[[target-id]]` or `[[file#section-id]]` links resolve to other nodes or trigger navigation.
     *   `[citation_key]` links open corresponding publication files.
 *   **Simulated AI Agents:** The Agent Console provides a glimpse into the intended AI-assisted functionalities.
+*   **LLM Integration:** Support for multiple LLM providers (OpenAI and OpenRouter) for enhanced AI capabilities.
 
-## Getting Started
+## Quick Start
 
-1.  **Clone the repository:**
-    ```bash
-    git clone <repository-url>
-    cd discovery-engine-platform
-    ```
-2.  **Install dependencies:**
-    ```bash
-    npm install
-    # or
-    yarn install
-    ```
-3.  **Verify Knowledge Base:**
-    *   Ensure your core knowledge Markdown files (`mechanisms.md`, `materials.md`, etc.) are present in the `public/KG/` directory.
-    *   Ensure `css.md` and `process.md` are also in `public/KG/` (or update paths in `cnmBuilder.ts` and `WIKI_BROWSER_CONFIG` in `App.tsx`).
-    *   Place markdown files for individual publications (e.g., `smith_etal_2023.md`) in `public/KG/publications/`.
-4.  **Run the development server:**
-    ```bash
-    npm run dev
-    # or
-    yarn dev
-    ```
-5.  Open your browser to the local address provided by Vite (e.g., `http://localhost:5173`).
+### Automated Setup (Recommended)
+```bash
+# Clone the repository
+git clone <repository-url>
+cd Research-Discovery-Engine/DE
 
-## Automated Knowledge Extraction (for LLMs)
+# Run the automated setup and launch
+python3 main.py
+```
+The `main.py` script will automatically verify requirements, install dependencies, and launch the application.
 
-A [dedicated Markdown template](template_llm_extraction.md) (you would link this file here if it exists) is designed to guide Large Language Models (LLMs) in systematically extracting information from scientific papers. This template directly maps to the CNM schema defined in `css.md`, facilitating the population of `SystemNode` attributes and its connections to materials, mechanisms, methods, etc. The output of this LLM-driven process can then be parsed to further enrich the CNM.
+### Manual Setup
+```bash
+# Navigate to the application directory
+cd DE
 
-## Current Status & Known Issues
+# Install dependencies
+npm install
 
-*   **AI Agent Simulation:** Most advanced AI agent functionalities (e.g., automated knowledge gap identification, hypothesis generation beyond basic suggestions) are currently simulated in the frontend. Full realization requires backend AI services.
-*   **React Warnings:**
-    *   `setState-in-render`: Efforts have been made to minimize this by deferring state updates from child component callbacks using `useEffect`. Further review may be needed for complex interactions.
-    *   DOM Nesting (`<pre>` in `<p>`): This typically indicates a need for better separation (blank lines) around fenced code blocks in the source `.md` files.
-*   **Markdown Link Robustness:** While significantly improved, complex or non-standard link syntax in source `.md` files might still pose challenges for the `cnmBuilder.ts` and the display renderers. Ensure links to section headings use their slugified form.
-*   **Materials Index Display:** If the "Materials" index (or any other specific file index) does not appear in the `KnowledgeBrowserSidebar`, verify that the `indexSectionTitleSlug` in `WIKI_BROWSER_CONFIG` (in `App.tsx`) precisely matches the slug generated from the actual "Index of..." H2 heading in the corresponding `.md` file.
+# Start development server
+npm run dev
+
+# Open http://localhost:5173 in your browser
+```
+
+### Verify Setup
+All system requirements and project structure will be automatically verified when using `python3 main.py`.
+
+### LLM Setup
+
+1. Create a `.env` file in the project root with your API keys:
+   ```
+   # For OpenAI
+   API_PROVIDER=openai
+   OPENAI_API_KEY=your_openai_api_key_here
+   
+   # OR for OpenRouter
+   API_PROVIDER=openrouter
+   OPENROUTER_API_KEY=your_openrouter_api_key_here
+   ```
+
+2. Test your LLM connection:
+   ```bash
+   # For OpenAI
+   npx tsx scripts/test-openai.ts
+   
+   # For OpenRouter
+   npx tsx scripts/openrouter-test.ts
+   ```
+
+## 📚 Documentation
+
+**Complete documentation is available in the [`docs/`](docs/) directory:**
+
+### For New Users
+- **[Startup Guide](docs/STARTUP_GUIDE.md)** - Complete setup and launch instructions
+- **[Documentation Index](docs/README.md)** - Complete navigation guide for all documentation
+
+### For Developers
+- **[Development Guide](docs/DEVELOPMENT_GUIDE.md)** - Comprehensive developer documentation
+- **[Component Architecture](docs/COMPONENTS.md)** - Detailed component specifications
+- **[API Reference](docs/API_REFERENCE.md)** - Complete API and utility reference
+
+### For Researchers
+- **[Script Usage Guide](docs/SCRIPT_USAGE.md)** - 7 standalone utilities for research workflows
+- **[Technical Assessment](docs/TECHNICAL_ASSESSMENT.md)** - Technical implementation details
+
+### For Deployment
+- **[Deployment Guide](docs/DEPLOYMENT.md)** - Production deployment strategies
+- **[Troubleshooting](docs/TROUBLESHOOTING.md)** - Common issues and solutions
+
+### Project Status
+- **[Final Status Report](docs/FINAL_STATUS.md)** - Complete project achievements and status
+
+## Comprehensive LLM Integration & Testing
+
+The Discovery Engine now includes full LLM integration with comprehensive testing capabilities:
+
+### 🤖 **LLM-Enhanced Research Capabilities**
+*   **LLM Summary Generation**: AI-powered research summaries with configurable depth and audience
+*   **Knowledge Processing**: Automated concept extraction and relationship identification
+*   **Research Question Generation**: AI-assisted formulation of research questions
+*   **Domain-Specific Analysis**: Tailored processing for materials science, nanotechnology, and related fields
+
+### 🧪 **Comprehensive LLM Testing Suite**
+*   **Unit Testing**: Full mock LLM service testing with response validation
+*   **Integration Testing**: End-to-end LLM workflow testing across all scripts
+*   **Performance Testing**: Token usage optimization and response time benchmarking
+*   **Load Testing**: Concurrent request handling and rate limiting validation
+*   **Error Handling**: Comprehensive testing of failure scenarios and recovery
+
+### 📊 **LLM Testing Scripts**
+*   **`run-tests.ts`**: Comprehensive test suite including LLM integration tests
+*   **`analyze-performance.ts`**: LLM performance benchmarking and optimization analysis
+*   **`llm-generate-summary.ts`**: Production-ready LLM summary generation
+*   **`llm-process-knowledge.ts`**: LLM-powered knowledge extraction and processing
+*   **`batch-test-headless.sh`**: Automated batch testing of all LLM capabilities
+
+### 🔬 **Testing Coverage**
+*   **Configuration Testing**: OpenAI API integration and parameter validation
+*   **Service Layer Testing**: Mock implementations for development and testing
+*   **Response Validation**: Token usage tracking and content quality assessment
+*   **Performance Metrics**: Response time, token efficiency, and throughput analysis
+*   **Error Scenarios**: API failures, timeout handling, and graceful degradation
+
+A dedicated LLM extraction template directly maps to the CNM schema defined in `css.md`, facilitating the population of `SystemNode` attributes and its connections to materials, mechanisms, methods, etc. The output of this LLM-driven process can then be parsed to further enrich the CNM.
+
+## Current Development Status
+
+### ✅ **Functional Components**
+*   **Core Platform**: Fully operational with development server running on Vite
+*   **Knowledge Graph**: Successfully loads and displays complex scientific knowledge base
+*   **3D Visualization**: Interactive force-directed graph with real-time filtering
+*   **Browser Interface**: Hierarchical knowledge navigation with markdown rendering
+*   **Concept Designer**: Guided workflow for creating new knowledge concepts
+*   **AI Agent Console**: Simulated AI assistant with conversation interface
+*   **Search & Navigation**: Real-time graph filtering and breadcrumb navigation
+*   **LLM Integration**: Complete OpenAI integration with production-ready services
+*   **Comprehensive Testing**: Full LLM testing suite with performance benchmarking
+*   **Headless Mode**: Automated batch processing for all scripts including LLM
+*   **Mock Testing**: Complete mock LLM services for development and CI/CD
+
+### 🔄 **In Active Development**
+*   **Code Architecture**: Refactoring large components into smaller, focused modules
+*   **Documentation**: Comprehensive inline documentation and component guides
+*   **Error Handling**: Implementing proper error boundaries and validation
+*   **Performance**: Optimizing graph rendering and component memoization
+*   **Testing**: Establishing comprehensive test coverage for critical components
+
+### 🚧 **Known Technical Debt**
+*   **App.tsx Size**: Main component is large (425 lines) and needs decomposition
+*   **Agent Simulation**: AI functionalities are frontend-simulated, awaiting backend integration
+*   **React Warnings**: Minor `setState-in-render` issues being addressed through refactoring
+*   **Bundle Optimization**: Code splitting and lazy loading implementation pending
+
+### 📋 **Recent Improvements**
+*   **Project Standards**: Comprehensive `.cursorrules` file with coding guidelines
+*   **Component Documentation**: Detailed architecture documentation in `docs/COMPONENTS.md`
+*   **TypeScript**: Enhanced type safety and interface definitions
+*   **Code Organization**: Improved file structure and naming conventions
+*   **LLM Integration**: Support for multiple LLM providers (OpenAI and OpenRouter)
+
+### 🎯 **Next Milestones**
+1. **Component Decomposition**: Break down App.tsx into feature-specific modules
+2. **Service Layer**: Extract agent simulation logic into dedicated services
+3. **Error Boundaries**: Implement comprehensive error handling
+4. **Performance Optimization**: Add memoization and lazy loading
+5. **LLM Production Deployment**: Scale LLM services for production workloads
+6. **Advanced LLM Features**: Implement fine-tuning and domain-specific models
+7. **Real-time LLM Integration**: Connect frontend directly to LLM services
 
 ## Future Directions
 

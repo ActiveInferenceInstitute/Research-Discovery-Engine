@@ -145,7 +145,8 @@ const KnowledgeBrowserSidebar: React.FC<KnowledgeBrowserSidebarProps> = ({
     },
     ul: ({node: _n,ordered, className, children, ...props}: any) => <ul className={`wiki-index-ul ${ordered ? 'list-decimal' : ''} ${className || ''} pl-3 space-y-0.5`} {...props}>{children}</ul>,
     li: ({node: _n,children, className, ...props}: any) => <li className={`wiki-index-li ${className|| ''}`} {...props}>{children}</li>,
-    p: ({node: _n, children, className, ...props}:any) => <span className={`block ${className || ''}`}>{children}</span>, 
+   // Use span instead of p to avoid nesting issues
+   p: ({node: _n, children, className, ...props}:any) => <span className={`block ${className || ''}`}>{children}</span>,
     h1: ({node: _n, ...props}: any) => <h2 className="text-xs font-semibold mt-1 mb-0.5" {...props} />,
     h2: ({node: _n, ...props}: any) => <h3 className="text-xs font-medium mt-1 mb-0.5" {...props} />,
     h3: ({node: _n, ...props}: any) => <h4 className="text-xs font-medium mt-1 mb-0.5" {...props} />,

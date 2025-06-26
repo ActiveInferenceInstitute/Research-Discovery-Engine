@@ -134,7 +134,9 @@ export async function buildCNMGraph(): Promise<GraphData> {
             if (!nodesMap.has(nodeId)) {
                 nodesMap.set(nodeId, {
                     id: nodeId, type: nodeType, group: localGroup, label: displayLabel,
-                    description, sourceWikiSectionId: nodeId, sourceFileKey: localFileKey,
+                    description: description || `*No detailed description available for ${displayLabel}.*`, 
+                    sourceWikiSectionId: nodeId, 
+                    sourceFileKey: localFileKey,
                     references: referencesFromSection, origin: 'wiki_section',
                 });
             } else { 

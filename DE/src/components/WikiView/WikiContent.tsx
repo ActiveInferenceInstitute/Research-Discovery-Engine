@@ -43,7 +43,8 @@ const WikiContent: React.FC<WikiContentProps> = ({
       h2: ({node: _n, ...props}: any) => <h2 id={(props.id && props.id !== "undefined") ? props.id : slugify(React.Children.toArray(props.children).join(''))} className="text-xl font-semibold mt-4 mb-2 border-b pb-1 dark:border-slate-700" {...props}></h2>,
       h3: ({node: _n, ...props}: any) => <h3 id={(props.id && props.id !== "undefined") ? props.id : slugify(React.Children.toArray(props.children).join(''))} className="text-lg font-semibold mt-3 mb-1.5" {...props}></h3>,
       h4: ({node: _n, ...props}: any) => ( <h4 id={(props.id && props.id !== "undefined") ? props.id : slugify(React.Children.toArray(props.children).join(''))} className="text-base font-semibold mt-2 mb-1 flex items-center" {...props}> <Hash size={14} className="mr-1.5 text-slate-500 dark:text-slate-400 opacity-70 flex-shrink-0" /> {props.children} </h4> ),
-      p: ({node: _n, ...props}: any) => <p className="mb-2 leading-relaxed text-sm" {...props}></p>,
+     // Use div instead of p to avoid nesting issues with pre/code elements
+     p: ({node: _n, ...props}: any) => <div className="mb-2 leading-relaxed text-sm" {...props}></div>,
       ul: ({node: _n, ...props}: any) => <ul className="list-disc pl-5 mb-2 space-y-0.5 text-sm" {...props}></ul>,
       ol: ({node: _n, ...props}: any) => <ol className="list-decimal pl-5 mb-2 space-y-0.5 text-sm" {...props}></ol>,
       li: ({node: _n, ...props}: any) => <li className="mb-0.5 text-sm leading-relaxed" {...props}></li>,

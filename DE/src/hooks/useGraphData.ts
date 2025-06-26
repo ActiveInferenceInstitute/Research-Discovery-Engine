@@ -1,12 +1,41 @@
-// src/hooks/useGraphData.ts
+/**
+ * Graph Data Hook - Manages knowledge graph data loading and state
+ * 
+ * This hook handles the asynchronous loading of the knowledge graph from markdown files,
+ * providing loading states, error handling, and the resulting graph data structure.
+ * 
+ * @returns Object containing graph data, loading state, error state, and setter function
+ */
+
 import { useState, useEffect } from 'react';
 import { GraphData } from '../types';
 import { buildCNMGraph } from '../utils/cnmBuilder';
-import { parseMarkdownToSections } from '../utils/markdownParser';
 
+/**
+ * Custom hook for managing graph data state and loading
+ * 
+ * Features:
+ * - Asynchronous graph data loading from markdown files
+ * - Loading state management
+ * - Error handling and reporting
+ * - Component unmount cleanup
+ * - Graph data updates via setter function
+ * 
+ * @example
+ * const { graphData, loading, error, setGraphData } = useGraphData();
+ * 
+ * if (loading) return <LoadingSpinner />;
+ * if (error) return <ErrorDisplay error={error} />;
+ * return <GraphVisualization data={graphData} />;
+ */
 export const useGraphData = () => {
+  /** Graph data state containing nodes and links */
   const [graphData, setGraphData] = useState<GraphData>({ nodes: [], links: [] });
+  
+  /** Loading state indicator */
   const [loading, setLoading] = useState(true);
+  
+  /** Error state for any loading failures */
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
@@ -55,5 +84,13 @@ export const useGraphData = () => {
     return () => { isMounted = false; console.log("[useGraphData] Component unmounted."); };
   }, []); // Empty dependency array ensures this runs only once on mount
 
+  /**
+   * Returns graph data management interface
+   * @returns {Object} Hook return object
+   * @returns {GraphData} graphData - Current graph data with nodes and links
+   * @returns {boolean} loading - Whether data is currently being loaded
+   * @returns {string|null} error - Error message if loading failed, null otherwise
+   * @returns {Function} setGraphData - Function to update graph data state
+   */
   return { graphData, loading, error, setGraphData };
 };

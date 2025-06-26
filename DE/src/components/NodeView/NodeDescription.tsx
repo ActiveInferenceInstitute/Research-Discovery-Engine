@@ -29,7 +29,8 @@ const NodeDescription: React.FC<NodeDescriptionProps> = ({
     h2: ({ node: _n, children, ...props }: any) => <h2 {...props} id={(props as any).id} className="text-lg font-semibold mt-5 mb-1.5">{children}</h2>,
     h3: ({ node: _n, children, ...props }: any) => <h3 {...props} id={(props as any).id} className="text-base font-semibold mt-4 mb-1">{children}</h3>,
     h4: ({ node: _n, children, ...props }: any) => <h4 {...props} id={(props as any).id} className="text-sm font-semibold mt-3 mb-0.5">{children}</h4>,
-    p: ({ node: _n, children, ...props }: any) => <p {...props} className="text-base leading-relaxed my-3">{children}</p>,
+    // Use div instead of p to avoid nesting issues with pre/code elements
+    p: ({ node: _n, children, ...props }: any) => <div {...props} className="text-base leading-relaxed my-3">{children}</div>,
     ul: ({ node: _n, children, ...props }: any) => <ul {...props} className="list-disc pl-6 my-3 space-y-1 text-base">{children}</ul>,
     ol: ({ node: _n, children, ...props }: any) => <ol {...props} className="list-decimal pl-6 my-3 space-y-1 text-base">{children}</ol>,
     li: ({ node: _n, children, ...props }: any) => <li {...props} className="my-1 text-base">{children}</li>,

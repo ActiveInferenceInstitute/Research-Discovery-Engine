@@ -24,7 +24,7 @@ interface NodeViewProps {
 const NodeViewHeader: React.FC<{ 
     title: string; 
     subtitle?: string; 
-    id: string, 
+    id?: string, 
     type?: NodeObject['type'], 
     status?: NodeObject['status'], 
     sourceFileKey?: string, 
@@ -63,7 +63,6 @@ const NodeViewHeader: React.FC<{
       )}
       <div className="mt-1.5 space-x-2 text-[11px] sm:text-xs">
             <span className={`font-medium text-slate-500 dark:text-slate-400`}>Type: {type}</span>
-            <span className={`font-mono text-slate-400 dark:text-slate-500`}>ID: {id}</span>
             {status && <span className={`px-1.5 py-0.5 rounded-full text-[10px] sm:text-xs font-semibold
                 ${status === 'Hypothetical' ? 'bg-yellow-200 text-yellow-800 dark:bg-yellow-700 dark:text-yellow-100' :
                   status === 'Proposed' ? 'bg-blue-200 text-blue-800 dark:bg-blue-700 dark:text-blue-100' :
@@ -85,7 +84,7 @@ const NodeViewHeader: React.FC<{
 const NodeViewDescription: React.FC<{ description: string; darkMode: boolean; markdownComponents: any; }> =
  ({ description, darkMode, markdownComponents }) => {
   if (!description || description.trim() === '' || description.startsWith('*No detailed description')) {
-    return <p className="italic text-sm text-slate-500 dark:text-slate-400 my-4">No primary description content provided for this node.</p>;
+    return <p className="italic text-sm text-slate-500 dark:text-slate-400 my-4">No primary description content provided for this node. Select a different node to view its details.</p>;
   }
   return (
     <section className="mb-5" aria-labelledby="node-main-description">
@@ -174,7 +173,7 @@ const NodeViewAttributes: React.FC<{
 };
 
 const NodeViewConnections: React.FC<{
-  connectionsText?: string;
+  connectionsText?: string | null;
   relatedConcepts: ParsedNodeDetails['relatedConcepts'];
   exampleCitations: ParsedNodeDetails['exampleCitations'];
   graphLinks: { [key: string]: { link: CNMLinkObject, targetNode: NodeObject }[] };
@@ -186,7 +185,7 @@ const NodeViewConnections: React.FC<{
   const getInitialActiveTab = () => {
     if (relatedConcepts && relatedConcepts.length > 0) return 'related';
     if (Object.keys(graphLinks).length > 0) return 'graph';
-    if (connectionsText && connectionsText.trim() !== "") return 'text';
+    if (connectionsText && connectionsText.trim && connectionsText.trim() !== "") return 'text';
     if (exampleCitations && exampleCitations.length > 0) return 'citations';
     return 'related'; 
   };
@@ -198,7 +197,7 @@ const NodeViewConnections: React.FC<{
 
   const hasRelated = relatedConcepts && relatedConcepts.length > 0;
   const hasGraphLinks = Object.keys(graphLinks).length > 0;
-  const hasTextLinks = !!connectionsText && connectionsText.trim() !== "";
+  const hasTextLinks = !!connectionsText && typeof connectionsText === 'string' && connectionsText.trim() !== "";
   const hasCitations = exampleCitations && exampleCitations.length > 0;
 
   if (!hasRelated && !hasGraphLinks && !hasTextLinks && !hasCitations) return null;
@@ -276,10 +275,18 @@ const NodeViewConnections: React.FC<{
           {activeTab === 'citations' && hasCitations && (
             <div className="flex flex-wrap gap-1">
               {exampleCitations.map((citation, index) => (
-                 <ReactMarkdown key={index} components={markdownComponents}>
-                    {/* Ensure the originalMatch is used if it's just the key, or construct the link */}
-                    {citation.originalMatch.startsWith('[') ? citation.originalMatch : `[${citation.key}]`} 
-                 </ReactMarkdown>
+                 <button
+                   key={index}
+                   onClick={() => onPaperClick(citation.key)}
+                   className={`font-mono text-sm px-3 py-2 rounded-md mr-2 mb-2 inline-flex items-center group transition-colors
+                               ${darkMode ? 'bg-slate-700 hover:bg-slate-600 text-teal-300 hover:text-teal-200'
+                                         : 'bg-slate-200 hover:bg-slate-300 text-teal-700 hover:text-teal-600'}`}
+                   title={`Open publication source: ${citation.key}.md`}
+                 >
+                   <FileText size={16} className="mr-2 flex-shrink-0" />
+                   <span className="group-hover:underline font-medium">{citation.key}</span>
+                   <ExternalLink size={16} className="ml-2 opacity-0 group-hover:opacity-100 transition-opacity" />
+                 </button>
               ))}
             </div>
           )}
@@ -299,6 +306,8 @@ const NodeView: React.FC<NodeViewProps> = ({
   const scrollRef = useRef<HTMLDivElement>(null);
   const parsedDetails = useMemo(() => parseNodeDetails(node, allNodes), [node, allNodes]);
 
+  // Ensure we're using the correct description field
+  const mainDescription = parsedDetails.mainDescription || parsedDetails.description;
   useEffect(() => {
     const targetSlug = (window as any).__targetSectionSlugForNodeView;
     if (targetSlug && scrollRef.current) {
@@ -330,7 +339,8 @@ const NodeView: React.FC<NodeViewProps> = ({
     h2: ({node: _n, ...props}: any) => <h2 id={props.id || slugify(React.Children.toArray(props.children).join(''))} className="text-lg font-semibold mt-3 mb-1.5 border-b pb-0.5 dark:border-slate-700" {...props}></h2>,
     h3: ({node: _n, ...props}: any) => <h3 id={props.id || slugify(React.Children.toArray(props.children).join(''))} className="text-base font-semibold mt-2 mb-1" {...props}></h3>,
     h4: ({node: _n, ...props}: any) => <h4 id={props.id || slugify(React.Children.toArray(props.children).join(''))} className="text-sm font-semibold mt-1.5 mb-0.5 flex items-center" {...props}><Hash size={13} className="mr-1 text-slate-500 dark:text-slate-400 opacity-70"/>{props.children}</h4>,
-    p: ({node: _n, ...props}: any) => <p className="my-1.5 leading-relaxed text-sm" {...props}></p>,
+   // Use div instead of p to avoid nesting issues with pre/code elements
+   p: ({node: _n, ...props}: any) => <div className="my-1.5 leading-relaxed text-sm" {...props}></div>,
     ul: ({node: _n, ...props}: any) => <ul className="list-disc pl-5 my-1.5 space-y-0.5 text-sm" {...props}></ul>,
     // CORRECTED THE ol COMPONENT HERE
     ol: ({node: _n, ...props}: any) => <ol className="list-decimal pl-5 my-1.5 space-y-0.5 text-sm" {...props}></ol>,
@@ -376,7 +386,7 @@ const NodeView: React.FC<NodeViewProps> = ({
       />
       
       <NodeViewDescription
-        description={parsedDetails.mainDescription}
+        description={mainDescription}
         darkMode={darkMode}
         markdownComponents={nodeViewMarkdownComponents}
       />

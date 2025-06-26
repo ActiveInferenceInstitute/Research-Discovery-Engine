@@ -1,10 +1,43 @@
 // src/utils/graphUtils.ts
 // Helper functions for graph manipulation and analysis.
 
-import { GraphData, NodeObject, LinkObject, CSSVector } from '../types';
+import { GraphData, NodeObject, LinkObject, CSSVector, NodeType } from '../types';
 import { cloneDeep } from 'lodash';
+import * as d3 from 'd3';
 
-// Find all neighbors of a given node up to a certain depth
+/**
+ * Assigns nodes to clusters for force-directed clustering visualization
+ * 
+ * @param nodes - Array of nodes to cluster
+ * @param numClusters - Number of clusters to create
+ * @returns Nodes with cluster assignments
+ */
+export function assignNodesToClusters(nodes: NodeObject[], numClusters: number): NodeObject[] {
+  // Simple implementation of force-directed clustering
+  const clusters = Array.from({ length: numClusters }, (_, i) => ({
+    id: i,
+    x: Math.random() * 100 - 50,
+    y: Math.random() * 100 - 50,
+    z: Math.random() * 100 - 50
+  }));
+  
+  // Assign initial random cluster to each node
+  const clonedNodes = nodes.map(node => ({
+    ...node,
+    cluster: Math.floor(Math.random() * numClusters)
+  }));
+  
+  return clonedNodes;
+}
+
+/**
+ * Find all neighbors of a given node up to a certain depth
+ * 
+ * @param graphData - The graph data
+ * @param nodeId - ID of the node to find neighbors for
+ * @param depth - Maximum depth to search (default: 1)
+ * @returns Sets of neighbor nodes and connecting links
+ */
 export function getNeighbors(graphData: GraphData, nodeId: string, depth: number = 1): { nodes: Set<NodeObject>, links: Set<LinkObject> } {
   const nodes = new Set<NodeObject>();
   const links = new Set<LinkObject>();
