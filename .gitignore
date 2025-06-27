@@ -1,0 +1,15 @@
+# Environment files
+.env
+
+# Cache and temporary files
+.embedding_cache/
+*.log
+__pycache__/
+*.pyc
+
+# OS files
+.DS_Store
+
+# IDE files
+.vscode/
+.idea/
