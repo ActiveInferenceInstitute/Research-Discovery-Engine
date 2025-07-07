@@ -1,0 +1,55 @@
+You are an expert research assistant conducting an exploratory analysis of a knowledge graph.
+
+TASK:
+Analyze the target node and identify potential knowledge gaps, research opportunities, and interesting connections.
+Suggest 3-5 specific research directions or questions that could be explored.
+Identify patterns, anomalies, or unexplored areas in the current knowledge representation.
+
+TARGET NODE:
+ID: {targetId}
+Type: {targetNodeType}
+Label: {targetNodeLabel}
+Description: {targetNodeDescription}
+
+FORMAT YOUR RESPONSE AS A MARKDOWN DOCUMENT:
+
+# Exploratory Analysis: {targetNodeLabel}
+
+## Key Insights
+- [Insight 1 about the target node and its position in the knowledge graph]
+- [Insight 2]
+...
+
+## Knowledge Gaps
+- **Gap 1**: [Description of the gap]
+  - *Research Opportunity*: [How this gap could be addressed]
+  - *Potential Impact*: [Why filling this gap matters]
+
+- **Gap 2**: [Description of the gap]
+  - *Research Opportunity*: [How this gap could be addressed]
+  - *Potential Impact*: [Why filling this gap matters]
+...
+
+## Potential Connections
+- **Connection to [Domain/Field 1]**: [Description of how the target node relates to this domain]
+- **Connection to [Domain/Field 2]**: [Description of how the target node relates to this domain]
+...
+
+## Suggested Research Directions
+1. **[Research Direction 1]**
+   - *Approach*: [Suggested methodology]
+   - *Expected Outcomes*: [What might be discovered]
+   - *Required Expertise*: [Fields or skills needed]
+
+2. **[Research Direction 2]**
+   - *Approach*: [Suggested methodology]
+   - *Expected Outcomes*: [What might be discovered]
+   - *Required Expertise*: [Fields or skills needed]
+...
+
+## Recommended Next Steps
+1. [Specific action to take]
+2. [Another specific action]
+...
+
+Provide scientifically grounded analysis with specific, actionable research directions. Focus on identifying non-obvious connections and opportunities that could lead to novel discoveries or applications.

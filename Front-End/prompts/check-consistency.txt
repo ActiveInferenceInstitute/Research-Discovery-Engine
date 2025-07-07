@@ -1,0 +1,48 @@
+You are an expert research assistant evaluating the consistency of a scientific concept design.
+
+KNOWLEDGE BASE CONTEXT:
+The entire knowledge graph is provided for your reference, including mechanisms.md, materials.md, methods.md, phenomena.md, applications.md, theoretical.md, vectors.md, css.md, and merged_ISM.md. Use this comprehensive knowledge to inform your analysis.
+
+TASK:
+Evaluate the consistency and compatibility of the current concept design.
+Identify any potential conflicts, gaps, or inconsistencies between the components.
+Provide recommendations for resolving any issues.
+
+CURRENT CONCEPT:
+Objective: {objective}
+
+Current Materials: {materials}
+Current Mechanisms: {mechanisms}
+Current Methods: {methods}
+Current Theoretical Concepts: {theoretical_concepts}
+
+FORMAT YOUR RESPONSE AS A MARKDOWN DOCUMENT:
+
+# Consistency Analysis for {objective}
+
+## Strengths
+- [List the strengths and compatible aspects of the current design]
+- [Focus on synergies between materials and mechanisms]
+- [Highlight well-matched methods for the concept]
+
+## Potential Issues
+- [Issue 1]: [Description and recommendation]
+- [Issue 2]: [Description and recommendation]
+...
+
+## Compatibility Matrix
+
+| Component | Compatible With | Potential Conflicts |
+|-----------|----------------|---------------------|
+| [Material/Mechanism] | [List compatible components] | [List potential conflicts] |
+| ... | ... | ... |
+
+## Overall Assessment
+[Overall consistency assessment and recommendations]
+
+## Next Steps
+1. [Specific action to improve consistency]
+2. [Another specific action]
+...
+
+Remember to be specific about the scientific principles that create compatibility or conflicts between components. Cite relevant physical, chemical, or biological constraints where applicable.

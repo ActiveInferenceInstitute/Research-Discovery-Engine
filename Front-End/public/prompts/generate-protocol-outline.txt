@@ -1,0 +1,86 @@
+You are an expert research scientist creating an experimental protocol for a novel concept.
+
+TASK:
+Generate a comprehensive experimental protocol to validate this concept.
+Include sections for materials, equipment, procedures, measurements, and analysis.
+Provide specific, actionable steps that would allow researchers to test and validate the concept.
+
+CURRENT CONCEPT:
+Objective: {objective}
+
+Materials: {materials}
+Mechanisms: {mechanisms}
+Methods: {methods}
+Theoretical Concepts: {theoretical_concepts}
+
+FORMAT YOUR RESPONSE AS A MARKDOWN DOCUMENT:
+
+# Experimental Protocol: {objective}
+
+## 1. Objective
+[Clear statement of the protocol's purpose, including specific hypotheses to be tested]
+
+## 2. Materials and Equipment
+
+### 2.1 Materials
+- [Material 1]: [Specifications, quantity, source/vendor if applicable]
+- [Material 2]: [Specifications, quantity, source/vendor if applicable]
+...
+
+### 2.2 Equipment
+- [Equipment 1]: [Specifications, settings]
+- [Equipment 2]: [Specifications, settings]
+...
+
+## 3. Safety Considerations
+- [Safety precaution 1]
+- [Safety precaution 2]
+...
+
+## 4. Preparation
+[Detailed preparation steps, including any solutions, samples, or setups that must be prepared before the main procedure]
+
+## 5. Experimental Procedure
+
+### 5.1 [Procedure Stage 1]
+1. [Step 1]
+2. [Step 2]
+...
+
+### 5.2 [Procedure Stage 2]
+1. [Step 1]
+2. [Step 2]
+...
+
+## 6. Measurements and Data Collection
+- [Measurement 1]: [What to measure, how to measure it, frequency/timing]
+- [Measurement 2]: [What to measure, how to measure it, frequency/timing]
+...
+
+## 7. Analysis Methods
+- [Analysis Method 1]: [Description, purpose, expected outcomes]
+- [Analysis Method 2]: [Description, purpose, expected outcomes]
+...
+
+## 8. Expected Results
+- [Expected Result 1]: [Description, how it validates the concept]
+- [Expected Result 2]: [Description, how it validates the concept]
+...
+
+## 9. Troubleshooting
+- [Potential Issue 1]: [Solution/Workaround]
+- [Potential Issue 2]: [Solution/Workaround]
+...
+
+## 10. Time Estimation
+- Total estimated time: [X hours/days]
+- [Stage 1]: [Time estimate]
+- [Stage 2]: [Time estimate]
+...
+
+## 11. References
+- [Reference 1]
+- [Reference 2]
+...
+
+Be specific about quantities, durations, temperatures, and other parameters. Include control experiments where appropriate. Ensure the protocol is reproducible by other researchers.
