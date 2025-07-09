@@ -45,6 +45,12 @@ Visual of Interface Design Proposal for Mobile Experience</p></center>
 
 [Behaviour of the Action-Intention Model](#Behaviour-of-the-Action-Intention-Model)
 
+[Minding the Gap: An Attentive Pause Before Action](#Minding-the-Gap-An-Attentive-Pause-Before-Action)
+
+[Gap-Closing or Gap-Filling](#Gap-Closing-or-Gap-Filling)
+
+[Heuristics for Choosing Gap-Filling or Gap-Closing](#Heuristics-for-Choosing-Gap-Filling-or-Gap-Closing)
+
 [System Architecture](#System-Architecture)
 
 [User Experience: Look and Feel](#User-Experience)
@@ -132,7 +138,6 @@ The conceptual foundation and design principles of Research Neighbourhood draws 
 Research Neighbourhood follows HCI principles through intuitive and efficient user interactions. [Progressive disclosure](https://www.google.com/url?q=https://www.interaction-design.org/literature/book/the-glossary-of-human-computer-interaction/progressive-disclosure&sa=D&source=editors&ust=1750107610022779&usg=AOvVaw0ckYHNwWWH3bnKG8pBMktF) is employed across multiple scales and directions of exploration—longitudinal, latitudinal, and relational—enabling users to navigate information both non-linearly and sequentially. Affordances (opportunities for action) and signifiers (meaningful environmental markers) make possible interactions clear, enabling effective navigation through tasks and features.
 
 2.  #### Information Visualisation
-    
 
 The platform leverages advanced information visualisation techniques to make complex research landscapes more accessible and interpretable. Semantic zooming enables users to explore clusters of related papers and concepts at varying levels of detail.
 
@@ -286,7 +291,47 @@ The action-intention model in Research Neighbourhood behaves as a responsive fra
 
 * * *
 
-## Minding the Gap
+## Minding the Gap: An Attentive Pause Before Action
+
+Before we speak of *filling* or *closing* gaps, we begin by **minding the gap**.
+
+This is not a call to act, but to wait.
+
+To **mind the gap** is to notice an absence without rushing to occupy it. It is to acknowledge that something appears missing, but to hold back from declaring it a problem, or offering a solution.
+
+> **Why do we think there is a gap?**
+> - Who senses the absence?
+> - Who benefits from naming it as such?
+> - Is the gap real—or are we creating it through our own desire to be useful, to insert, to act?
+
+Gaps are often **produced**, not found. They can arise from institutional imperatives to demonstrate relevance, or from personal habits of intervention and improvement. Without care, these impulses risk generating busywork, friction, or harm—especially when existing systems already have their own ways of tending, balancing, or resolving tension.
+
+To mind the gap is to pause:
+- **Stay with** what is already present.
+- **Notice** how things are held together, even when loosely.
+- **Wait** to see if movement or connection is already underway.
+- **Ask** whether any intervention would truly serve.
+
+Only after that pause can we ask:
+- Is this a gap to be **closed**—by drawing connection between what is already there?
+- Or is it a gap to be **filled**—by creating something genuinely new, that is *wanted* and *needed*?
+
+Both may be valid. But only after the pause.
+
+### Gap-Closing or Gap-Filling
+
+| Aspect                  | Gap-Closing                                                    | Gap-Filling                                                    |
+|-------------------------|----------------------------------------------------------------|----------------------------------------------------------------|
+| **Metaphor**            | Connection, reconciliation, direct bridge between existing concepts                | Insertion, occupation, creation of a new bridge |
+| **Graph Logic**         | Add a new **edge** between existing nodes                  | Insert a new **node** connecting existing ones                     |
+| **Affect**              | Gentle, relational, restorative                    | Assertive, ambitious, potentially extractive                                |
+| **Value Creation**      | Builds trust or recognition across existing boundaries                       | Claims novelty; reframes existing fields         |
+| **Epistemic Politics**  | Encourages dialogue without erasure                 | Risks overwriting marginal or local knowledges                            |
+| **Ontology of Gap**     | Gap = **Disconnection** (rift to repair or translate across)                  | Gap = **Absence** (space to insert something)    |
+| **Power Dynamics**      | Respects autonomy; promotes negotiation               | Can displace or centralise power in the new node                        |
+| **Typical Outputs**     | Conceptual bridges, shared tools, or translations                    | New terminology, framework, or hybrid field              |
+| **Common In**           | Interdisciplinary work, decolonial research                    | Competitive grants, novelty-driven research                    |
+| **Ethical Risk**        | Over-simplification, false equivalence                    | Colonising, extractive knowledge production                         |
 
 ### Heuristics for Choosing Gap-Filling or Gap-Closing
 
@@ -319,7 +364,6 @@ It's the same as your population density analogy, identifying gaps (lack of brid
 Nodes are defined by type, for example methods. Edges are connections. Who is mentioning and in which context. There is another measure is the co-occurrence matrix.
 No keywords. Minimum bias from authors opinions in the papers.
 Maybe it would be easier to illustrate on Active Inference field.
-
 
 * * *
 
