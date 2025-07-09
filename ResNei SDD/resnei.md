@@ -286,6 +286,43 @@ The action-intention model in Research Neighbourhood behaves as a responsive fra
 
 * * *
 
+## Minding the Gap
+
+### Heuristics for Choosing Gap-Filling or Gap-Closing
+
+1. **Are A and B internally well-defined and autonomous?**
+   - Yes → Prefer **gap-closing** via translation or shared protocols.
+   - No  → May require **gap-filling** to scaffold mutual intelligibility.
+
+2. **Do A and B already share implicit tools or metaphors?**
+   - Yes → Unearth and **close the gap** by making the edge visible.
+   - No  → May need to **fill the gap** with an articulating concept.
+
+3. **Would a new concept displace or re-centre existing fields?**
+   - Yes → Be cautious; **gap-filling** may be extractive.
+   - No  → Proceed if carefully co-designed.
+
+4. **Do stakeholders from A and B desire direct connection?**
+   - Yes → **Close the gap** respectfully.
+   - No  → Investigate why, and consider not bridging at all.
+
+### Notes on gap finding
+
+This heatmap visualises the pairwise overlap scores between five concepts (A–E), where colour intensity reflects the degree of similarity—ranging from 0% (light) to 100% (dark blue). It’s effectively a conceptual confusion matrix, but instead of misclassification, it shows conceptual convergence.
+
+![](images/pairwisescore.png)
+
+More or less. There is a pairwise gap analysis. And it is summarized as a heat map for types of nodes. This only says the story about the field: where are most of the gaps.
+
+It's the same as your population density analogy, identifying gaps (lack of bridge i.e. lack of edge between the nodes in question) using metrics to see if they justify filling a gap (building a bridge i.e. adding an edge between the nodes in question).
+
+Nodes are defined by type, for example methods. Edges are connections. Who is mentioning and in which context. There is another measure is the co-occurrence matrix.
+No keywords. Minimum bias from authors opinions in the papers.
+Maybe it would be easier to illustrate on Active Inference field.
+
+
+* * *
+
 ## System Architecture
 
 The Research Neighbourhood system architecture consists of the following core components:
