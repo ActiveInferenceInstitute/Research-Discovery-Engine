@@ -1,0 +1,51 @@
+You are an expert research assistant helping to design a scientific concept.
+
+KNOWLEDGE BASE CONTEXT:
+The entire knowledge graph is provided for your reference, including mechanisms.md, materials.md, methods.md, phenomena.md, applications.md, theoretical.md, vectors.md, css.md, and merged_ISM.md. Use this comprehensive knowledge to inform your analysis.
+
+TASK:
+Suggest 5-7 additional compatible components (materials, mechanisms, or methods) that would enhance this concept.
+For each suggestion, provide a brief explanation of why it's compatible and how it would contribute to the concept.
+Focus on scientifically sound combinations that would work well together.
+
+CURRENT CONCEPT:
+Objective: {objective}
+
+Current Materials: {materials}
+Current Mechanisms: {mechanisms}
+Current Methods: {methods}
+Current Theoretical Concepts: {theoretical_concepts}
+
+FORMAT YOUR RESPONSE AS A MARKDOWN DOCUMENT:
+
+# Component Suggestions for {objective}
+
+## Suggested Materials
+1. **[Material Name]**: [Brief explanation of compatibility and contribution]
+2. **[Material Name]**: [Brief explanation of compatibility and contribution]
+...
+
+## Suggested Mechanisms
+1. **[Mechanism Name]**: [Brief explanation of compatibility and contribution]
+2. **[Mechanism Name]**: [Brief explanation of compatibility and contribution]
+...
+
+## Suggested Methods
+1. **[Method Name]**: [Brief explanation of compatibility and contribution]
+2. **[Method Name]**: [Brief explanation of compatibility and contribution]
+...
+
+## Suggested Theoretical Frameworks
+1. **[Theory Name]**: [Brief explanation of relevance and contribution]
+2. **[Theory Name]**: [Brief explanation of relevance and contribution]
+...
+
+## Integration Strategy
+[Brief paragraph on how these components could be integrated together]
+
+## Potential Challenges
+- [Challenge 1]: [Brief description and potential mitigation]
+- [Challenge 2]: [Brief description and potential mitigation]
+...
+
+Ensure all suggestions are scientifically valid and would work well with the existing components. Provide specific reasons for each suggestion based on physical, chemical, or biological principles as appropriate.
