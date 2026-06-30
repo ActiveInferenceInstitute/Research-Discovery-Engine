@@ -13,6 +13,10 @@ institute:
   maturity: released
   steward: Active Inference Institute
 ecosystem:
+  relations:
+  - repo: ActiveInferenceInstitute/InstituteOS
+    relation: referenced-by
+    note: Federated via the InstituteOS .aii manifest.
   links:
     github: https://github.com/ActiveInferenceInstitute/Research-Discovery-Engine
     website: https://www.activeinference.org
@@ -21,8 +25,10 @@ artifacts:
   kind: doc
   description: Repository overview.
 provenance:
+  license: CC-BY-4.0
   citation:
     zenodo: https://zenodo.org/badge/latestdoi/948595787
+    text: Active Inference Institute — Research-Discovery-Engine.
 instituteos:
   tags:
   - research
@@ -33,3 +39,7 @@ instituteos:
   - html
 capabilities:
 - documentation
+tasks:
+  install:
+    cmd: pip install -r requirements.txt
+    description: Install dependencies.
