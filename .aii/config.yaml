@@ -1,0 +1,35 @@
+# AII sidecar — InstituteOS metadata. Schema: instituteos.platform.aii_sidecar
+meta:
+  updated: '2026-06-30'
+repo:
+  name: Research-Discovery-Engine
+  slug: research-discovery-engine
+  full_name: ActiveInferenceInstitute/Research-Discovery-Engine
+  description: IntelliDE is an advanced platform that uses artificial intelligence
+    to accelerate scientific discovery, foster interdisciplinary collaboration, and
+    democratize access to knowledge.
+institute:
+  category: research
+  maturity: released
+  steward: Active Inference Institute
+ecosystem:
+  links:
+    github: https://github.com/ActiveInferenceInstitute/Research-Discovery-Engine
+    website: https://www.activeinference.org
+artifacts:
+- path: README.md
+  kind: doc
+  description: Repository overview.
+provenance:
+  citation:
+    zenodo: https://zenodo.org/badge/latestdoi/948595787
+instituteos:
+  tags:
+  - research
+  - discovery
+  - engine
+  - intellide
+  - advanced
+  - html
+capabilities:
+- documentation
