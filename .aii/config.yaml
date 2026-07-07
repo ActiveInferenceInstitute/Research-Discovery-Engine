@@ -21,7 +21,7 @@ ecosystem:
     github: https://github.com/ActiveInferenceInstitute/Research-Discovery-Engine
     website: https://www.activeinference.org
 artifacts:
-- path: README.md
+- path: ReadMe.md
   kind: doc
   description: Repository overview.
 provenance:
