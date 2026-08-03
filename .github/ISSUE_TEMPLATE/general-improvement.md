@@ -7,15 +7,6 @@ assignees: ''
 
 ---
 
----
-name: 💡 Improvement
-about: Suggest an improvement or enhancement to an existing feature or component
-title: "[Improvement]: "
-labels: ["improvement"]
-assignees: []
-
----
-
 ## 💡 Improvement Description
 A clear and concise description of the improvement or enhancement.
 

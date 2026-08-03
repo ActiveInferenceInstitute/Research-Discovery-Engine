@@ -18,8 +18,8 @@ assignees: ''
 
 ## ✅ Acceptance Criteria 
 
-- [ ] 
-- [ ] Criterion 2
-- [ ] Criterion 3
+- [ ] First acceptance criterion
+- [ ] Second acceptance criterion
+- [ ] Third acceptance criterion
 
 ## 📄 Additional Information

@@ -21,12 +21,12 @@ Our UX design moves away from conventional passive, attention-driven systems tow
 
 This platform aims to scale research processes through the interplay of generalists and specialists. Our platform involves a graphical concept model, enabling specialists to engage with reliable evaluation of scientific output, while democratising the otherwise intractable web of knowledge for the generalist. The co-evolution of expert-lead early adoption with generalist participation drives insight and growth: where research thrives through their collaboration. Grounded in scientific protocols and social accountability, ResNei values reciprocity, interdependence, and access. Innovation here acknowledges its real-world costs—social, ecological, and temporal—and builds not just tools, but shared capacity for meaningful discovery.
 
-Project Status: As of the first version of this publication in May 2025, this Solution Design Document outlines the foundational concepts, architecture, and guiding principles of ResNei. The project is currently in early development, with a set of working prototypes and a technical paper in preprint. This document supports the transition from conceptual design to implementation.
+Project Status: As of the first version of this publication in May 2025, this Solution Design Document outlines the foundational concepts, architecture, and guiding principles of ResNei. The project is currently in early development, with an early prototype (`resnei/` in this repository) and a technical paper in preprint. This document supports the transition from conceptual design to implementation; capabilities described here are design targets unless the `resnei/` code demonstrates them.
 
 * * *
 
 <center><p align="center">
-    <img src="images/image18.png "Visual of Interface Design Proposal for Desktop Experience"><br>
+    *Figure not present in the repository (referenced file: `images/image18.png`): Visual of Interface Design Proposal for Desktop Experience*<br>
 Visual of Interface Design Proposal for Desktop Experience</p>
 
 <p align="center">
@@ -37,45 +37,45 @@ Visual of Interface Design Proposal for Mobile Experience</p></center>
 
 # CONTENTS
 
-[Introduction](#Introduction)
+[Introduction](#introduction)
 
-[Background: Conceptual and Design Foundations](#Background)
+[Background](#background)
 
-[Action-Intention Model](#Action-Intention-Model)
+[Action-Intention Model](#action-intention-model)
 
-[Behaviour of the Action-Intention Model](#Behaviour-of-the-Action-Intention-Model)
+[Behaviour of the Action-Intention Model](#behaviour-of-the-action-intention-model)
 
-[Minding the Gap: An Attentive Pause Before Action](#Minding-the-Gap-An-Attentive-Pause-Before-Action)
+[Minding the Gap: An Attentive Pause Before Action](#minding-the-gap-an-attentive-pause-before-action)
 
-[Gap-Closing or Gap-Filling](#Gap-Closing-or-Gap-Filling)
+[Gap-Closing or Gap-Filling](#gap-closing-or-gap-filling)
 
-[Heuristics for Choosing Gap-Filling or Gap-Closing](#Heuristics-for-Choosing-Gap-Filling-or-Gap-Closing)
+[Heuristics for Choosing Gap-Filling or Gap-Closing](#heuristics-for-choosing-gap-filling-or-gap-closing)
 
-[System Architecture](#System-Architecture)
+[System Architecture](#system-architecture)
 
-[User Experience: Look and Feel](#User-Experience)
+[User Experience](#user-experience)
 
-[User Interaction Design](#User-Interaction-Design)
+[User Interaction Design](#user-interaction-design)
 
-[Interface Design](#Interface-Design)
+[Interface Design](#interface-design)
 
-[Cognitive Load Management](#Cognitive-Load-Management)
+[Cognitive Load Management](#cognitive-load-management)
 
-[How ResNei works](#How-ResNei-works)
+[How ResNei works](#how-resnei-works)
 
-[Technical Specifications](#Technical-Specifications)
+[Technical Specifications](#technical-specifications)
 
-[Challenges and Solutions](#Challenges-and-Solutions)
+[Challenges and Solutions](#challenges-and-solutions)
 
-[Next Steps and Future Work](#Next-Steps-and-Future-Work)
+[Next Steps and Future Work](#next-steps-and-future-work)
 
-[Conclusion](#Conclusion)
+[Conclusion](#conclusion)
 
-[References](#References)
+[References](#references)
 
-[Neuro UX Design articles](#Neuro-UX-Design-articles)
+[Neuro UX Design articles](#neuro-ux-design-articles)
 
-[Appendix](#Appendix)
+[Appendix](#appendix)
 
 * * *
 
@@ -113,7 +113,7 @@ By offering a visually rich, collaborative, and cognitively supportive environme
 
 ### Motivation
 
-![](images/image14.png)
+*Figure not present in the repository (referenced file: `images/image14.png`).*
 
 Researchers, students, and collaborative teams often face challenges related to:
 
@@ -128,7 +128,7 @@ Research Neighbourhood is designed to address these challenges through a researc
 
 ### Design Principles
 
-![](images/image2.png)
+*Figure not present in the repository (referenced file: `images/image2.png`).*
 
 The conceptual foundation and design principles of Research Neighbourhood draws on theories and practices from several domains:
 
@@ -147,7 +147,7 @@ Drawing from knowledge graph theory, the system enables relational navigation t
 
 3.  #### Neuro Informed Design
     
-Research Neighbourhood applies [Neuro Informed Design](https://www.google.com/url?q=https://www.loop11.com/neuroarchitecture-and-ux-the-importance-of-design-psychology/&sa=D&source=editors&ust=1750107610027375&usg=AOvVaw2jNorRsnMhRxLXHtZrvedx) principles to reduce cognitive load while maintaining coherence and contextual awareness (see [Appendix](#h.6ewogw3l9gmb)). Instead of segmented presentation, i.e., fragmenting tasks into small, isolated parts, the platform organises information into contextual groups that make sense as cohesive units.
+Research Neighbourhood applies [Neuro Informed Design](https://www.google.com/url?q=https://www.loop11.com/neuroarchitecture-and-ux-the-importance-of-design-psychology/&sa=D&source=editors&ust=1750107610027375&usg=AOvVaw2jNorRsnMhRxLXHtZrvedx) principles to reduce cognitive load while maintaining coherence and contextual awareness (see [Appendix](#appendix)). Instead of segmented presentation, i.e., fragmenting tasks into small, isolated parts, the platform organises information into contextual groups that make sense as cohesive units.
 
 To support intuitive interaction, contextual cues and dynamic visual hierarchy are used to subtly guide users without causing distraction. Fault tolerance mechanisms further reduce anxiety by enabling easy undo/redo actions and providing clear warnings before irreversible tasks. Inspired by neuroarchitecture, the design prioritises smooth interaction flow and visual consistency to minimise cognitive friction and maintain user focus.
 
@@ -168,7 +168,7 @@ The system’s design philosophy acknowledges the need for balance between struc
 *   Adaptability: Instead of rigid individual customisation, the platform prioritises customisable layouts and shared workspaces that mediate collaboration between researchers.
 *   Interpersonal Design: Tools and features are designed to promote discussion, shared annotation, and collective meaning-making, strengthening research as a collaborative rather than purely individual pursuit.
 
-![](images/image9.png)
+*Figure not present in the repository (referenced file: `images/image9.png`).*
 
 ### Values
 
@@ -244,7 +244,7 @@ The production of scientific knowledge is often shaped by its funding. Research 
 
 The Research Neighbourhood employs an Action-Intention Model, in which user actions are treated as meaningful signals of research direction and intent. Unlike traditional attention-based systems that focus on passive engagement or maximising content consumption, this model actively responds to the goals, actions, and intentions of users.
 
-![](images/image22.png)
+*Figure not present in the repository (referenced file: `images/image22.png`).*
 
 The platform is designed to support user-defined research goals and collaborative practices, offering relevant tools and contextual structures as users explore materials or engage in shared discussions. In the current design, the system responds to explicit actions and interaction patterns, aligning with common research directions—such as familiarising with a concept, exploring related ideas, or comparing and evaluating findings. While the platform does not infer intent through predictive modelling in the current stage , its architecture allows for future development in this area, where adaptive responses could be refined through more nuanced understanding of user behaviour.
 
@@ -256,7 +256,7 @@ By centring on user actions and intentions, the platform creates a more fluid an
 
 ### Behaviour of the Action-Intention Model
 
-![](images/image21.png)
+*Figure not present in the repository (referenced file: `images/image21.png`).*
 
 The action-intention model in Research Neighbourhood behaves as a responsive framework, structured around identifiable user actions that reflect underlying research goals. Instead of predicting user intent through automated inference, the system supports a situated and action-oriented interaction model.
 
@@ -510,7 +510,7 @@ The current default theme is Arctic, characterised by cool green-blues and greys
 
 ## Cognitive Load Management
 
-Research Neighbourhood is designed to reduce cognitive load and enhance mental clarity through intentional arrangement, interface consistency, and fault-tolerant interactions. These design choices are grounded in principles from cognitive neuroscience and neurodesign, which highlight how attention, memory, and perception are shaped by the structure and presentation of information. The tool prioritises spatial coherence, pattern recognition, and emotional resonance to create an interface that feels both intuitive and informative. For specific references, see the [Neuroscience-Informed UX Recommendations Table](#h.faac1h5ri4zw) [in the Appendix](#h.faac1h5ri4zw).
+Research Neighbourhood is designed to reduce cognitive load and enhance mental clarity through intentional arrangement, interface consistency, and fault-tolerant interactions. These design choices are grounded in principles from cognitive neuroscience and neurodesign, which highlight how attention, memory, and perception are shaped by the structure and presentation of information. The tool prioritises spatial coherence, pattern recognition, and emotional resonance to create an interface that feels both intuitive and informative. For specific references, see the [Neuroscience-Informed UX Recommendations Table](#neuroscience-informed-ux-recommendations-table) [in the Appendix](#appendix).
 
 #### Principles and Features
 

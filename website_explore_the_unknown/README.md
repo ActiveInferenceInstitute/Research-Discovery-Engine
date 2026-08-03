@@ -1,36 +1,43 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Explore the Unknown — website prototype
 
-## Getting Started
+Next.js 14 (App Router) site for the "Explore the Unknown" research-discovery concept, with a companion Flask API. The two development servers are started together.
 
-First, run the development server:
+## Pages
+
+- `/` — landing page
+- `/chat` — chat interface
+- `/discover` — discovery mentor view
+- `/methods` — proposed methods (explanatory content)
+- `/team` — team page
+- `/waitlist` — waitlist signup
+
+## API routes
+
+- Next.js route handlers: `app/api/chat/route.ts`, `app/api/subscribe/route.ts`
+- Flask blueprints: `api/index_bp.py`, `api/routes/chat.py`, `api/routes/subscribe.py` (plus `api/chat_inital_version.py`, an older draft)
+
+In development, `next.config.js` rewrites `/api/:path*` to the Flask service; the frontend calls the `/api_ts/:path*` alias for the Next.js route handlers.
+
+## Development
 
 ```bash
+npm install
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+`npm run dev` starts both servers with `concurrently`:
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+- Next.js on http://localhost:3000 (`npm run next-dev`)
+- Flask on http://localhost:8000 (`npm run flask-dev`)
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+Python dependencies for the Flask API:
 
-## Learn More
+```bash
+pip install -r requirements.txt
+```
 
-To learn more about Next.js, take a look at the following resources:
+## Environment
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+The Flask chat route reads `MISTRAL_API_KEY` (see `api/routes/chat.py`). Other integrations (Supabase client, etc.) may require additional keys depending on the feature. Never commit real keys.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+This site is a prototype: the `/methods` page and related copy describe the proposed discovery methodology and are not a claim that the computation is implemented in this repository.

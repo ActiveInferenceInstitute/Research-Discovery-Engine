@@ -1,7 +1,8 @@
-from flask import Flask, render_template, jsonify
+from flask import Flask, render_template, jsonify, request
 import random
+from uploads.markdown_renderer import parse_markdown
 
-app = Flask(__name__, template_folder='templates', template_folder='uploads', static_folder='static')
+app = Flask(__name__, template_folder='templates', static_folder='static')
 
 # Sample data for the network graph
 def generate_sample_nodes():
