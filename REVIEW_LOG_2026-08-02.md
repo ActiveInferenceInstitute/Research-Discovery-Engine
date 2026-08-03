@@ -35,6 +35,9 @@ Changes are recorded in `TO-DO.md`; completed items are marked there with the co
 - `ebedc6c` — Discovery Engine documentation aligned with implemented code and script parsers
 - `b419782` — ResNei SDD, website prototype docs, path-analysis guide, issue templates, and the
   resnei compile fix (repeated `template_folder` keyword + missing imports)
+- `46a2df7` — follow-up runtime fix: outer resnei app template folder resolution and
+  module-relative, sanitized upload handling (found by running the apps in a throwaway
+  Flask venv, see "Verification performed" below)
 
 ### Verification performed
 
@@ -47,3 +50,8 @@ Changes are recorded in `TO-DO.md`; completed items are marked there with the co
 - The DE TypeScript build (`npm run build`) and full test suites were not run: the
   repository has no committed test suite for the frontend and `node_modules` is absent;
   only the seven scripts' argument parsers were inspected directly.
+- Runtime verification of both `resnei` Flask entry points in a throwaway venv
+  (`/tmp/resnei-verify-venv`, flask + markdown installed, removed after use):
+  `GET /`, `GET /network-data`, and `POST /render-article` all return 200 on both
+  `resnei/app.py` and `resnei/resnei/app.py`. The first run exposed the two defects
+  fixed in `46a2df7`; the second run passed all eight checks.
