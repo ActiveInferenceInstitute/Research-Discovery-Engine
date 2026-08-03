@@ -2,123 +2,64 @@
 
 [![DOI](https://zenodo.org/badge/948595787.svg)](https://doi.org/10.5281/zenodo.15084931)
 
-## Transforming Scientific Research Through AI-Powered Knowledge Discovery
+The Research Discovery Engine is a collection of research prototypes and supporting analyses for exploring scientific knowledge as structured, connected information. The repository currently includes:
 
-IntelliDE is an advanced platform that uses artificial intelligence to accelerate scientific discovery, foster interdisciplinary collaboration, and democratize access to knowledge.
+- `DE/`: a React, TypeScript, Vite, and Tailwind frontend for browsing the Discovery Engine knowledge graph and experimenting with concept design and LLM-assisted workflows.
+- `path/`: a Python network-analysis pipeline over the linked Markdown knowledge base, with checked-in outputs under `path/results/`.
+- `resnei/`: a small Flask-based ResNei prototype.
+- `website_explore_the_unknown/`: a Next.js website prototype.
+- `Docs/`: the numbered Discovery Engine system-design documentation.
+- `ResNei SDD/`: the ResNei software design document and diagrams.
 
-## 🌟 Vision
+The repository is experimental and contains multiple related prototypes rather than one installable package. Read the component README before running a component.
 
-The Scientific Discovery Engine aims to overcome key limitations in traditional scientific research:
-- Metrics-driven evaluation that can restrict innovation
-- Publication pressure that fragments research
-- Knowledge silos that prevent cross-disciplinary insights
-- Information overload that hinders discovery of critical connections
+## Quick start: Discovery Engine frontend
 
-## Interface
-![Demo](/Docs/videos/DE.gif)
-
-## 🧠 Core Technology
-
-IntelliDE leverages several cutting-edge technologies:
-
-### CT-GIN Framework
-Combines Category Theory and Graph Isomorphism Networks to create structured knowledge representations that identify connections across disciplines.
-
-### Vector-Based Knowledge System
-Represents all extracted information as vectors, enabling:
-- Concept mapping across research domains
-- Sophisticated filtering of relevant information
-- Knowledge aggregation from disparate sources
-
-### Active Inference
-Uses probabilistic modeling for uncertainty-based hypothesis generation, producing evidence-based research directions rather than random outputs.
-
-### Advanced NLP Processing
-- **Automated Literature Analysis**: Processes scientific papers to extract structured knowledge
-- **Topic Modeling & Clustering**: Uses BERTopic and SciBERT to discover patterns across research fields
-- **Hierarchical Visualization**: Maps research in high-dimensional space for visual exploration
-
-## 🔧 Features
-
-- **Structured Knowledge Extraction**: Parses scientific literature into standardized templates
-- **Pattern Detection**: Maps relationships between research fields, topics, and concepts
-- **Hypothesis Generation**: Proposes evidence-based research directions
-- **Collaboration Facilitation**: Identifies researchers with complementary expertise
-- **Visual Knowledge Maps**: Presents complex relationships through intuitive diagrams
-- **Interdisciplinary Integration**: Maps knowledge across different scales and domains
-- **Continuous Learning**: Refines recommendations based on feedback and new literature
-
-## 🚀 Getting Started
-
-### Prerequisites
-```
-Python 3.8+
-Required packages listed in requirements.txt
-```
-
-### Installation
 ```bash
-# Clone the repository
-git clone https://github.com/yourusername/intellide.git
-cd intellide
+git clone https://github.com/ActiveInferenceInstitute/Research-Discovery-Engine.git
+cd Research-Discovery-Engine/DE
+npm install
+npm run dev
+```
 
-# Create and activate a virtual environment (recommended)
-python -m venv env
-source env/bin/activate  # On Windows: env\Scripts\activate
+Open the local URL printed by Vite (normally `http://localhost:5173`). The frontend reads the knowledge base from `DE/KG/` at runtime.
 
-# Install dependencies
+To run the automated launcher instead:
+
+```bash
+python3 main.py
+```
+
+For the frontend's detailed setup, LLM configuration, scripts, and troubleshooting, see [`DE/docs/README.md`](DE/docs/README.md).
+
+## Analysis pipeline
+
+The Python analysis pipeline is run from `path/`:
+
+```bash
+cd path
+python -m venv .venv
+source .venv/bin/activate  # Windows: .venv\Scripts\activate
 pip install -r requirements.txt
+python research_paths.py
 ```
 
-### Basic Usage
-```python
-# Example code for processing scientific papers
-from intellide.core import DocumentProcessor
+It reads the Markdown knowledge-base files in `path/` and writes staged artifacts beneath `path/results/`. See [`path/README.md`](path/README.md) for the current output layout.
 
-processor = DocumentProcessor()
-knowledge_graph = processor.process_document("path/to/paper.pdf")
-```
+## Design documentation
 
-## 📊 Project Status
+The system-design series is indexed by [`Docs/0. DE-Paper-Outline.md`](Docs/0.%20DE-Paper-Outline.md). It describes the proposed Conceptual Nexus Model, template system, synthesis pipeline, FAIR goals, limitations, assumptions, and future direction. These documents describe the design and research direction; they should not be read as a claim that every proposed capability is implemented in the current prototypes.
 
-IntelliDE is currently in active development. We are focusing on:
+## Configuration and credentials
 
-1. Refining the core pipeline:
-   - Completing the initial processing script (main.py)
-   - Ensuring robust PDF text extraction
-   - Validating BERTopic clustering effectiveness
+The root `.env.example` documents configuration used by the Python tooling. Keep credentials in an untracked `.env` file and never commit API keys. The DE frontend uses Vite-prefixed variables such as `VITE_API_PROVIDER`, `VITE_OPENAI_API_KEY`, and `VITE_OPENROUTER_API_KEY`; see `DE/src/llm/config/LLMConfig.ts` for the current names.
 
-2. Developing the user interface:
-   - Creating visualization for knowledge graphs
-   - Designing interfaces for hypothesis generation
-   - Implementing collaborative features
+## Contributing
 
-## 🤝 Contributing
+See [`CONTRIBUTING.md`](CONTRIBUTING.md) for the scope of contributions and the local validation expectations.
 
-We welcome contributions from researchers, developers, and domain experts! See [CONTRIBUTING.md](CONTRIBUTING.md) for details on our code of conduct and the process for submitting pull requests.
+## License and citation
 
-## 📜 License
+Repository materials are licensed under [CC BY 4.0](LICENSE). The repository has a Zenodo DOI: [10.5281/zenodo.15084931](https://doi.org/10.5281/zenodo.15084931).
 
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
-
-## 📚 Documentation
-
-Comprehensive documentation is under development. In the meantime, check the `docs/` directory for available resources.
-
-## 🔗 Related Projects and Resources
-- [Active Inference Institute](https://www.activeinference.institute/)
-  - Umbrella Organization
-- [Project Website](https://explore-the-unknown.vercel.app/)
-  - 
-- [Research Paper](https://arxiv.org/abs/...)
-- [Blog Post](https://blog.example.com/intellide-announcement)
-
-## 👥 Team
-
-IntelliDE is being developed by a multidisciplinary team of researchers and engineers passionate about transforming scientific discovery.
-
-## 📧 Contact
-
-For questions, feedback, or collaboration opportunities, please contact us at:
-- Email: vbaulin@activeinference.institute
-
+For the institute, see [Active Inference Institute](https://www.activeinference.institute/). The public project prototype is also presented at [explore-the-unknown.vercel.app](https://explore-the-unknown.vercel.app/).
