@@ -29,4 +29,21 @@ DOCS-DEEP review of the public repository, including the root README and metadat
 
 ## Implementation
 
-Changes are recorded in `TO-DO.md`; completed items are marked there with the commit reference after commits are made.
+Changes are recorded in `TO-DO.md`; completed items are marked there with the commit references:
+
+- `4ae3d9a` — root README overhaul, CONTRIBUTING.md, Docs/ series fixes, review log and TODO
+- `ebedc6c` — Discovery Engine documentation aligned with implemented code and script parsers
+- `b419782` — ResNei SDD, website prototype docs, path-analysis guide, issue templates, and the
+  resnei compile fix (repeated `template_folder` keyword + missing imports)
+
+### Verification performed
+
+- `python3 -m py_compile` passes for `resnei/app.py`, `resnei/resnei/app.py`,
+  `resnei/uploads/markdown_renderer.py`, `config.py`, and `path/research_paths.py`.
+- A GitHub-slug-aware repo-wide Markdown link scan reports no remaining broken
+  documentation links or dead anchors (remaining hits are math notation such as
+  `N[m](Δa_max)` in knowledge-base records, a directory link, and a %20-encoded link,
+  all GitHub-valid).
+- The DE TypeScript build (`npm run build`) and full test suites were not run: the
+  repository has no committed test suite for the frontend and `node_modules` is absent;
+  only the seven scripts' argument parsers were inspected directly.

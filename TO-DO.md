@@ -11,13 +11,13 @@ Severity definitions: Minor = typo, broken link, or formatting defect. Medium = 
 
 ## Medium
 
-- [✓] Correct root README license, repository links, documentation paths, examples, and project status (`ReadMe.md`, `CONTRIBUTING.md`) — completed in commit `PENDING`.
-- [✓] Add auditable review record (`REVIEW_LOG_2026-08-02.md`) — completed in commit `PENDING`.
-- [✓] Repair the numbered design-document series and truncated use-case table (`Docs/9. Use Cases.md`, `Docs/12. Direction.md`) — completed in commit `PENDING`.
-- [✓] Align the DE README and developer/startup indexes with actual files, scripts, environment variables, and package commands (`DE/README.md`, `DE/docs/README.md`, `DE/docs/DEVELOPMENT_GUIDE.md`, `DE/docs/STARTUP_GUIDE.md`) — completed in commit `PENDING`.
-- [✓] Align the path-analysis guide with the actual pipeline and generated result tree (`path/README.md`) — completed in commit `PENDING`.
-- [✓] Replace the website's scaffold README with an accurate local setup and route overview (`website_explore_the_unknown/README.md`) — completed in commit `PENDING`.
-- [✓] Repair duplicate YAML front matter in the general improvement issue template (`.github/ISSUE_TEMPLATE/general-improvement.md`) — completed in commit `PENDING`.
+- [✓] Correct root README license, repository links, documentation paths, examples, and project status (`ReadMe.md`, `CONTRIBUTING.md`) — completed in commit `4ae3d9a`.
+- [✓] Add auditable review record (`REVIEW_LOG_2026-08-02.md`) — completed in commit `4ae3d9a`.
+- [✓] Repair the numbered design-document series and truncated use-case table (`Docs/9. Use Cases.md`, `Docs/12. Direction.md`) — completed in commit `4ae3d9a`.
+- [✓] Align the DE README and developer/startup indexes with actual files, scripts, environment variables, and package commands (`DE/README.md`, `DE/docs/README.md`, `DE/docs/DEVELOPMENT_GUIDE.md`, `DE/docs/STARTUP_GUIDE.md`) — completed in commit `ebedc6c`.
+- [✓] Align the path-analysis guide with the actual pipeline and generated result tree (`path/README.md`) — completed in commit `b419782`.
+- [✓] Replace the website's scaffold README with an accurate local setup and route overview (`website_explore_the_unknown/README.md`) — completed in commit `b419782`.
+- [✓] Repair duplicate YAML front matter in the general improvement issue template (`.github/ISSUE_TEMPLATE/general-improvement.md`) — completed in commit `b419782`.
 
 ## Major
 
@@ -26,4 +26,4 @@ Severity definitions: Minor = typo, broken link, or formatting defect. Medium = 
 
 ## Open / deferred
 
-Only the two Minor application/content follow-ups and the two Major documentation-system items above remain open. The remaining uncommitted `PENDING` markers will be replaced with the actual commit references before final verification.
+Only the two Minor application/content follow-ups and the two Major documentation-system items above remain open.
