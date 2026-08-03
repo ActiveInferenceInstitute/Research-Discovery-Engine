@@ -6,19 +6,19 @@
 
 ## 🚀 Overview
 
-This guide provides comprehensive documentation for all 7 standalone scripts in the Research Discovery Engine. Each script implements core functionality as modular, reusable utilities with professional CLI interfaces.
+This guide documents the seven core standalone scripts in the Research Discovery Engine. The `scripts/` directory also contains LLM-integrated and test-support scripts not covered here. Verify a script's current options with `--help` before relying on an example.
 
 ## 📋 Script Inventory
 
 | Script | Purpose | Functions | CLI Options | Test Status |
 |--------|---------|-----------|-------------|-------------|
-| `generate-summary.ts` | Content summarization | Summary generation, metadata extraction | `--help` | ✅ Tested |
-| `generate-protocol.ts` | Protocol generation | Interactive/batch protocol creation | `--interactive`, `--concept`, `--output` | ✅ Tested |
-| `analyze-data.ts` | Data analysis & statistics | Graph analysis, validation, search | `--stats`, `--validate`, `--search-query` | ✅ Tested |
-| `process-knowledge.ts` | Knowledge processing | Markdown parsing, reference extraction | `--source-file`, `--extract-refs`, `--stats` | ✅ Tested |
-| `run-tests.ts` | Testing infrastructure | Unit/integration/performance tests | `--test-type`, `--verbose`, `--component` | ✅ Tested |
-| `simulate-agents.ts` | Agent simulation | Multi-agent scenarios, performance metrics | `--scenario`, `--agent-count`, `--duration` | ✅ Tested |
-| `analyze-performance.ts` | Performance analysis | Benchmarking, optimization recommendations | `--test-type`, `--benchmark-size` | ✅ Tested |
+| `generate-summary.ts` | Content summarization | Summary generation, metadata extraction | `--concept`, `--format`, `--headless`, `--headless-output` | ✅ Tested |
+| `generate-protocol.ts` | Protocol generation | Protocol creation from a concept objective | `--objective`, `--materials`, `--mechanisms`, `--methods`, `--detail-level`, `--output-file` | ✅ Tested |
+| `analyze-data.ts` | Data analysis & statistics | Graph analysis, validation, search | `--input-file`, `--search-query`, `--stats`, `--validate`, `--find-path`, `--output-format`, `--headless`, `--headless-output` | ✅ Tested |
+| `process-knowledge.ts` | Knowledge processing | Markdown parsing, reference extraction | `--source-file`, `--source-dir`, `--extract-refs`, `--validate-links`, `--output-format`, `--output-file`, `--stats` | ✅ Tested |
+| `run-tests.ts` | Testing infrastructure | Unit/integration/performance tests | `--test-type`, `--component`, `--generate-mock-data`, `--validate-graph`, `--performance-test`, `--llm-test`, `--output-format`, `--verbose` | ✅ Tested |
+| `simulate-agents.ts` | Agent simulation | Multi-agent scenarios, performance metrics | none (no CLI argument parser) | ⚠️ Runs with defaults |
+| `analyze-performance.ts` | Performance analysis | Benchmarking, optimization recommendations | none (no CLI argument parser) | ⚠️ Runs with defaults |
 
 ## 📊 1. Data Analysis Script (`analyze-data.ts`)
 
@@ -44,16 +44,15 @@ npx tsx scripts/analyze-data.ts --validate
 npx tsx scripts/analyze-data.ts --search-query "polymer" --output-format readable
 
 # Find shortest path between nodes
-npx tsx scripts/analyze-data.ts --find-path --source "node1" --target "node2"
+npx tsx scripts/analyze-data.ts --find-path node1 node2
 ```
 
 ### CLI Options
 - `--stats` - Calculate and display graph statistics
 - `--validate` - Validate graph data structure
 - `--search-query <term>` - Search nodes and links for specific content
-- `--find-path` - Find shortest path between nodes
-- `--source <id>` - Source node for path finding
-- `--target <id>` - Target node for path finding
+- `--input-file <path>` - Input graph data JSON file
+- `--find-path <source> <target>` - Find shortest path between two nodes
 - `--output-format <format>` - Output format (json|readable)
 
 ### Sample Output
@@ -162,24 +161,15 @@ Simulate multi-agent research scenarios and analyze agent behavior patterns.
 - `generateAgentMetrics()` - Performance analysis
 - `trackInteractionPatterns()` - Behavior pattern analysis
 
-### Usage Examples
+### Usage
+
+`simulate-agents.ts` currently has no command-line argument parser; it runs with its built-in defaults when invoked:
 
 ```bash
-# Run exploration scenario with multiple agents
-npx tsx scripts/simulate-agents.ts --scenario exploration --agent-count 3 --duration 30
-
-# Research scenario with detailed output
-npx tsx scripts/simulate-agents.ts --scenario research --agent-count 5 --verbose
-
-# Validation scenario
-npx tsx scripts/simulate-agents.ts --scenario validation --agent-count 2 --duration 60
+npx tsx scripts/simulate-agents.ts
 ```
 
-### CLI Options
-- `--scenario <type>` - Simulation scenario (research|exploration|validation)
-- `--agent-count <number>` - Number of agents to simulate
-- `--duration <seconds>` - Simulation duration
-- `--verbose` - Detailed agent interaction logs
+The script exercises the `AgentService` simulation paths directly and prints agent interaction output. CLI options (scenario, agent count, duration, verbosity) are not implemented.
 
 ### Sample Output
 ```
@@ -203,23 +193,15 @@ Comprehensive performance analysis, benchmarking, and optimization recommendatio
 - `generateOptimizationRecommendations()` - Performance insights
 - `profileSystemPerformance()` - Overall system analysis
 
-### Usage Examples
+### Usage
+
+`analyze-performance.ts` currently has no command-line argument parser; it runs its built-in benchmark suite when invoked:
 
 ```bash
-# Compute performance analysis
-npx tsx scripts/analyze-performance.ts --test-type compute --benchmark-size 1000
-
-# Memory usage analysis
-npx tsx scripts/analyze-performance.ts --test-type memory --optimization-suggestions
-
-# Full system profiling
-npx tsx scripts/analyze-performance.ts --test-type all --benchmark-size 500
+npx tsx scripts/analyze-performance.ts
 ```
 
-### CLI Options
-- `--test-type <type>` - Test type (compute|memory|render|all)
-- `--benchmark-size <number>` - Benchmark dataset size
-- `--optimization-suggestions` - Generate optimization recommendations
+CLI options such as `--test-type`, `--benchmark-size`, and `--optimization-suggestions` are not implemented.
 
 ### Sample Output
 ```
@@ -244,23 +226,28 @@ Generate detailed experimental protocols for research concepts.
 ### Usage Examples
 
 ```bash
-# Interactive protocol generation
-npx tsx scripts/generate-protocol.ts --interactive
+# Generate a protocol from a concept objective
+npx tsx scripts/generate-protocol.ts --objective "Smart Materials"
 
-# Batch protocol generation
-npx tsx scripts/generate-protocol.ts --concept "Smart Materials" --output ./protocols/
+# With materials, mechanisms, methods, and a detail level
+npx tsx scripts/generate-protocol.ts \
+  --objective "Adaptive Material System" \
+  --materials "PEG_Hydrogel,Iron_Nanoparticles" \
+  --mechanisms "Magnetic_Actuation,pH_Response" \
+  --methods "Rheology,FTIR" \
+  --detail-level advanced
 
-# JSON output format
-npx tsx scripts/generate-protocol.ts --concept "Sensor Integration" --format json
+# Write the protocol to a file
+npx tsx scripts/generate-protocol.ts --objective "Sensor Integration" --output-file ./protocols/sensor.md
 ```
 
 ### CLI Options
-- `--interactive` - Interactive mode with prompts
-- `--concept <name>` - Concept name for protocol
+- `--objective <text>` - Concept objective (required)
 - `--materials <list>` - Comma-separated materials list
 - `--mechanisms <list>` - Comma-separated mechanisms list
-- `--output <path>` - Output file path
-- `--format <type>` - Output format (markdown|json)
+- `--methods <list>` - Comma-separated methods list
+- `--detail-level <level>` - Detail level: basic, intermediate, advanced
+- `--output-file <path>` - Output file path
 
 ### Sample Output
 ```
@@ -285,21 +272,21 @@ Generate comprehensive summaries of research concepts and documentation.
 ### Usage Examples
 
 ```bash
-# Generate summary with default settings
-npx tsx scripts/generate-summary.ts
-
 # Generate summary with specific concept
 npx tsx scripts/generate-summary.ts --concept "Bio-Inspired Materials"
 
 # JSON output format
-npx tsx scripts/generate-summary.ts --format json --output ./summaries/
+npx tsx scripts/generate-summary.ts --format json
+
+# Headless mode with a custom output directory
+npx tsx scripts/generate-summary.ts --concept "Bio-Inspired Materials" --headless --headless-output ./summaries/
 ```
 
 ### CLI Options
 - `--concept <name>` - Specific concept to summarize
 - `--format <type>` - Output format (markdown|json)
-- `--output <path>` - Output file path
-- `--complexity <level>` - Target complexity level
+- `--headless` - Enable headless mode with file output
+- `--headless-output <path>` - Custom output directory for headless mode
 
 ### Sample Output
 ```
@@ -404,11 +391,11 @@ npx tsx scripts/analyze-performance.ts --optimization-suggestions
 
 ## 📚 Additional Resources
 
-- **Main Documentation**: `/README.md`
-- **Technical Assessment**: `/DE/TECHNICAL_ASSESSMENT.md`
-- **Component Guide**: `/DE/docs/COMPONENTS.md`
-- **API Reference**: `/DE/docs/API_REFERENCE.md`
-- **Development Guide**: `/DE/docs/DEVELOPMENT_GUIDE.md`
+- **Main Documentation**: [`../README.md`](../README.md)
+- **Technical Assessment**: [`TECHNICAL_ASSESSMENT.md`](TECHNICAL_ASSESSMENT.md)
+- **Component Guide**: [`COMPONENTS.md`](COMPONENTS.md)
+- **API Reference**: [`API_REFERENCE.md`](API_REFERENCE.md)
+- **Development Guide**: [`DEVELOPMENT_GUIDE.md`](DEVELOPMENT_GUIDE.md)
 
 ---
 

@@ -4,6 +4,8 @@
 
 The headless mode functionality has been comprehensively implemented for the Research Discovery Engine scripts with full LLM integration, enabling automated batch processing, AI-powered research analysis, and seamless integration into CI/CD pipelines. When enabled, scripts operate without interactive console output and save structured results to timestamped output folders.
 
+> **Status (audited 2026-08-02):** Only `generate-summary.ts` and `analyze-data.ts` parse `--headless`/`--headless-output`. `generate-protocol.ts` documents these options in its header but does not parse them; `run-tests.ts`, `simulate-agents.ts`, and `analyze-performance.ts` do not support headless options. Examples below that use unsupported flags are marked.
+
 ## ✅ Implementation Status
 
 ### Fully Implemented ✅
@@ -22,13 +24,11 @@ The headless mode functionality has been comprehensively implemented for the Res
 **2. analyze-data.ts**
 - ✅ Headless functionality added
 - ✅ CLI options defined
-- 🚧 TypeScript configuration issues (import problems)
-- 🚧 Needs completion and testing
+- ✅ `--headless`/`--headless-output` parsed and implemented
 
 **3. generate-protocol.ts** 
-- ✅ CLI options added for headless mode
-- 🚧 Headless functionality needs implementation
-- 🚧 TypeScript configuration issues
+- 🚧 CLI options implemented, but `--headless`/`--headless-output` are documented in the source header and not parsed
+- 🚧 Headless execution needs implementation
 
 ### Fully Implemented with LLM Integration ✅
 
@@ -227,8 +227,8 @@ npx tsx DE/scripts/analyze-data.ts --headless \
   --stats --validate \
   --input-file data.json
 
-# Generate protocol in headless mode
-npx tsx DE/scripts/generate-protocol.ts --headless \
+# Generate protocol (headless options not parsed; CLI mode shown)
+npx tsx DE/scripts/generate-protocol.ts \
   --objective "Smart Material Design" \
   --materials "Polymer,Nanotubes"
 ```
@@ -248,16 +248,14 @@ npx tsx DE/scripts/llm-process-knowledge.ts --headless \
   --input-text "Research text here..." \
   --processing-type "extract_concepts"
 
-# Comprehensive testing including LLM integration
-npx tsx DE/scripts/run-tests.ts --headless \
+# Comprehensive testing including LLM integration (no --headless support)
+npx tsx DE/scripts/run-tests.ts \
   --test-type all \
   --llm-test \
   --performance-test
 
-# LLM performance analysis and benchmarking
-npx tsx DE/scripts/analyze-performance.ts --headless \
-  --test-type llm \
-  --benchmark-size large
+# LLM performance analysis and benchmarking (no CLI parser; runs defaults)
+npx tsx DE/scripts/analyze-performance.ts
 ```
 
 ### Batch Processing

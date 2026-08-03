@@ -2,6 +2,8 @@
 
 This directory contains standalone analysis and utility scripts that demonstrate and test the core functionality of the Research Discovery Engine outside the main application framework.
 
+> **Status (audited 2026-08-02):** This document mixes verified behavior with historical and aspirational descriptions. `simulate-agents.ts` and `analyze-performance.ts` have no CLI argument parser (they run with defaults), and benchmark metrics shown below were not reproducible from the current parsers. Verify options with each script's `--help` output before relying on an example.
+
 ## Script Overview
 
 | Script | Purpose | Dependencies |
@@ -142,13 +144,13 @@ graph LR
 
 | Script | Key Options | Example Usage | Output |
 |--------|-------------|---------------|--------|
-| **analyze-performance.ts** | `--test-type`, `--benchmark-size`, `--profile-components` | `npx tsx analyze-performance.ts --test-type compute --benchmark-size large` | Performance metrics & recommendations |
+| **analyze-performance.ts** | none (no CLI parser) | `npx tsx analyze-performance.ts` | Performance metrics & recommendations |
 | **analyze-data.ts** | `--input-file`, `--search-query`, `--stats`, `--validate` | `npx tsx analyze-data.ts --input-file graph.json --stats --validate` | Graph statistics & validation results |
 | **generate-summary.ts** | No specific options (demo mode) | `npx tsx generate-summary.ts` | Concept summary in markdown |
 | **process-knowledge.ts** | `--source-file`, `--source-dir`, `--extract-refs` | `npx tsx process-knowledge.ts --source-dir KG/ --extract-refs` | Processed knowledge & references |
 | **generate-protocol.ts** | `--objective`, `--materials`, `--detail-level` | `npx tsx generate-protocol.ts --objective "Smart Material" --detail-level advanced` | Experimental protocol |
 | **run-tests.ts** | `--test-type`, `--component`, `--performance-test` | `npx tsx run-tests.ts --test-type integration --performance-test` | Test results & performance |
-| **simulate-agents.ts** | `--scenario`, `--agent-count`, `--duration` | `npx tsx simulate-agents.ts --scenario research --agent-count 5` | Agent interaction simulation |
+| **simulate-agents.ts** | none (no CLI parser) | `npx tsx simulate-agents.ts` | Agent interaction simulation |
 
 ## 🔧 Function Signatures & Interfaces
 

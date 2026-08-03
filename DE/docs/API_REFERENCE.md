@@ -101,17 +101,17 @@ const {
 **Purpose**: Simulate AI agent interactions and responses
 
 ```typescript
-const agentService = createAgentService();
+// The service requires a callback that receives streamed agent messages
+const agentService = new AgentService((message) => {
+  console.log(message);
+});
 
 // Trigger agent action
-const response = await agentService.triggerAction({
-  type: 'search',
-  payload: { query: 'materials' }
-});
+agentService.triggerAgent('search-graph', { query: 'materials' });
 ```
 
 **Agent Actions**:
-- `search` - Search graph for relevant nodes
+- `search-graph` - Search graph for relevant nodes
 - `explore` - Suggest exploration paths
 - `consistency` - Check concept consistency
 - `protocol` - Suggest validation protocols

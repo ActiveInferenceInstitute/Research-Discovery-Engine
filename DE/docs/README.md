@@ -8,7 +8,6 @@ This directory contains comprehensive documentation for the Research Discovery E
 
 ### For Users
 - **[Getting Started](#getting-started)** - Start here if you're new to the platform
-- **[User Guide](#user-guide)** - How to use the application features
 - **[Startup Guide](STARTUP_GUIDE.md)** - Complete setup and launch instructions
 - **[Troubleshooting](TROUBLESHOOTING.md)** - Common issues and solutions
 
@@ -145,7 +144,7 @@ This directory contains comprehensive documentation for the Research Discovery E
 ## 🚀 Getting Started
 
 ### Prerequisites
-- **Node.js 16+** - JavaScript runtime
+- **Node.js 18.20+** - JavaScript runtime (baseline verified by `main.py`)
 - **Python 3.8+** - For the main entry script
 - **Modern Browser** - Chrome, Firefox, Safari, or Edge with WebGL support
 - **Git** - Version control (optional)
@@ -184,8 +183,8 @@ npm run dev
 ## 🛠️ System Requirements
 
 ### Required Software
-- **Node.js**: Version 16.0 or higher
-- **npm**: Version 8.0 or higher (included with Node.js)
+- **Node.js**: Version 18.20 or higher (baseline verified by `main.py`)
+- **npm**: Version 10 or higher (included with Node.js)
 - **Python**: Version 3.8 or higher
 - **Modern Web Browser**: 
   - Chrome 90+
@@ -218,6 +217,8 @@ npm run dev
 - **3D Graph Rendering**: 60fps with 500+ nodes
 - **Search Performance**: < 100ms response time
 - **Memory Usage**: < 512MB for typical usage
+
+Performance targets are planning goals, not measured guarantees; no benchmark artifacts are committed for them.
 
 ## 🧪 Testing
 
@@ -263,7 +264,7 @@ npm run dev
 - **📝 Content Management**: Dynamic markdown content processing
 - **🎬 Animation System**: Smooth transitions and visual feedback
 - **⚡ Performance Optimization**: Efficient handling of large datasets
-- **🛠️ Standalone Utilities**: 7 comprehensive scripts for research workflows
+- **Standalone Utilities**: 7 core scripts (13 TypeScript scripts in `scripts/` in total)
 
 ## 🎓 Learning Resources
 

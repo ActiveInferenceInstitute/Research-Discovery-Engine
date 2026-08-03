@@ -172,8 +172,8 @@ const { conceptState, updateConcept } = useConceptDesign();
 
 ### Context for Deep State
 ```typescript
-// Used sparingly for app-wide state
-const AppContext = createContext(appState);
+// App-wide state is managed through the useAppState hook
+const appState = useAppState();
 ```
 
 ## Styling Architecture
@@ -241,7 +241,7 @@ className={`${darkMode ? 'dark' : ''} app-container`}
 ### Async Error Handling
 ```typescript
 // Custom hooks handle loading/error states
-const { data, loading, error } = useAsyncData();
+const { graphData, loading, error } = useGraphData();
 
 if (error) return <ErrorDisplay error={error} />;
 if (loading) return <LoadingSpinner />;

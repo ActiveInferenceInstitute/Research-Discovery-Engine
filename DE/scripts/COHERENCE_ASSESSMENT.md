@@ -17,10 +17,10 @@ This document provides a comprehensive assessment of the coherence, accuracy, an
 - Updated all LLM scripts to use improved environment loading
 
 **Files Modified**:
-- `DE/scripts/load-env.ts` (NEW) - Central environment loading utility
-- `DE/scripts/llm-generate-summary.ts` - Updated to use new loader
-- `DE/scripts/llm-process-knowledge.ts` - Updated to use new loader
-- `DE/scripts/test-openai.ts` - Updated to use new loader
+- `load-env.ts` (NEW) - Central environment loading utility
+- `llm-generate-summary.ts` - Updated to use new loader
+- `llm-process-knowledge.ts` - Updated to use new loader
+- `test-openai.ts` - Updated to use new loader
 
 ### 2. **Batch Processing Path Issues - RESOLVED**
 
@@ -32,8 +32,8 @@ This document provides a comprehensive assessment of the coherence, accuracy, an
 - Improved error handling and logging in batch scripts
 
 **Files Modified**:
-- `DE/scripts/examples/batch-test-headless.sh` - Fixed paths and env loading
-- `DE/scripts/batch-test-llm.sh` - Improved environment validation
+- `examples/batch-test-headless.sh` - Fixed paths and env loading
+- `batch-test-llm.sh` - Improved environment validation
 
 ### 3. **ES Module Compatibility - RESOLVED**
 
@@ -67,14 +67,16 @@ batch-test-20250611-084316/
 
 ### **Documentation Coherence**: **HIGH (95%)**
 
-| Document | Coherence Score | Assessment |
-|----------|----------------|------------|
-| `README.md` | 95% | ✅ Accurately describes functionality, CLI options work as documented |
-| `HEADLESS_MODE.md` | 100% | ✅ Perfect match with actual headless behavior |
-| `README_HEADLESS.md` | 90% | ✅ Implementation status accurate, some scripts marked "TODO" are functional |
-| `/docs` Suite | 90% | ✅ System requirements and architecture match implementation |
+| Document | Coherence (audited 2026-08-02) | Assessment |
+|----------|--------------------------------|------------|
+| `README.md` | Partial | Several CLI examples and headless claims do not match the implemented parsers |
+| `HEADLESS_MODE.md` | Partial | Per-script headless status corrected; several scripts do not implement `--headless` |
+| `README_HEADLESS.md` | Partial | Same headless/CLI drift as `HEADLESS_MODE.md`; examples corrected |
+| `/docs` Suite | Partial | System requirements and architecture largely match; script inventories and counts were stale |
 
-### **Functional Coherence**: **EXCELLENT (95%)**
+### **Functional Coherence**: **PARTIAL**
+
+An audit on 2026-08-02 found that several documented CLI flags (e.g. `analyze-performance.ts` options, `simulate-agents.ts` options, `generate-protocol.ts --headless`) are not implemented by the current parsers. The affected examples were corrected in this pass; see `TO-DO.md` at the repository root for the current findings.
 
 #### ✅ **Working Examples**
 1. **Individual Script Execution** - 100% functional
@@ -97,7 +99,7 @@ batch-test-20250611-084316/
 ✅ generate-summary.ts                           # Basic functionality works
 ✅ generate-summary.ts --headless                # Headless mode functional
 ✅ analyze-data.ts --stats --validate            # Data analysis working
-✅ analyze-performance.ts --benchmark core       # Performance testing working
+⚠️ analyze-performance.ts (no CLI parser; runs default benchmark)
 ✅ run-tests.ts --test-type unit --verbose       # Unit tests pass (100%)
 ✅ load-env.ts                                   # Environment loading working
 ```

@@ -167,9 +167,9 @@ npm run preview
 
 ## 🔗 Related Documentation
 
-- [Technical Assessment](../TECHNICAL_ASSESSMENT.md) - Comprehensive system analysis
-- [Component Guide](docs/COMPONENTS.md) - Application architecture
-- [API Reference](docs/API_REFERENCE.md) - Development interfaces
+- [Technical Assessment](TECHNICAL_ASSESSMENT.md) - Comprehensive system analysis
+- [Component Guide](COMPONENTS.md) - Application architecture
+- [API Reference](API_REFERENCE.md) - Development interfaces
 - [README](../README.md) - Project overview and quick start
 
 ---

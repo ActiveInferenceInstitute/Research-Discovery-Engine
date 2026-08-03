@@ -310,7 +310,7 @@ sudo sysctl -p
    npm install <package-name>
    ```
 
-### 14. ESLint/TypeScript Errors
+### 15. ESLint/TypeScript Errors
 
 **Problem**: Linting or type checking failures
 
@@ -328,7 +328,7 @@ npm update @types/react @types/react-dom
 
 ## 📁 File System Issues
 
-### 15. Permission Denied Errors
+### 16. Permission Denied Errors
 
 **Problem**: Cannot read/write files
 
@@ -345,7 +345,7 @@ chmod 644 <file>
 sudo chown -R $USER:$USER <directory>
 ```
 
-### 16. Path Not Found Errors
+### 17. Path Not Found Errors
 
 **Problem**: Files or directories not found
 
@@ -370,7 +370,7 @@ sudo chown -R $USER:$USER <directory>
 
 ## 🔒 Security and Network Issues
 
-### 17. Firewall Blocking Connections
+### 18. Firewall Blocking Connections
 
 **Problem**: Cannot access development server
 
@@ -387,7 +387,7 @@ sudo firewall-cmd --reload
 netstat -tulpn | grep 5173
 ```
 
-### 18. CORS Errors
+### 19. CORS Errors
 
 **Problem**: Cross-Origin Resource Sharing errors
 
@@ -413,7 +413,7 @@ netstat -tulpn | grep 5173
 
 ## 🐛 Debugging Techniques
 
-### 19. Enable Debug Mode
+### 20. Enable Debug Mode
 
 **Problem**: Need more verbose output for debugging
 
@@ -430,7 +430,7 @@ node --inspect npm run dev
 # Check Console, Network, and Sources tabs
 ```
 
-### 20. Log Analysis
+### 21. Log Analysis
 
 **Problem**: Need to analyze application logs
 
@@ -452,7 +452,7 @@ node --inspect npm run dev
 
 ## 🔄 Recovery Procedures
 
-### 21. Complete Reset
+### 22. Complete Reset
 
 **Problem**: Multiple issues, need fresh start
 
@@ -472,7 +472,7 @@ git reset --hard HEAD
 python3 main.py --install
 ```
 
-### 22. Backup and Recovery
+### 23. Backup and Recovery
 
 **Problem**: Need to backup/restore project state
 
@@ -488,7 +488,7 @@ npm install
 
 ## 📞 Getting Help
 
-### 23. Where to Get Support
+### 24. Where to Get Support
 
 **Resources**:
 1. **Documentation**:
@@ -510,7 +510,7 @@ npm install
    # Terminal output
    ```
 
-### 24. Creating Bug Reports
+### 25. Creating Bug Reports
 
 **Include This Information**:
 - Operating system and version

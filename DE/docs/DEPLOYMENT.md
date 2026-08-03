@@ -21,7 +21,7 @@ npm run dev
 ### Production Build
 ```bash
 # Type checking
-npm run type-check
+npx tsc --noEmit
 
 # Lint code
 npm run lint
@@ -126,7 +126,7 @@ FROM node:18-alpine AS builder
 
 WORKDIR /app
 COPY package*.json ./
-RUN npm ci --only=production
+RUN npm ci
 
 COPY . .
 RUN npm run build
@@ -416,7 +416,7 @@ jobs:
     
     - name: Type check
       working-directory: ./DE
-      run: npm run type-check
+      run: npx tsc --noEmit
     
     - name: Lint
       working-directory: ./DE
@@ -439,7 +439,7 @@ jobs:
 ## 🎯 Production Checklist
 
 ### Pre-Deployment
-- [ ] Run type checking (`npm run type-check`)
+- [ ] Run type checking (`npx tsc --noEmit`)
 - [ ] Run linting (`npm run lint`)
 - [ ] Test production build (`npm run build && npm run preview`)
 - [ ] Verify all environment variables

@@ -5,7 +5,7 @@
 This project, the "Discovery Engine," is a frontend application designed to facilitate the exploration of complex scientific knowledge and support the collaborative generation of novel scientific concepts and research artifacts. It operates on a **Conceptual Nexus Model (CNM)**, a dynamic knowledge graph constructed by parsing and structuring information from a corpus of Markdown (`.md`) files. These files represent an interconnected knowledge tree of scientific domains, including mechanisms, materials, methods, phenomena, theoretical principles, and associated publications.
 
 The platform aims to transform how researchers interact with and build upon scientific knowledge by:
-1.  **Synthesizing a Knowledge Graph:** Automatically building the CNM from structured `.md` files located in the `public/KG/` directory.
+1.  **Synthesizing a Knowledge Graph:** Automatically building the CNM from structured `.md` files located in the `KG/` directory (served as static assets by Vite).
 2.  **Intuitive Exploration:** Providing users with interactive tools, including a 3D graph visualization and a browsable "Knowledge Browser" sidebar, to navigate and understand the CNM.
 3.  **AI-Assisted Discovery (Simulated):** Integrating a suite of (currently simulated) AI agents designed to:
     *   Identify knowledge gaps and inconsistencies within the CNM.
@@ -27,9 +27,8 @@ By default, the system uses OpenAI's API for LLM capabilities. To use OpenAI:
 
 1. Create a `.env` file with your OpenAI API key:
    ```
-   API_PROVIDER=openai
-   OPENAI_API_KEY=your_openai_api_key_here
-   OPENAI_MODEL=gpt-4o-mini
+   VITE_API_PROVIDER=openai
+   VITE_OPENAI_API_KEY=your_openai_api_key_here
    ```
 
 ### OpenRouter Integration
@@ -38,9 +37,8 @@ The system also supports OpenRouter, which provides access to various models inc
 
 1. Create a `.env` file with your OpenRouter API key:
    ```
-   API_PROVIDER=openrouter
-   OPENROUTER_API_KEY=your_openrouter_api_key_here
-   OPENROUTER_MODEL=google/gemini-2.0-flash-exp:free
+   VITE_API_PROVIDER=openrouter
+   VITE_OPENROUTER_API_KEY=your_openrouter_api_key_here
    ```
 
 2. Available OpenRouter models:
@@ -57,7 +55,7 @@ The system also supports OpenRouter, which provides access to various models inc
 
 ## Core Philosophy & Workflow
 
-The Discovery Engine embodies a human-AI co-creation process. It leverages the strengths of human expertise for ideation and critical evaluation, augmented by AI's capability for large-scale information processing, pattern recognition, and suggestion generation. The detailed workflow is described in `process.md` and involves:
+The Discovery Engine embodies a human-AI co-creation process. It leverages the strengths of human expertise for ideation and critical evaluation, augmented by AI's capability for large-scale information processing, pattern recognition, and suggestion generation. The workflow is implemented across the Concept Designer, Agent Console, and related source modules:
 
 1.  **Defining Scope & Initiating Design:** Users start by exploring the CNM or stating a high-level goal. AI assistants (simulated) help refine the scope.
 2.  **Component Integration & Novel Combination:** Users build concepts by adding and relating components from the CNM, with AI providing suggestions and consistency checks.
@@ -66,10 +64,10 @@ The Discovery Engine embodies a human-AI co-creation process. It leverages the s
 
 ## Project Structure
 
-*   **`public/KG/`**: The knowledge base.
+*   **`KG/`**: The knowledge base served as static assets.
     *   `mechanisms.md`, `materials.md`, `methods.md`, `phenomena.md`, `applications.md`, `theoretical.md`: Core domain knowledge.
     *   `css.md`: **Crucial Schema Definition** for all node and edge types in the CNM. This file defines the structure and attributes that the system expects.
-    *   `process.md`: Outlines the human-AI workflow.
+
     *   `publications/`: Markdown files for individual cited publications (e.g., `author_year_title.md`).
 *   **`src/`**: React application source.
     *   **`App.tsx`**: Main application component.
@@ -85,7 +83,7 @@ The Discovery Engine embodies a human-AI co-creation process. It leverages the s
     *   **`hooks/`**: `useGraphData.ts`, `useConceptDesign.ts`.
     *   **`types/`**: TypeScript definitions (`index.ts`, `css.ts`).
     *   **`utils/`**:
-        *   `cnmBuilder.ts`: Parses all `.md` files in `public/KG/` to build the graph data (`nodes` and `links`) based on headings and link syntax.
+        *   **`cnmBuilder.ts`**: Fetches and parses the configured `.md` files in `KG/` to build graph data (`nodes` and `links`) based on headings and link syntax.
         *   `markdownParser.ts`: Parses raw markdown into a structured format (document title, preamble, hierarchical sections).
         *   `parseNodeData.ts`: Extracts and formats content from a `NodeObject`'s description for display in `NodeView`.
         *   `graphUtils.ts`: Graph-related helper functions.
@@ -145,12 +143,12 @@ All system requirements and project structure will be automatically verified whe
 1. Create a `.env` file in the project root with your API keys:
    ```
    # For OpenAI
-   API_PROVIDER=openai
-   OPENAI_API_KEY=your_openai_api_key_here
+   VITE_API_PROVIDER=openai
+   VITE_OPENAI_API_KEY=your_openai_api_key_here
    
    # OR for OpenRouter
-   API_PROVIDER=openrouter
-   OPENROUTER_API_KEY=your_openrouter_api_key_here
+   VITE_API_PROVIDER=openrouter
+   VITE_OPENROUTER_API_KEY=your_openrouter_api_key_here
    ```
 
 2. Test your LLM connection:

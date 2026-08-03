@@ -16,7 +16,7 @@ This guide provides comprehensive information for developers working with the Re
 ### Initial Setup
 ```bash
 # Clone the repository
-git clone https://github.com/yourusername/Research-Discovery-Engine.git
+git clone https://github.com/ActiveInferenceInstitute/Research-Discovery-Engine.git
 cd Research-Discovery-Engine
 
 # Navigate to the application directory
@@ -39,9 +39,6 @@ npm run build
 
 # Preview production build
 npm run preview
-
-# Type checking
-npm run type-check
 
 # Linting
 npm run lint
@@ -574,8 +571,8 @@ For development questions and support:
 ## 📚 Additional Resources
 
 - **[Component Architecture](COMPONENTS.md)**: Detailed component documentation
-- **[Refactoring Progress](REFACTORING_PROGRESS.md)**: History of improvements
-- **[.cursorrules](../.cursorrules)**: Complete coding standards
+- **Development History**: See the repository commit history and `FINAL_STATUS.md`
+- **Coding Standards**: Project conventions documented in this guide and enforced with `npm run lint`
 - **TypeScript Documentation**: [Official TypeScript docs](https://www.typescriptlang.org/docs/)
 - **React Documentation**: [Official React docs](https://react.dev/)
 

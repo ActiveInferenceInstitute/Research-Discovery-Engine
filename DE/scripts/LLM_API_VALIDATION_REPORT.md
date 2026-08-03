@@ -1,6 +1,8 @@
 # LLM API Handling Validation Report
 **Research Discovery Engine - Complete API Validation**
 
+> **Note (audited 2026-08-02):** The tables below are historical test documentation. The current script set does not include a committed executable test artifact that reproduces these exact totals; treat the numbers as a dated record rather than a re-runnable result.
+
 ## 🎯 Executive Summary
 
 **OVERALL RESULT**: ✅ **LLM API HANDLING IS VALID AND ACCURATE**

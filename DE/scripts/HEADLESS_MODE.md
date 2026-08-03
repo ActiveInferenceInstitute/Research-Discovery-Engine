@@ -2,6 +2,8 @@
 
 This document describes the comprehensive headless mode functionality implemented across all standalone scripts in the Research Discovery Engine, including full LLM integration testing. Headless mode allows scripts to run without displaying output to the console, instead saving structured results to timestamped output folders.
 
+> **Status (audited 2026-08-02):** Not every script implements headless mode. Only `generate-summary.ts` and `analyze-data.ts` parse `--headless`/`--headless-output`; the LLM scripts have their own option sets. Sections below mark the actual parser state per script.
+
 ## Overview
 
 When headless mode is enabled, each script:
@@ -71,22 +73,24 @@ generate-summary_2025-06-10T21-03-55/
 - `--concept "name"` - Target concept for summary
 - `--format markdown|json` - Output format
 
-### 2. generate-protocol.ts 🚧 IN PROGRESS
+### 2. generate-protocol.ts 🚧 PARTIAL
 
 Generates experimental protocols from concept definitions.
 
-**Usage:**
+**Usage (CLI implemented; headless options not parsed):**
 ```bash
-# Basic headless mode
-npx tsx DE/scripts/generate-protocol.ts --headless --objective "Smart Hydrogel Actuator"
+# Generate a protocol from an objective
+npx tsx DE/scripts/generate-protocol.ts --objective "Smart Hydrogel Actuator"
 
 # With specific materials and mechanisms
-npx tsx DE/scripts/generate-protocol.ts --headless \
+npx tsx DE/scripts/generate-protocol.ts \
   --objective "Adaptive Material System" \
   --materials "PEG_Hydrogel,Iron_Nanoparticles" \
   --mechanisms "Magnetic_Actuation,pH_Response" \
   --detail-level advanced
 ```
+
+The source header documents `--headless` and `--headless-output`, but the argument parser does not handle them; headless execution for this script is not implemented.
 
 **Unique Options:**
 - `--objective "text"` - Concept objective (required)
@@ -94,8 +98,9 @@ npx tsx DE/scripts/generate-protocol.ts --headless \
 - `--mechanisms "x,y,z"` - Comma-separated mechanisms list
 - `--methods "m1,m2"` - Comma-separated methods list
 - `--detail-level basic|intermediate|advanced` - Protocol complexity
+- `--output-file path` - Write the protocol to a file
 
-### 3. analyze-data.ts 🚧 IN PROGRESS
+### 3. analyze-data.ts ✅ IMPLEMENTED
 
 Performs comprehensive data analysis on graph structures.
 
@@ -124,72 +129,57 @@ npx tsx DE/scripts/analyze-data.ts --headless \
 - `--find-path source target` - Find shortest path between nodes
 - `--output-format json|readable` - Output format
 
-### 4. process-knowledge.ts 📋 TODO
+### 4. process-knowledge.ts ✅ IMPLEMENTED (no headless mode)
 
 Processes and transforms knowledge graph data.
 
-**Planned Usage:**
+**Usage:**
 ```bash
-# Basic knowledge processing
-npx tsx DE/scripts/process-knowledge.ts --headless --operation extract
+# Process a single markdown file
+npx tsx DE/scripts/process-knowledge.ts --source-file path/to/file.md
 
-# Custom processing with filters
-npx tsx DE/scripts/process-knowledge.ts --headless \
-  --operation transform \
-  --filter-type Material \
-  --headless-output ./knowledge-results
+# Process a directory and extract references
+npx tsx DE/scripts/process-knowledge.ts --source-dir ../KG/ --extract-refs --output-file ./knowledge.json
 ```
 
-### 5. run-tests.ts 📋 TODO
+The parser supports `--source-file`, `--source-dir`, `--extract-refs`, `--validate-links`, `--output-format`, `--output-file`, and `--stats`. It does not implement `--headless` or `--operation`.
+
+### 5. run-tests.ts ✅ IMPLEMENTED (no headless mode)
 
 Executes comprehensive test suites and validation.
 
-**Planned Usage:**
+**Usage:**
 ```bash
-# Full test suite in headless mode
-npx tsx DE/scripts/run-tests.ts --headless --suite all
+# Full test suite
+npx tsx DE/scripts/run-tests.ts --test-type all
 
 # Specific test categories
-npx tsx DE/scripts/run-tests.ts --headless \
-  --suite integration \
-  --verbose \
-  --headless-output ./test-results
+npx tsx DE/scripts/run-tests.ts --test-type integration --verbose
 ```
 
-### 6. simulate-agents.ts 📋 TODO
+The parser supports `--test-type`, `--component`, `--generate-mock-data`, `--validate-graph`, `--performance-test`, `--llm-test`, `--output-format`, and `--verbose`. It does not implement `--headless` or `--suite`.
+
+### 6. simulate-agents.ts ⚠️ NO CLI PARSER
 
 Simulates agent interactions and workflows.
 
-**Planned Usage:**
+**Usage:**
 ```bash
-# Basic agent simulation
-npx tsx DE/scripts/simulate-agents.ts --headless --scenario standard
-
-# Custom simulation parameters
-npx tsx DE/scripts/simulate-agents.ts --headless \
-  --scenario collaboration \
-  --agents 5 \
-  --duration 300 \
-  --headless-output ./simulation-results
+npx tsx DE/scripts/simulate-agents.ts
 ```
 
-### 7. analyze-performance.ts ✅ IMPLEMENTED
+This script has no command-line argument parser; it runs its built-in simulation with default parameters.
+
+### 7. analyze-performance.ts ⚠️ NO CLI PARSER
 
 Analyzes system performance and generates reports including LLM performance testing.
 
 **Usage:**
 ```bash
-# Comprehensive performance analysis including LLM
-npx tsx DE/scripts/analyze-performance.ts --headless \
-  --test-type all \
-  --benchmark-size medium \
-  --optimization-suggestions
-
-# LLM-specific performance testing
-npx tsx DE/scripts/analyze-performance.ts --headless \
-  --test-type llm \
-  --benchmark-size large
+npx tsx DE/scripts/analyze-performance.ts
 ```
+
+This script has no command-line argument parser; it runs its built-in benchmark suite with default parameters.
 
 ### 8. llm-process-knowledge.ts ✅ IMPLEMENTED
 
@@ -211,7 +201,7 @@ npx tsx DE/scripts/llm-process-knowledge.ts --headless \
   --question-type "exploratory"
 ```
 
-### 9. run-tests.ts ✅ IMPLEMENTED WITH LLM
+### 9. run-tests.ts — LLM integration testing
 
 Comprehensive testing suite including full LLM integration testing.
 
