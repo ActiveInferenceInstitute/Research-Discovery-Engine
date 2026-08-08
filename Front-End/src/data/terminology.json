@@ -1,0 +1,256 @@
+{
+  "novel_terms": {
+    "conceptual_ecology": {
+      "id": "conceptual_ecology",
+      "name": "Conceptual Ecology",
+      "classification": "Novel",
+      "discipline": "Discovery Engine Framework",
+      "description": "A structured map of domain concepts and their interrelationships",
+      "detailed_description": "Treating the field itself as a complex 'conceptual ecosystem' by constructing and analyzing a comprehensive knowledge graph of interconnected concepts, moving beyond qualitative review to quantitative, data-driven cartography.",
+      "links": ["Discovery Path Prototype"],
+      "usage_context": "field_exploration",
+      "importance": "foundational"
+    },
+    "probabilistic_knowledge_gap_engine": {
+      "id": "probabilistic_knowledge_gap_engine",
+      "name": "Probabilistic Knowledge-Gap Engine",
+      "classification": "Novel",
+      "discipline": "Network Science, Graph Theory",
+      "description": "Identifies and ranks likely missing links in a knowledge graph",
+      "detailed_description": "A predictive engine that leverages network structure to systematically identify and rank high-potential 'knowledge gaps'—non-existent links between materials and applications that are strongly predicted by shared mechanistic neighbors.",
+      "links": ["Discovery Path Prototype"],
+      "usage_context": "gap_discovery",
+      "importance": "core"
+    },
+    "causal_trajectory_synthesis": {
+      "id": "causal_trajectory_synthesis",
+      "name": "Causal Trajectory Synthesis",
+      "classification": "Novel",
+      "discipline": "Graph Theory, Algorithm Design",
+      "description": "Generates multi-step hypothesis paths through concept networks",
+      "detailed_description": "An algorithm that moves beyond simple link prediction to generate plausible, multi-step research programs connecting a starting concept to a target concept across a knowledge gap, transforming static predictions into actionable research hypotheses.",
+      "links": ["Discovery Path Prototype"],
+      "usage_context": "innovation_planning",
+      "importance": "core"
+    },
+    "ct_gin_framework": {
+      "id": "ct_gin_framework",
+      "name": "CT-GIN Framework",
+      "classification": "Novel",
+      "discipline": "Category Theory, Knowledge Graphs",
+      "description": "Category-theoretic templates coupled with graph embeddings for structured reasoning",
+      "detailed_description": "A framework combining category theory's formal structure with Graph Isomorphism Networks for robust knowledge representation and reasoning.",
+      "links": ["IntelliDE README"],
+      "usage_context": "advanced_reasoning",
+      "importance": "specialized"
+    },
+    "active_inference_agents": {
+      "id": "active_inference_agents",
+      "name": "Active Inference Agents",
+      "classification": "Novel",
+      "discipline": "Active Inference, Free-Energy Principle",
+      "description": "Autonomous agents that minimize variational free energy to guide exploration",
+      "detailed_description": "AI agents based on the free-energy principle that actively explore the knowledge space, making predictions and updating beliefs to minimize uncertainty and guide scientific discovery.",
+      "links": ["Buehler & Pashea (Active Inference Integration)"],
+      "usage_context": "agent_systems",
+      "importance": "advanced"
+    },
+    "conceptual_nexus_model": {
+      "id": "conceptual_nexus_model",
+      "name": "Conceptual Nexus Model (CNM)",
+      "classification": "Novel",
+      "discipline": "Knowledge Graphs, AI Synthesis",
+      "description": "A dynamic, AI-curated knowledge graph representing concepts, methods, parameters, and relations",
+      "detailed_description": "The core knowledge representation system that integrates concepts from multiple scientific domains into a unified, queryable, and dynamically updated graph structure.",
+      "links": ["The Discovery Engine paper"],
+      "usage_context": "knowledge_representation",
+      "importance": "foundational"
+    },
+    "conceptual_nexus_tensor": {
+      "id": "conceptual_nexus_tensor",
+      "name": "Conceptual Nexus Tensor (TCNM)",
+      "classification": "Novel",
+      "discipline": "Tensor Algebra, Knowledge Representation",
+      "description": "A high-dimensional tensor encoding modes for nodes, relationships, context, and provenance",
+      "detailed_description": "A mathematical representation that captures the multi-dimensional relationships between concepts, including temporal evolution, contextual dependencies, and evidence provenance.",
+      "links": ["The Discovery Engine paper"],
+      "usage_context": "advanced_analytics",
+      "importance": "specialized"
+    },
+    "knowledge_artifact": {
+      "id": "knowledge_artifact",
+      "name": "Knowledge Artifact",
+      "classification": "Novel",
+      "discipline": "AI-Driven Distillation",
+      "description": "A structured, verifiable output unit extracted from publications by guided LLMs",
+      "detailed_description": "Standardized units of knowledge extracted from scientific literature using AI, containing structured information about concepts, methods, results, and relationships that can be integrated into the knowledge graph.",
+      "links": ["The Discovery Engine paper"],
+      "usage_context": "knowledge_extraction",
+      "importance": "core"
+    },
+    "universal_concept_schema": {
+      "id": "universal_concept_schema",
+      "name": "Universal Concept Schema (UCS)",
+      "classification": "Novel",
+      "discipline": "Ontologies, Category Theory",
+      "description": "The formal template schema defining node and edge types for knowledge extraction",
+      "detailed_description": "A comprehensive schema that standardizes how scientific concepts, methods, phenomena, and their relationships are represented and interconnected across disciplines.",
+      "links": ["The Discovery Engine paper"],
+      "usage_context": "schema_definition",
+      "importance": "foundational"
+    },
+    "distillation_template": {
+      "id": "distillation_template",
+      "name": "Distillation Template",
+      "classification": "Novel",
+      "discipline": "Structured AI Prompts",
+      "description": "Adaptive, modular LLM prompt schema used to extract granular knowledge components",
+      "detailed_description": "Carefully designed prompt templates that guide large language models to extract structured knowledge from scientific papers in a consistent, verifiable format.",
+      "links": ["The Discovery Engine paper"],
+      "usage_context": "llm_extraction",
+      "importance": "core"
+    },
+    "verifiability_robustness_scoring": {
+      "id": "verifiability_robustness_scoring",
+      "name": "Verifiability & Robustness Scoring System",
+      "classification": "Novel",
+      "discipline": "FAIR Principles, Metrics Design",
+      "description": "Dynamic scoring framework evaluating findability, interoperability, reusability, and evidence strength",
+      "detailed_description": "A comprehensive evaluation system that assesses the quality, reliability, and utility of knowledge artifacts and connections based on FAIR principles and evidence strength.",
+      "links": ["The Discovery Engine paper"],
+      "usage_context": "quality_assessment",
+      "importance": "core"
+    }
+  },
+  "borrowed_terms": {
+    "knowledge_graph": {
+      "id": "knowledge_graph",
+      "name": "Knowledge Graph",
+      "classification": "Borrowed",
+      "discipline": "Graph Theory, Semantic Web",
+      "description": "A graph-based representation of entities and their semantic relationships",
+      "detailed_description": "A data structure that represents information as nodes (entities) and edges (relationships), enabling complex queries and reasoning about interconnected knowledge.",
+      "links": ["https://en.wikipedia.org/wiki/Knowledge_graph"],
+      "usage_context": "foundational_technology",
+      "importance": "foundational"
+    },
+    "network_centrality": {
+      "id": "network_centrality",
+      "name": "Network Centrality",
+      "classification": "Borrowed",
+      "discipline": "Network Science",
+      "description": "Measures of node importance in graphs (Degree, PageRank, Betweenness)",
+      "detailed_description": "Mathematical measures that quantify the importance or influence of nodes in a network, used to identify key concepts and influential research areas.",
+      "links": ["https://en.wikipedia.org/wiki/Centrality"],
+      "usage_context": "network_analysis",
+      "importance": "core"
+    },
+    "community_detection": {
+      "id": "community_detection",
+      "name": "Community Detection (Louvain)",
+      "classification": "Borrowed",
+      "discipline": "Network Science",
+      "description": "Algorithm for uncovering modular structure (clusters) in large networks",
+      "detailed_description": "Computational methods for identifying groups of densely connected nodes that represent research communities or thematic clusters within the knowledge space.",
+      "links": ["https://en.wikipedia.org/wiki/Louvain_modularity"],
+      "usage_context": "community_identification",
+      "importance": "core"
+    },
+    "cooccurrence_network": {
+      "id": "cooccurrence_network",
+      "name": "Co-occurrence Network & Shannon Entropy",
+      "classification": "Borrowed",
+      "discipline": "Information Theory",
+      "description": "Builds term co-occurrence networks and quantifies uncertainty via entropy",
+      "detailed_description": "Methods for analyzing how frequently concepts appear together and measuring the information content and uncertainty in these relationships.",
+      "links": ["https://en.wikipedia.org/wiki/Co-occurrence_network"],
+      "usage_context": "relationship_analysis",
+      "importance": "specialized"
+    },
+    "graph_isomorphism_networks": {
+      "id": "graph_isomorphism_networks",
+      "name": "Graph Isomorphism Networks",
+      "classification": "Borrowed",
+      "discipline": "Graph Neural Networks",
+      "description": "GNN architectures that test graph isomorphism invariance",
+      "detailed_description": "Neural network architectures specifically designed for learning on graph-structured data while preserving important structural properties.",
+      "links": ["https://arxiv.org/abs/1810.00826"],
+      "usage_context": "machine_learning",
+      "importance": "specialized"
+    },
+    "functors_limits": {
+      "id": "functors_limits",
+      "name": "Functors, Limits/Colimits",
+      "classification": "Borrowed",
+      "discipline": "Category Theory",
+      "description": "Fundamental constructs for mapping and composing abstract structures",
+      "detailed_description": "Mathematical tools from category theory used for formal reasoning about relationships and transformations between different knowledge domains.",
+      "links": ["https://en.wikipedia.org/wiki/Functor"],
+      "usage_context": "formal_reasoning",
+      "importance": "specialized"
+    },
+    "free_energy_minimization": {
+      "id": "free_energy_minimization",
+      "name": "Free-Energy Minimization",
+      "classification": "Borrowed",
+      "discipline": "Statistical Physics, Variational Inference",
+      "description": "Principle guiding probabilistic inference via energy-based optimization",
+      "detailed_description": "A fundamental principle from physics and neuroscience that drives learning and adaptation by minimizing prediction errors and uncertainty.",
+      "links": ["https://en.wikipedia.org/wiki/Free_energy_principle"],
+      "usage_context": "agent_behavior",
+      "importance": "advanced"
+    },
+    "bayesian_embedding_updates": {
+      "id": "bayesian_embedding_updates",
+      "name": "Bayesian Embedding Updates",
+      "classification": "Borrowed",
+      "discipline": "Bayesian Statistics",
+      "description": "Incremental posterior updates of node embeddings based on new evidence",
+      "detailed_description": "Statistical methods for continuously updating the numerical representations of concepts as new evidence and relationships are discovered.",
+      "links": ["https://en.wikipedia.org/wiki/Bayesian_inference"],
+      "usage_context": "dynamic_learning",
+      "importance": "advanced"
+    },
+    "reinforcement_learning": {
+      "id": "reinforcement_learning",
+      "name": "Reinforcement Learning (ORPO, EXO)",
+      "classification": "Borrowed",
+      "discipline": "Reinforcement Learning",
+      "description": "Policy optimization methods for sequential decision-making",
+      "detailed_description": "Machine learning approaches that enable agents to learn optimal strategies for exploration and decision-making through trial and error.",
+      "links": ["https://arxiv.org/abs/2403.07691"],
+      "usage_context": "agent_optimization",
+      "importance": "specialized"
+    }
+  },
+  "archetype_categories": {
+    "foundational_hubs": {
+      "name": "Foundational Hubs",
+      "description": "High influence, specialized knowledge pillars",
+      "characteristics": ["High centrality", "Domain-specific", "Well-established", "Heavily cited"],
+      "color": "purple",
+      "examples": ["physical-embodied-computation", "neuromorphic-computation", "mechanical-actuation"]
+    },
+    "boundary_spanners": {
+      "name": "Boundary Spanners", 
+      "description": "Cross-disciplinary bridges and unifying frameworks",
+      "characteristics": ["High interdisciplinarity", "Connect domains", "Unifying concepts", "Cross-pollination"],
+      "color": "blue",
+      "examples": ["statistical-mechanics--stochastic-thermodynamics", "collective-intelligence-conceptual"]
+    },
+    "niche_connectors": {
+      "name": "Niche Connectors",
+      "description": "Emerging hot topics with high interdisciplinary potential",
+      "characteristics": ["High growth potential", "Novel connections", "Emerging fields", "Innovation opportunities"],
+      "color": "green", 
+      "examples": ["basal-minimal-cognition-conceptual", "active-inference-fep"]
+    },
+    "specialized_concepts": {
+      "name": "Specialized Concepts",
+      "description": "Essential building blocks and specialized tools",
+      "characteristics": ["Domain-specific", "Technical precision", "Methodological", "Implementation-focused"],
+      "color": "gray",
+      "examples": ["monte-carlo-mc", "self-amputation"]
+    }
+  }
+}

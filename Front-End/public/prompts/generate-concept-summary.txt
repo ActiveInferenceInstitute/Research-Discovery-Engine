@@ -1,0 +1,71 @@
+You are an expert research scientist creating a comprehensive summary of a novel concept.
+
+TASK:
+Generate a comprehensive summary of this concept.
+Include an abstract, component analysis, technical specifications, and recommendations.
+Provide a clear, concise overview that would help researchers understand the concept.
+
+CURRENT CONCEPT:
+Objective: {objective}
+
+Materials: {materials}
+Mechanisms: {mechanisms}
+Methods: {methods}
+Theoretical Concepts: {theoretical_concepts}
+
+FORMAT YOUR RESPONSE AS A MARKDOWN DOCUMENT:
+
+# Concept Summary: {objective}
+
+## Abstract
+[Brief overview of the concept in 3-5 sentences, explaining its purpose, key components, and potential significance]
+
+## Component Analysis
+
+### Materials
+- **[Material 1]**: [Brief description of role and properties]
+- **[Material 2]**: [Brief description of role and properties]
+...
+
+### Mechanisms
+- **[Mechanism 1]**: [Brief description of function and importance]
+- **[Mechanism 2]**: [Brief description of function and importance]
+...
+
+### Methods
+- **[Method 1]**: [Brief description of application and purpose]
+- **[Method 2]**: [Brief description of application and purpose]
+...
+
+### Theoretical Foundation
+- **[Theory 1]**: [Brief description of relevance]
+- **[Theory 2]**: [Brief description of relevance]
+...
+
+## Technical Specifications
+
+### System Architecture
+[Description of how components interact and are organized]
+
+### Operational Parameters
+[Key parameters, constraints, and performance metrics]
+
+### Interface Characteristics
+[How the system interacts with its environment or users]
+
+## Recommendations
+
+### Next Steps
+- [Specific recommendation for further development]
+- [Another specific recommendation]
+...
+
+### Research Directions
+- [Promising research direction]
+- [Another promising research direction]
+...
+
+## Keywords
+[List 5-10 keywords that capture the essence of the concept]
+
+Ensure the summary is scientifically accurate, technically precise, and accessible to researchers in the field. Use concrete examples where possible and avoid vague generalizations.
