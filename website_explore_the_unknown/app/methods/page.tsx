@@ -541,7 +541,7 @@ export default function MethodsPage() {
                 informs the architecture and functionalities of the platform.
               </p>
               <a
-                href="https://github.com/ActiveInferenceInstitute/ActiveInferAnts/tree/54330ff2658d1b3b80708536e4a9db744c8cf585/1_PREPARE/Methods/Research/FieldSHIFT-2"
+                href="https://github.com/ActiveInferenceInstitute/Active_InferAnts/tree/54330ff2658d1b3b80708536e4a9db744c8cf585/1_PREPARE/Methods/Research/FieldSHIFT-2"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="inline-flex items-center space-x-2 text-blue-400 hover:text-blue-300"
