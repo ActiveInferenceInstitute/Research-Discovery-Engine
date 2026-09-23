@@ -1,0 +1,123 @@
+/* src/index.css */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* --- WikiView Index Sidebar Styling --- */
+.wiki-index-container {
+  font-size: 0.875rem; /* text-sm equivalent */
+  line-height: 1.4;
+}
+
+/* All ULs within the index */
+.wiki-index-container ul.wiki-index-ul {
+  list-style-type: none; /* Remove default bullets globally first */
+  padding-left: 0;
+  margin: 0.25em 0;
+}
+
+/* All LIs within the index */
+.wiki-index-container li.wiki-index-li {
+  margin: 0;
+  padding: 0;
+  position: relative; /* For positioning pseudo-elements like bullets */
+}
+
+/* == Styling for Buttons that are links == */
+.wiki-index-container button.wiki-index-link {
+  display: block; 
+  width: 100%;
+  text-align: left;
+  padding: 4px 6px; /* Base padding */
+  background-color: transparent; 
+  border: none; 
+  cursor: pointer;
+  line-height: 1.3; 
+  border-radius: 3px;
+  transition: background-color 0.1s ease-in-out;
+  font-weight: 400; /* Default normal weight */
+}
+.wiki-index-container.light-theme button.wiki-index-link:hover {
+  background-color: #EBF4FF; /* Tailwind blue-100 */
+}
+.wiki-index-container.dark-theme button.wiki-index-link:hover {
+  background-color: #2D3748; /* Tailwind gray-800 (a bit darker than default dark bg) */
+}
+
+
+/* == Level 1 List Items (Your H2 Categories in the index) == */
+/* This targets LI direct children of the first UL inside .wiki-index-container */
+.wiki-index-container > ul.wiki-index-ul > li.wiki-index-li {
+  padding-left: 1.25rem; /* Make space for the bullet */
+}
+.wiki-index-container > ul.wiki-index-ul > li.wiki-index-li::before {
+  content: '●'; /* Bullet character */
+  position: absolute;
+  left: 0.25rem; /* Position the bullet */
+  top: 6px;      /* Adjust vertical alignment of bullet */
+  font-size: 0.6em; /* Smaller bullet */
+}
+/* Color for top-level link text */
+.wiki-index-container.light-theme > ul.wiki-index-ul > li.wiki-index-li > button.wiki-index-link {
+  color: #1E40AF; /* Tailwind blue-800 - Darkest Blue for top level */
+  font-weight: 500; /* Medium for categories */
+}
+.wiki-index-container.dark-theme > ul.wiki-index-ul > li.wiki-index-li > button.wiki-index-link {
+  color: #93C5FD; /* Tailwind blue-300 - Brightest Blue for top level */
+  font-weight: 500;
+}
+/* Bullet color for top-level */
+.wiki-index-container.light-theme > ul.wiki-index-ul > li.wiki-index-li::before { color: #60A5FA; /* blue-400 */ }
+.wiki-index-container.dark-theme > ul.wiki-index-ul > li.wiki-index-li::before { color: #3B82F6; /* blue-500 */ }
+
+
+/* == Level 2 List (Your H3s, nested once) == */
+.wiki-index-container ul.wiki-index-ul > li.wiki-index-li > ul.wiki-index-ul {
+  padding-left: 1rem;   /* INDENT from parent li (which already has padding for its own bullet) */
+  margin-top: 0.1em;
+  margin-bottom: 0.25em;
+}
+/* Link text color for second-level items */
+.wiki-index-container.light-theme ul > li > ul > li > button.wiki-index-link { /* > direct child selector for specificity */
+  color: #2563EB; /* Tailwind blue-600 - Mid Blue */
+}
+.wiki-index-container.dark-theme ul > li > ul > li > button.wiki-index-link {
+  color: #60A5FA; /* Tailwind blue-400 - Mid Blue */
+}
+
+
+/* == Level 3 List (Your H4s, nested twice) == */
+.wiki-index-container ul > li > ul > li > ul.wiki-index-ul {
+  padding-left: 1rem;   /* Further INDENT */
+  margin-top: 0.1em;
+  margin-bottom: 0.25em;
+}
+/* Link text color for third-level items */
+.wiki-index-container.light-theme ul > li > ul > li > ul > li > button.wiki-index-link {
+  color: #3B82F6; /* Tailwind blue-500 - Lighter/Softer Blue */
+  font-size: 0.8125rem; /* Slightly smaller for deep nesting */
+}
+.wiki-index-container.dark-theme ul > li > ul > li > ul > li > button.wiki-index-link {
+  color: #93C5FD; /* Tailwind blue-300 - Lighter Blue */
+  font-size: 0.8125rem;
+}
+
+/* Common hover/focus for ALL wiki-index-link buttons, color defined by theme specific above */
+.wiki-index-container button.wiki-index-link:hover,
+.wiki-index-container button.wiki-index-link:focus-visible { /* Use focus-visible for better accessibility */
+  text-decoration: underline;
+}
+.wiki-index-container.light-theme button.wiki-index-link:hover,
+.wiki-index-container.light-theme button.wiki-index-link:focus-visible {
+  background-color: #DBEAFE; /* Tailwind blue-200 */
+}
+.wiki-index-container.dark-theme button.wiki-index-link:hover,
+.wiki-index-container.dark-theme button.wiki-index-link:focus-visible {
+  background-color: #1E3A8A; /* Tailwind blue-800, adjust as needed for dark theme hover */
+}
+
+/* Styles for paragraphs inside list items, rendered as spans by indexMarkdownComponents */
+.wiki-index-container li.wiki-index-li > span {
+  margin: 0 !important;
+  padding: 0 !important; 
+}
