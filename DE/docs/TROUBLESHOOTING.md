@@ -316,8 +316,9 @@ sudo sysctl -p
 
 **Solutions**:
 ```bash
-# Fix auto-fixable issues
-npm run lint -- --fix
+# The lint script cannot currently run: it passes --ext, which a flat config
+# rejects, and eslint.config.js imports packages the manifest does not depend on
+# (see FINAL_STATUS.md). Use the type checker instead:
 
 # Check specific TypeScript errors
 npx tsc --noEmit --pretty

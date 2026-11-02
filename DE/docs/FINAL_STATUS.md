@@ -38,7 +38,8 @@ The application itself: 63 TypeScript/TSX files under `DE/src`, 8 component dire
 - There is **no automated test suite**: no Jest, Vitest, Playwright or Cypress configuration, and no `test` script in `package.json`.
 - The repository ships `DE/scripts/run-tests.ts` (652 lines), a standalone harness: `npx tsx scripts/run-tests.ts --test-type unit|integration|validation|llm|all`.
 - Measured without provider credentials: `unit` 5/5, `integration` 3/3 and `validation` 3/3 pass; `--test-type llm` reports 7 failures. The harness exits 0 in every case, including when tests fail, so a gate has to assert the reported failure count rather than the exit code.
-- The documented gate for this repository is `npm ci` followed by `npm run build`, which includes the type check, the Vite build, the knowledge-base mirror and its assertion.
+- `.github/workflows/ci.yml` is the repository's CI: Node 24 on `ubuntu-24.04`, `actions/checkout` and `actions/setup-node` pinned by commit SHA, `npm ci` from `package-lock.json`, the three credential-free harness subsets (asserting `Failed: 0`), then `npm run build`, which covers the type check, the Vite build, the knowledge-base mirror and its assertion. It runs no secrets and no scanners. Measured from a fresh checkout under Node 24.22.2: every step exits 0, and removing a document from `dist/KG/` makes the assertion exit 1.
+- `npm run lint` cannot run: the script passes `--ext ts,tsx`, which a flat config rejects, and `eslint.config.js` imports `@eslint/js`, `globals` and `typescript-eslint`, none of which the manifest depends on (it lists the older `@typescript-eslint/eslint-plugin` and `@typescript-eslint/parser` instead). CI does not invoke it.
 
 ## Known gaps
 
@@ -52,6 +53,7 @@ The application itself: 63 TypeScript/TSX files under `DE/src`, 8 component dire
 
 ## Recent changes
 
+- 2026-11-02 — CI added (`.github/workflows/ci.yml`), and this status record rewritten around the tree's measured behaviour.
 - 2026-11-02 — dead `.cursorrules` references removed from the DE documentation.
 - 2026-11-02 — single knowledge-base home: the analysis pipeline reads `DE/KG/`, and the duplicate copies that used to live in `path/` are gone.
 - 2026-11-02 — the runtime knowledge-base wiring is fixed: `DE/public/KG/` is generated at dev and build time instead of being missing.

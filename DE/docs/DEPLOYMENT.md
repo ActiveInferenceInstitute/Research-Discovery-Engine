@@ -23,10 +23,10 @@ npm run dev
 # Type checking
 npx tsc --noEmit
 
-# Lint code
-npm run lint
+# Lint code: the script cannot currently run (see FINAL_STATUS.md)
+# npm run lint
 
-# Build for production
+# Build for production (type check, bundle, knowledge-base assertion)
 npm run build
 
 # Preview production build locally
@@ -389,47 +389,37 @@ location /health {
 ## 🔄 CI/CD Pipeline
 
 ### GitHub Actions
-Create `.github/workflows/deploy.yml`:
+The repository runs `.github/workflows/ci.yml` on pushes to `main` and on pull requests: Node 24 on `ubuntu-24.04`, `actions/checkout` and `actions/setup-node` pinned by commit SHA, `npm ci` from `DE/package-lock.json`, the credential-free `run-tests.ts` subsets (`unit`, `integration`, `validation`, asserting the reported failure count), and `npm run build`, which type-checks, bundles and asserts the mirrored knowledge base in `dist/KG`. It needs no secrets, and the type check doubles as the check the old `lint` step was meant to provide (the lint script cannot currently run; see `FINAL_STATUS.md`).
+
+To deploy the built site from CI, add a separate workflow and keep every credential in repository secrets. With Vercel, for example:
 
 ```yaml
-name: Deploy to Production
-
+name: deploy
 on:
   push:
     branches: [main]
 
 jobs:
   deploy:
-    runs-on: ubuntu-latest
-    
+    runs-on: ubuntu-24.04
+    defaults:
+      run:
+        working-directory: DE
+
     steps:
-    - uses: actions/checkout@v3
-    
-    - name: Setup Node.js
-      uses: actions/setup-node@v3
+    - uses: actions/checkout@<commit-sha> # v7.0.1
+
+    - uses: actions/setup-node@<commit-sha> # v7.1.0
       with:
-        node-version: '18'
+        node-version: '24'
         cache: 'npm'
         cache-dependency-path: 'DE/package-lock.json'
-    
-    - name: Install dependencies
-      working-directory: ./DE
-      run: npm ci
-    
-    - name: Type check
-      working-directory: ./DE
-      run: npx tsc --noEmit
-    
-    - name: Lint
-      working-directory: ./DE
-      run: npm run lint
-    
-    - name: Build
-      working-directory: ./DE
-      run: npm run build
-    
-    - name: Deploy to Vercel
-      uses: amondnet/vercel-action@v20
+
+    - run: npm ci
+
+    - run: npm run build
+
+    - uses: amondnet/vercel-action@<commit-sha>
       with:
         vercel-token: ${{ secrets.VERCEL_TOKEN }}
         vercel-org-id: ${{ secrets.VERCEL_ORG_ID }}
@@ -438,11 +428,13 @@ jobs:
         vercel-args: '--prod'
 ```
 
+Replace each `<commit-sha>` with the release's commit and keep the version comment beside it.
+
 ## 🎯 Production Checklist
 
 ### Pre-Deployment
 - [ ] Run type checking (`npx tsc --noEmit`)
-- [ ] Run linting (`npm run lint`)
+- [ ] Run the CI gate locally (`npm ci` and `npm run build` inside `DE/`; the lint script cannot currently run)
 - [ ] Test production build (`npm run build && npm run preview`)
 - [ ] Verify all environment variables
 - [ ] Check bundle size and performance

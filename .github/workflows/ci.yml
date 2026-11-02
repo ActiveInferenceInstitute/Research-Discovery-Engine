@@ -1,0 +1,47 @@
+name: ci
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+defaults:
+  run:
+    working-directory: DE
+
+jobs:
+  build:
+    name: build, test harness and knowledge base (node 24, locked install)
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - name: Set up Node 24
+        uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: "24"
+          cache: npm
+          cache-dependency-path: DE/package-lock.json
+
+      - name: Install from the lockfile
+        run: npm ci
+
+      # The llm subset needs a provider key and is deliberately not run here.
+      - name: Run the credential-free test harness subsets
+        run: |
+          set -o pipefail
+          for type in unit integration validation; do
+            npx tsx scripts/run-tests.ts --test-type "$type" | tee "$RUNNER_TEMP/$type.log"
+            # run-tests.ts exits 0 even when tests fail, so assert its report.
+            grep -q "Failed: 0" "$RUNNER_TEMP/$type.log" || {
+              echo "::error::$type reported failures"; exit 1; }
+          done
+
+      # npm run build runs prebuild (sync-kg.mjs), tsc, vite build and
+      # postbuild (sync-kg.mjs --check-dist), which asserts dist/KG.
+      - name: Build and assert the knowledge base in dist
+        run: npm run build
