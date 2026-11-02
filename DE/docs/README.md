@@ -289,7 +289,7 @@ Performance targets are planning goals, not measured guarantees; no benchmark ar
 1. **Setup Development Environment**: Follow [Development Guide](DEVELOPMENT_GUIDE.md)
 2. **Understand Architecture**: Read [Component Architecture](COMPONENTS.md)
 3. **Review API Reference**: Familiarize with [API Reference](API_REFERENCE.md)
-4. **Follow Coding Standards**: Adhere to `.cursorrules` guidelines
+4. **Follow Coding Standards**: Adhere to the guidelines in the [Development Guide](DEVELOPMENT_GUIDE.md)
 5. **Write Tests**: Use testing utilities and patterns
 6. **Submit Changes**: Follow pull request guidelines
 
