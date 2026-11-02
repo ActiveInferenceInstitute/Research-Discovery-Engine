@@ -27,14 +27,18 @@ Severity definitions: Minor = typo, broken link, or formatting defect. Medium = 
 
 - [✓] Replace the aspirational status report with a verified current-state record: `DE/docs/FINAL_STATUS.md` now describes the repository and knowledge-base layout, the generated `public/KG/` mirror and its assertion, the analysis pipeline with its checked-in results, the credential-free subsets of `scripts/run-tests.ts` (and the fact that the harness exits 0 even when tests fail), and the known gaps; the DE README and documentation index lost their unsupported testing claims in the same change — completed in commit `0a18e6d`.
 
+- [ ] Repair the `lint` script and its configuration: `npm run lint` cannot run today because it passes `--ext ts,tsx` (rejected when a flat config is present) and `eslint.config.js` imports `@eslint/js`, `globals` and `typescript-eslint`, none of which `DE/package.json` depends on (it carries the older `@typescript-eslint/eslint-plugin` and `@typescript-eslint/parser`). `DE/docs/DEVELOPMENT_GUIDE.md` no longer claims lint enforcement; the CI workflow does not invoke lint.
+
+- [✓] Add the repository's CI workflow (`.github/workflows/ci.yml`): Node 24 on `ubuntu-24.04`, SHA-pinned `actions/checkout` and `actions/setup-node`, `npm ci` from `DE/package-lock.json`, the credential-free `run-tests.ts` subsets with their reported failure count asserted, and `npm run build` with its `dist/KG` assertion. No secrets, no scanners. Verified from a fresh checkout under Node 24.22.2 before the pull request, and by the workflow's own run on it — completed in commit `9646871`.
+
 ## Major
 
-- [ ] Introduce automated Markdown link/anchor validation in CI. Deferred: this repository has no CI workflow and the KG uses application-specific link syntax; adding a validator safely requires first separating ordinary Markdown from CNM navigation syntax.
+- [ ] Introduce automated Markdown link/anchor validation in CI. Deferred: the repository now runs a CI workflow (`.github/workflows/ci.yml`), but the KG uses application-specific link syntax, so adding a validator safely requires first separating ordinary Markdown from CNM navigation syntax.
 - [ ] Establish a generated documentation/reference pipeline for the DE API and research scripts. Deferred: current docs are partly aspirational and there is no single source-of-truth schema from which such references can be generated.
 
 ## Open / deferred
 
-Open items in this list are the two Minor application/content follow-ups and the two Major documentation-system items above.
+Open items in this list are the two Minor application/content follow-ups, the `lint`-script repair above, and the two Major documentation-system items.
 
 Branch and pull-request cleanup is done: all seven unmerged 2025 branches were reviewed against `main` (none is proven merged, so nothing was pruned). PR #27 "Add requirements" — 861 `.venv/` files, two `.DS_Store` files and an empty `requirements.txt` while `main` carries a populated one — was closed and its branch `setup-dependencies` deleted. PR #28 "feat: test new UI" was closed with the rationale recorded on the pull request: it adds a second top-level `Front-End/` tree including its own copy of the knowledge base, and nothing from it was merged; its branch is kept so no work is lost. Kept untouched: `DE_tech_focus`, `data-pipeline`, `kg-algos`, `minimal`, `setup`. The repository has no open pull requests.
 
