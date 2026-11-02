@@ -13,7 +13,8 @@ from scipy.stats import entropy
 from tqdm import tqdm
 
 # --- Configuration ---
-MARKDOWN_FILES = [f for f in os.listdir('.') if f.endswith('.md')]
+KB_DIR = os.path.normpath(os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "DE", "KG"))
+MARKDOWN_FILES = [f for f in os.listdir(KB_DIR) if f.endswith('.md')]
 OUTPUT_DIR = "knowledge_graph_final_definitive"
 NODE_CATEGORIES = {
     'applications.md': ('Application', '#e41a1c'), 'materials.md':    ('Material',    '#377eb8'),
@@ -30,7 +31,7 @@ def get_node_metadata(files):
     for md_file in files:
         if md_file in NODE_CATEGORIES:
             category, color = NODE_CATEGORIES[md_file]
-            with open(md_file, 'r', encoding='utf-8') as f:
+            with open(os.path.join(KB_DIR, md_file), 'r', encoding='utf-8') as f:
                 headers = re.findall(r"###\s+([a-zA-Z0-9\-\_]+)", f.read())
                 for header in headers:
                     if header not in node_info: node_info[header] = {'category': category, 'color': color}
@@ -42,7 +43,7 @@ def build_explicit_link_graph(files, node_info):
     for node, data in node_info.items(): G.add_node(node, **data)
     for md_file in files:
         if md_file in NODE_CATEGORIES:
-            with open(md_file, 'r', encoding='utf-8') as f:
+            with open(os.path.join(KB_DIR, md_file), 'r', encoding='utf-8') as f:
                 content = f.read(); sections = re.split(r"###\s+", content); headers = [""] + re.findall(r"###\s+([a-zA-Z0-9\-\_]+)", content)
                 for i, section in enumerate(sections[1:], 1):
                     if i < len(headers):
@@ -55,7 +56,7 @@ def build_explicit_link_graph(files, node_info):
 def build_cooccurrence_data(files, node_info):
     print("--- Building Co-occurrence Data ---")
     link_regex = re.compile(r"\[\[\./([a-z\-\_]+\.md)#([a-zA-Z0-9\-\_]+)\]\]")
-    doc_links = {mf: [link[1] for link in link_regex.findall(open(mf, 'r', encoding='utf-8').read())] for mf in files if mf in NODE_CATEGORIES}
+    doc_links = {mf: [link[1] for link in link_regex.findall(open(os.path.join(KB_DIR, mf), 'r', encoding='utf-8').read())] for mf in files if mf in NODE_CATEGORIES}
     abundance_matrix = pd.DataFrame(0, index=sorted(node_info.keys()), columns=sorted(doc_links.keys()))
     for doc, links in doc_links.items():
         counts = pd.Series(links).value_counts()

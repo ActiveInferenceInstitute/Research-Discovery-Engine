@@ -14,7 +14,7 @@ pip install -r requirements.txt
 python research_paths.py
 ```
 
-`research_paths.py` currently has no command-line argument parser; its input files, output directory, and trajectory endpoints are configured in the module. It reads these knowledge-base files from `path/`:
+`research_paths.py` currently has no command-line argument parser; its input files, output directory, and trajectory endpoints are configured in the module. It reads the six category files from the canonical knowledge base in `../DE/KG/`:
 
 - `applications.md`
 - `materials.md`
@@ -22,6 +22,8 @@ python research_paths.py
 - `methods.md`
 - `phenomena.md`
 - `theoretical.md`
+
+`DE/KG/` is the knowledge base the frontend serves. Its `css.md`, `merged_ISM.md` and `vectors.md` records are not category files and are ignored by the pipeline's `NODE_CATEGORIES` filter. Duplicate copies of the six files previously kept in this directory were removed: their node and link sets are identical to the canonical files, which additionally delimit wikilinks and citation keys in backticks and carry index annotations in `methods.md` that the copies lacked.
 
 ## Output layout
 
