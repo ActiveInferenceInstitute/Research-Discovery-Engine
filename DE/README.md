@@ -5,7 +5,7 @@
 This project, the "Discovery Engine," is a frontend application designed to facilitate the exploration of complex scientific knowledge and support the collaborative generation of novel scientific concepts and research artifacts. It operates on a **Conceptual Nexus Model (CNM)**, a dynamic knowledge graph constructed by parsing and structuring information from a corpus of Markdown (`.md`) files. These files represent an interconnected knowledge tree of scientific domains, including mechanisms, materials, methods, phenomena, theoretical principles, and associated publications.
 
 The platform aims to transform how researchers interact with and build upon scientific knowledge by:
-1.  **Synthesizing a Knowledge Graph:** Automatically building the CNM from structured `.md` files located in the `KG/` directory (served as static assets by Vite).
+1.  **Synthesizing a Knowledge Graph:** Automatically building the CNM from structured `.md` files located in the `KG/` directory, which `scripts/sync-kg.mjs` mirrors into `public/KG/` at dev and build time and Vite then serves as static assets.
 2.  **Intuitive Exploration:** Providing users with interactive tools, including a 3D graph visualization and a browsable "Knowledge Browser" sidebar, to navigate and understand the CNM.
 3.  **AI-Assisted Discovery (Simulated):** Integrating a suite of (currently simulated) AI agents designed to:
     *   Identify knowledge gaps and inconsistencies within the CNM.
@@ -64,11 +64,10 @@ The Discovery Engine embodies a human-AI co-creation process. It leverages the s
 
 ## Project Structure
 
-*   **`KG/`**: The knowledge base served as static assets.
+*   **`KG/`**: The canonical knowledge base. `scripts/sync-kg.mjs` mirrors it into `public/KG/` (generated, ignored by git) on `npm run dev` and `npm run build`, because the app fetches these files at runtime as `/KG/<file>.md`.
     *   `mechanisms.md`, `materials.md`, `methods.md`, `phenomena.md`, `applications.md`, `theoretical.md`: Core domain knowledge.
     *   `css.md`: **Crucial Schema Definition** for all node and edge types in the CNM. This file defines the structure and attributes that the system expects.
-
-    *   `publications/`: Markdown files for individual cited publications (e.g., `author_year_title.md`).
+*   **`publications/`**: Markdown files for individual cited publications (e.g., `author_year_title.md`). The sync script mirrors them to `public/KG/publications/`, which is where the app opens them from.
 *   **`src/`**: React application source.
     *   **`App.tsx`**: Main application component.
     *   **`components/`**:

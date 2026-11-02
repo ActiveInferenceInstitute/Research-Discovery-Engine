@@ -151,6 +151,7 @@ graph LR
 | **generate-protocol.ts** | `--objective`, `--materials`, `--detail-level` | `npx tsx generate-protocol.ts --objective "Smart Material" --detail-level advanced` | Experimental protocol |
 | **run-tests.ts** | `--test-type`, `--component`, `--performance-test` | `npx tsx run-tests.ts --test-type integration --performance-test` | Test results & performance |
 | **simulate-agents.ts** | none (no CLI parser) | `npx tsx simulate-agents.ts` | Agent interaction simulation |
+| **sync-kg.mjs** | `--check-dist` (verify the built output instead of syncing) | `node sync-kg.mjs` (wired as `predev`/`prebuild`, asserted by `postbuild`) | `public/KG/` mirror of `KG/` and `publications/`, which the app fetches at runtime |
 
 ## 🔧 Function Signatures & Interfaces
 
