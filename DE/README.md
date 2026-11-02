@@ -246,7 +246,7 @@ A dedicated LLM extraction template directly maps to the CNM schema defined in `
 *   **Bundle Optimization**: Code splitting and lazy loading implementation pending
 
 ### 📋 **Recent Improvements**
-*   **Project Standards**: Comprehensive `.cursorrules` file with coding guidelines
+*   **Project Standards**: Coding guidelines documented in [`docs/DEVELOPMENT_GUIDE.md`](docs/DEVELOPMENT_GUIDE.md)
 *   **Component Documentation**: Detailed architecture documentation in `docs/COMPONENTS.md`
 *   **TypeScript**: Enhanced type safety and interface definitions
 *   **Code Organization**: Improved file structure and naming conventions

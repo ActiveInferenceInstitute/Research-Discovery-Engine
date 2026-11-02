@@ -84,9 +84,9 @@ DE/
 
 ## 📋 Coding Standards
 
-### Following .cursorrules
+### Project Coding Standards
 
-The project follows comprehensive coding standards defined in `.cursorrules`. Key principles:
+The coding standards for this project are maintained in this guide. Key principles:
 
 - **Professional**: Clean, well-structured code
 - **Functional**: Focus on functionality and user experience
