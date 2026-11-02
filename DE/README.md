@@ -181,11 +181,11 @@ All system requirements and project structure will be automatically verified whe
 - **[Troubleshooting](docs/TROUBLESHOOTING.md)** - Common issues and solutions
 
 ### Project Status
-- **[Final Status Report](docs/FINAL_STATUS.md)** - Complete project achievements and status
+- **[Final Status Report](docs/FINAL_STATUS.md)** - Verified current status, measured facts, and known gaps
 
-## Comprehensive LLM Integration & Testing
+## LLM Integration & Testing
 
-The Discovery Engine now includes full LLM integration with comprehensive testing capabilities:
+The Discovery Engine includes LLM-backed script tooling plus a standalone test harness (see `docs/FINAL_STATUS.md` for the verified current state):
 
 ### 🤖 **LLM-Enhanced Research Capabilities**
 *   **LLM Summary Generation**: AI-powered research summaries with configurable depth and audience
@@ -193,26 +193,18 @@ The Discovery Engine now includes full LLM integration with comprehensive testin
 *   **Research Question Generation**: AI-assisted formulation of research questions
 *   **Domain-Specific Analysis**: Tailored processing for materials science, nanotechnology, and related fields
 
-### 🧪 **Comprehensive LLM Testing Suite**
-*   **Unit Testing**: Full mock LLM service testing with response validation
-*   **Integration Testing**: End-to-end LLM workflow testing across all scripts
-*   **Performance Testing**: Token usage optimization and response time benchmarking
-*   **Load Testing**: Concurrent request handling and rate limiting validation
-*   **Error Handling**: Comprehensive testing of failure scenarios and recovery
+### 🧪 **Test Harness**
+*   **`run-tests.ts`** is a standalone harness, not a CI test runner: `npx tsx scripts/run-tests.ts --test-type unit|integration|validation|llm|all`
+*   **Credential-free subsets** pass as measured on 2026-11-02: `unit` 5/5, `integration` 3/3, `validation` 3/3
+*   **The `llm` subset** exercises the LLM services and reports 7 failures without a provider key; it needs `VITE_OPENAI_API_KEY` or `VITE_OPENROUTER_API_KEY`
+*   **Exit codes are not a gate**: the harness exits 0 even when tests fail, so any gate must assert the reported failure count
+*   There is no Jest/Vitest/Playwright configuration and no `test` script in this repository
 
-### 📊 **LLM Testing Scripts**
-*   **`run-tests.ts`**: Comprehensive test suite including LLM integration tests
-*   **`analyze-performance.ts`**: LLM performance benchmarking and optimization analysis
-*   **`llm-generate-summary.ts`**: Production-ready LLM summary generation
+### 📊 **LLM Scripts**
+*   **`llm-generate-summary.ts`**: LLM summary generation
 *   **`llm-process-knowledge.ts`**: LLM-powered knowledge extraction and processing
-*   **`batch-test-headless.sh`**: Automated batch testing of all LLM capabilities
-
-### 🔬 **Testing Coverage**
-*   **Configuration Testing**: OpenAI API integration and parameter validation
-*   **Service Layer Testing**: Mock implementations for development and testing
-*   **Response Validation**: Token usage tracking and content quality assessment
-*   **Performance Metrics**: Response time, token efficiency, and throughput analysis
-*   **Error Scenarios**: API failures, timeout handling, and graceful degradation
+*   **`batch-test-llm.sh`**: batch run over the LLM capabilities
+*   **`analyze-performance.ts`**: local compute and memory benchmarks (not an LLM benchmark)
 
 A dedicated LLM extraction template directly maps to the CNM schema defined in `css.md`, facilitating the population of `SystemNode` attributes and its connections to materials, mechanisms, methods, etc. The output of this LLM-driven process can then be parsed to further enrich the CNM.
 
@@ -226,10 +218,9 @@ A dedicated LLM extraction template directly maps to the CNM schema defined in `
 *   **Concept Designer**: Guided workflow for creating new knowledge concepts
 *   **AI Agent Console**: Simulated AI assistant with conversation interface
 *   **Search & Navigation**: Real-time graph filtering and breadcrumb navigation
-*   **LLM Integration**: Complete OpenAI integration with production-ready services
-*   **Comprehensive Testing**: Full LLM testing suite with performance benchmarking
-*   **Headless Mode**: Automated batch processing for all scripts including LLM
-*   **Mock Testing**: Complete mock LLM services for development and CI/CD
+*   **LLM Integration**: OpenAI and OpenRouter service classes under `src/llm/`, used by the script tooling
+*   **Test Harness**: `scripts/run-tests.ts`; the credential-free subsets pass, the LLM subset needs a provider key
+*   **Headless Mode**: Batch runs for the scripts are documented in `scripts/README_HEADLESS.md`
 
 ### 🔄 **In Active Development**
 *   **Code Architecture**: Refactoring large components into smaller, focused modules
@@ -239,7 +230,7 @@ A dedicated LLM extraction template directly maps to the CNM schema defined in `
 *   **Testing**: Establishing comprehensive test coverage for critical components
 
 ### 🚧 **Known Technical Debt**
-*   **App.tsx Size**: Main component is large (425 lines) and needs decomposition
+*   **App.tsx Size**: Main component is 339 lines; an unreferenced 311-line `App.new.tsx` sits beside it
 *   **Agent Simulation**: AI functionalities are frontend-simulated, awaiting backend integration
 *   **React Warnings**: Minor `setState-in-render` issues being addressed through refactoring
 *   **Bundle Optimization**: Code splitting and lazy loading implementation pending
