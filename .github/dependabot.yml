@@ -1,0 +1,50 @@
+version: 2
+updates:
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: weekly
+    groups:
+      github-actions:
+        patterns:
+          - "*"
+  - package-ecosystem: npm
+    directory: /DE
+    schedule:
+      interval: weekly
+    groups:
+      de-frontend:
+        patterns:
+          - "*"
+  - package-ecosystem: npm
+    directory: /website_explore_the_unknown
+    schedule:
+      interval: weekly
+    groups:
+      website-frontend:
+        patterns:
+          - "*"
+  - package-ecosystem: pip
+    directory: /
+    schedule:
+      interval: weekly
+    groups:
+      python-root:
+        patterns:
+          - "*"
+  - package-ecosystem: pip
+    directory: /path
+    schedule:
+      interval: weekly
+    groups:
+      python-path:
+        patterns:
+          - "*"
+  - package-ecosystem: pip
+    directory: /website_explore_the_unknown
+    schedule:
+      interval: weekly
+    groups:
+      python-website:
+        patterns:
+          - "*"
