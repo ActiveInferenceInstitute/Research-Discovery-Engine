@@ -29,6 +29,8 @@ Severity definitions: Minor = typo, broken link, or formatting defect. Medium = 
 
 - [ ] Repair the `lint` script and its configuration: `npm run lint` cannot run today because it passes `--ext ts,tsx` (rejected when a flat config is present) and `eslint.config.js` imports `@eslint/js`, `globals` and `typescript-eslint`, none of which `DE/package.json` depends on (it carries the older `@typescript-eslint/eslint-plugin` and `@typescript-eslint/parser`). `DE/docs/DEVELOPMENT_GUIDE.md` no longer claims lint enforcement; the CI workflow does not invoke lint.
 
+- [✓] Add the repository's CI workflow (`.github/workflows/ci.yml`): Node 24 on `ubuntu-24.04`, SHA-pinned `actions/checkout` and `actions/setup-node`, `npm ci` from `DE/package-lock.json`, the credential-free `run-tests.ts` subsets with their reported failure count asserted, and `npm run build` with its `dist/KG` assertion. No secrets, no scanners. Verified from a fresh checkout under Node 24.22.2 before the pull request, and by the workflow's own run on it — completed in commit `9646871`.
+
 ## Major
 
 - [ ] Introduce automated Markdown link/anchor validation in CI. Deferred: the repository now runs a CI workflow (`.github/workflows/ci.yml`), but the KG uses application-specific link syntax, so adding a validator safely requires first separating ordinary Markdown from CNM navigation syntax.
