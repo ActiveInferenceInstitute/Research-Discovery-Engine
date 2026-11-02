@@ -1,6 +1,6 @@
 # Documentation TODO
 
-Last reviewed: 2026-11-02 (dead-reference cleanup) after 2026-08-02
+Last reviewed: 2026-11-02 (reference and hygiene pass) after 2026-08-02
 
 Severity definitions: Minor = typo, broken link, or formatting defect. Medium = stale section rewrite, documentation restructure, or missing focused guide. Major = cross-cutting documentation-system overhaul or new documentation site.
 
@@ -21,6 +21,8 @@ Severity definitions: Minor = typo, broken link, or formatting defect. Medium = 
 - [✓] Replace the website's scaffold README with an accurate local setup and route overview (`website_explore_the_unknown/README.md`) — completed in commit `b419782`.
 - [✓] Repair duplicate YAML front matter in the general improvement issue template (`.github/ISSUE_TEMPLATE/general-improvement.md`) — completed in commit `b419782`.
 - [✓] Remove the dead `.cursorrules` references (`DE/README.md`, `DE/docs/DEVELOPMENT_GUIDE.md`, `DE/docs/README.md`) — completed in commit `ac77bfc`. The file is not in the tree and never was on `main` (it existed only as a 1-byte placeholder on the unmerged `minimal` branch), so there were no live rules to migrate; the standards are documented in the Development Guide's "Coding Standards" section. The dated `REVIEW_LOG_2026-08-02.md` finding is retained as history.
+- [✓] Remove the only tracked `.DS_Store` (`path/results/5_Research_Trajectory_Synthesis/.DS_Store`) — completed in commit `d527b21`. Both the root and `DE/` ignore files already list the name.
+- [✓] Give the analysis pipeline a single knowledge-base home: `path/research_paths.py` now reads the six category records from the canonical `DE/KG/` (resolved from the script's own location rather than the working directory), the six duplicate `path/*.md` copies are removed, and `path/README.md` documents the arrangement — completed in commit `f289b17`. Node-header sets and wikilink multisets are equal across the renditions, so the graph the pipeline builds is unchanged.
 
 ## Major
 
@@ -29,4 +31,8 @@ Severity definitions: Minor = typo, broken link, or formatting defect. Medium = 
 
 ## Open / deferred
 
-Only the two Minor application/content follow-ups and the two Major documentation-system items above remain open.
+Open items in this list are the two Minor application/content follow-ups and the two Major documentation-system items above.
+
+Decisions recorded but not yet acted on (owner): the seven unmerged 2025 branches and two open pull requests were reviewed — none is proven merged, so nothing was pruned. PR #27 "Add requirements" contributes 861 `.venv/` files, two `.DS_Store` files and an empty `requirements.txt` (main already has a populated one), and PR #28 "feat: test new UI" adds a second top-level `Front-End/` tree including its own copy of the knowledge base. Both are recommended for closing rather than merging.
+
+Generated script run outputs stay tracked by design: `DE/scripts/README_HEADLESS.md` lists "Archival: Permanent record of all processing runs with inputs and outputs" among the headless mode's achieved benefits, `DE/scripts/output/generate-summary_2025-06-11T15-08-08/` and `DE/scripts/outputs/batch-test-20250611-084316/` are cited as evidence in `DE/scripts/COHERENCE_ASSESSMENT.md`, and the remaining run directories are records of the same 2025-06-11 sessions. They are not disposable build output.
