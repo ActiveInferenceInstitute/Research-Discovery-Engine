@@ -33,6 +33,8 @@ npm run build
 npm run preview
 ```
 
+`npm run build` mirrors the canonical knowledge base (`KG/` and `publications/`) into `public/KG/` before Vite runs, then asserts the built `dist/KG/` carries every document, so a deployment always ships the files the app fetches as `/KG/<file>.md` and `/KG/publications/<key>.md`.
+
 ## 🚀 Deployment Options
 
 ### 1. Static Site Deployment

@@ -12,6 +12,10 @@ dist
 dist-ssr
 *.local
 
+# Generated knowledge-base mirror: scripts/sync-kg.mjs copies KG/ and publications/
+# here at dev/build time because the app fetches them as /KG/<file>.md
+public/KG/
+
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json

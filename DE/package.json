@@ -4,8 +4,12 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
+    "sync-kg": "node scripts/sync-kg.mjs",
+    "predev": "node scripts/sync-kg.mjs",
     "dev": "vite",
+    "prebuild": "node scripts/sync-kg.mjs",
     "build": "tsc && vite build",
+    "postbuild": "node scripts/sync-kg.mjs --check-dist",
     "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
     "preview": "vite preview"
   },

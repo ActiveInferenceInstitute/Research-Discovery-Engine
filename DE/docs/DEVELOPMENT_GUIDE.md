@@ -42,7 +42,12 @@ npm run preview
 
 # Linting
 npm run lint
+
+# Mirror the knowledge base only (normally run by the hooks below)
+npm run sync-kg
 ```
+
+`npm run dev` and `npm run build` first run `scripts/sync-kg.mjs`, which mirrors the canonical knowledge base (`KG/` and `publications/`) into `public/KG/` — the path the app fetches at runtime (`/KG/<file>.md` and `/KG/publications/<key>.md`). The mirror is generated and ignored by git, and `npm run build` additionally asserts that the built `dist/KG/` carries every document.
 
 ## 🏗️ Architecture Overview
 
