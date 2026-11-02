@@ -98,8 +98,9 @@ rm -rf dist
 rm -rf node_modules package-lock.json
 npm install
 
-# Check TypeScript configuration
-npx tsc --noEmit
+# Check TypeScript configuration (the real check; it currently reports
+# pre-existing errors — see FINAL_STATUS.md)
+npx tsc -b
 
 # Update TypeScript
 npm update typescript
@@ -320,8 +321,8 @@ sudo sysctl -p
 # rejects, and eslint.config.js imports packages the manifest does not depend on
 # (see FINAL_STATUS.md). Use the type checker instead:
 
-# Check specific TypeScript errors
-npx tsc --noEmit --pretty
+# Check specific TypeScript errors (bare `tsc` checks nothing here; see FINAL_STATUS.md)
+npx tsc -b --pretty
 
 # Update type definitions
 npm update @types/react @types/react-dom

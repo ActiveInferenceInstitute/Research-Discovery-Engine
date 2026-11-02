@@ -296,8 +296,9 @@ The LLM module integrates seamlessly with other components:
 # Install dependencies
 npm install
 
-# Run type checking
-npx tsc --noEmit
+# Run type checking (bare `tsc` is a no-op with the solution-style tsconfig;
+# `npx tsc -b` is the real check and currently reports pre-existing errors)
+npx tsc -b
 
 # Test individual services
 node -e "

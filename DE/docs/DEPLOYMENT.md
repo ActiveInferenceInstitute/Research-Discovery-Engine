@@ -20,13 +20,14 @@ npm run dev
 
 ### Production Build
 ```bash
-# Type checking
-npx tsc --noEmit
+# Type checking: bare `tsc` is a no-op with the solution-style tsconfig;
+# `npx tsc -b` is the real check and currently reports pre-existing errors
+npx tsc -b
 
 # Lint code: the script cannot currently run (see FINAL_STATUS.md)
 # npm run lint
 
-# Build for production (type check, bundle, knowledge-base assertion)
+# Build for production (bundle, knowledge-base assertion)
 npm run build
 
 # Preview production build locally
@@ -389,7 +390,7 @@ location /health {
 ## 🔄 CI/CD Pipeline
 
 ### GitHub Actions
-The repository runs `.github/workflows/ci.yml` on pushes to `main` and on pull requests: Node 24 on `ubuntu-24.04`, `actions/checkout` and `actions/setup-node` pinned by commit SHA, `npm ci` from `DE/package-lock.json`, the credential-free `run-tests.ts` subsets (`unit`, `integration`, `validation`, asserting the reported failure count), and `npm run build`, which type-checks, bundles and asserts the mirrored knowledge base in `dist/KG`. It needs no secrets, and the type check doubles as the check the old `lint` step was meant to provide (the lint script cannot currently run; see `FINAL_STATUS.md`).
+The repository runs `.github/workflows/ci.yml` on pushes to `main` and on pull requests: Node 24 on `ubuntu-24.04`, `actions/checkout` and `actions/setup-node` pinned by commit SHA, `npm ci` from `DE/package-lock.json`, the credential-free `run-tests.ts` subsets (`unit`, `integration`, `validation`, asserting the reported failure count), and `npm run build`, which bundles the app and asserts the mirrored knowledge base in `dist/KG`. It needs no secrets. Neither lint nor a real type check runs today: the lint script cannot run at all, and its replacement candidate `npx tsc -b` reports pre-existing errors (see `FINAL_STATUS.md`).
 
 To deploy the built site from CI, add a separate workflow and keep every credential in repository secrets. With Vercel, for example:
 
@@ -433,7 +434,7 @@ Replace each `<commit-sha>` with the release's commit and keep the version comme
 ## 🎯 Production Checklist
 
 ### Pre-Deployment
-- [ ] Run type checking (`npx tsc --noEmit`)
+- [ ] Run the type check (`npx tsc -b`; see `FINAL_STATUS.md` for its pre-existing errors)
 - [ ] Run the CI gate locally (`npm ci` and `npm run build` inside `DE/`; the lint script cannot currently run)
 - [ ] Test production build (`npm run build && npm run preview`)
 - [ ] Verify all environment variables

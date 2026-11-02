@@ -530,8 +530,10 @@ const stats = calculateGraphStats(graphData);
 
 ### Build Process
 ```bash
-# Type checking
-npm run type-check
+# Type checking (there is no `npm run type-check` script, and the build's bare
+# `tsc` checks nothing; this is the real check and it currently reports
+# pre-existing errors — see FINAL_STATUS.md)
+npx tsc -b
 
 # Build for production
 npm run build

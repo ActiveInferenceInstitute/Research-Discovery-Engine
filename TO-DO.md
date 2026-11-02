@@ -31,6 +31,8 @@ Severity definitions: Minor = typo, broken link, or formatting defect. Medium = 
 
 - [✓] Add the repository's CI workflow (`.github/workflows/ci.yml`): Node 24 on `ubuntu-24.04`, SHA-pinned `actions/checkout` and `actions/setup-node`, `npm ci` from `DE/package-lock.json`, the credential-free `run-tests.ts` subsets with their reported failure count asserted, and `npm run build` with its `dist/KG` assertion. No secrets, no scanners. Verified from a fresh checkout under Node 24.22.2 before the pull request, and by the workflow's own run on it — completed in commit `9646871`.
 
+- [ ] Make the type check real: `npm run build` runs a bare `tsc`, which does nothing while `tsconfig.json` is a solution file with `files: []`, so a deliberate type error passes the build. `npx tsc -b` is the real check and reports 42 pre-existing errors — 34 from the 3-line stub `src/hooks/useAgentInteraction.ts` (nothing imports it) and 7 from `src/utils/stateUtils.ts`. Fix or delete the stub, resolve the rest, then wire `tsc -b` into the build or the CI workflow; the guides now say exactly this instead of the previous no-op commands.
+
 ## Major
 
 - [ ] Introduce automated Markdown link/anchor validation in CI. Deferred: the repository now runs a CI workflow (`.github/workflows/ci.yml`), but the KG uses application-specific link syntax, so adding a validator safely requires first separating ordinary Markdown from CNM navigation syntax.
@@ -38,8 +40,8 @@ Severity definitions: Minor = typo, broken link, or formatting defect. Medium = 
 
 ## Open / deferred
 
-Open items in this list are the two Minor application/content follow-ups, the `lint`-script repair above, and the two Major documentation-system items.
+Open items in this list are the two Minor application/content follow-ups, the `lint`-script and type-check repairs above, and the two Major documentation-system items.
 
-Branch and pull-request cleanup is done: all seven unmerged 2025 branches were reviewed against `main` (none is proven merged, so nothing was pruned). PR #27 "Add requirements" — 861 `.venv/` files, two `.DS_Store` files and an empty `requirements.txt` while `main` carries a populated one — was closed and its branch `setup-dependencies` deleted. PR #28 "feat: test new UI" was closed with the rationale recorded on the pull request: it adds a second top-level `Front-End/` tree including its own copy of the knowledge base, and nothing from it was merged; its branch is kept so no work is lost. Kept untouched: `DE_tech_focus`, `data-pipeline`, `kg-algos`, `minimal`, `setup`. The repository has no open pull requests.
+Branch and pull-request cleanup is done: all seven unmerged 2025 branches were reviewed against `main` (none is proven merged, so nothing was pruned). PR #27 "Add requirements" — 861 `.venv/` files, two `.DS_Store` files and an empty `requirements.txt` while `main` carries a populated one — was closed and its branch `setup-dependencies` deleted. PR #28 "feat: test new UI" was closed with the rationale recorded on the pull request: it adds a second top-level `Front-End/` tree including its own copy of the knowledge base, and nothing from it was merged; its branch is kept so no work is lost. Kept untouched: `DE_tech_focus`, `data-pipeline`, `kg-algos`, `minimal`, `setup`. Nothing is left waiting on a decision: PRs #31–#35 (`.cursorrules` removal, hygiene pass, knowledge-base serving fix, status-report rewrite, CI workflow) are merged.
 
 Generated script run outputs stay tracked by design: `DE/scripts/README_HEADLESS.md` lists "Archival: Permanent record of all processing runs with inputs and outputs" among the headless mode's achieved benefits, `DE/scripts/output/generate-summary_2025-06-11T15-08-08/` and `DE/scripts/outputs/batch-test-20250611-084316/` are cited as evidence in `DE/scripts/COHERENCE_ASSESSMENT.md`, and the remaining run directories are records of the same 2025-06-11 sessions. They are not disposable build output.
