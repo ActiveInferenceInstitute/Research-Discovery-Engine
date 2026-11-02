@@ -576,7 +576,8 @@ For development questions and support:
 ## 📚 Additional Resources
 
 - **[Component Architecture](COMPONENTS.md)**: Detailed component documentation
-- **Development History**: See the repository commit history and `FINAL_STATUS.md`
+- **Current Status**: `FINAL_STATUS.md` records what the tree verifiably does and what remains incomplete
+- **Development History**: See the repository commit history and `REVIEW_LOG_2026-08-02.md`
 - **Coding Standards**: Project conventions documented in this guide and enforced with `npm run lint`
 - **TypeScript Documentation**: [Official TypeScript docs](https://www.typescriptlang.org/docs/)
 - **React Documentation**: [Official React docs](https://react.dev/)

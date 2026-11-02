@@ -23,7 +23,7 @@ This directory contains comprehensive documentation for the Research Discovery E
 - **[Performance Optimization](#performance)** - Optimization guidelines
 
 ### Technical Documentation
-- **[Final Status Report](FINAL_STATUS.md)** - Complete project status and achievements
+- **[Final Status Report](FINAL_STATUS.md)** - Verified current status, measured facts, and known gaps
 - **[Technical Assessment](TECHNICAL_ASSESSMENT.md)** - Specific technical issue resolution
 - **[Output Directory Structure](OUTPUT_DIRECTORY_STRUCTURE.md)** - Output organization
 
@@ -111,16 +111,15 @@ This directory contains comprehensive documentation for the Research Discovery E
 **Target Audience**: New users, system administrators
 
 ### 8. [Final Status Report](FINAL_STATUS.md)
-**Purpose**: Complete project status and achievements
+**Purpose**: What the repository verifiably does today, and what it does not
 **Content**:
-- Implementation completion status
-- Technical achievements including modular scripts
-- Performance metrics
-- Future roadmap
-- Success metrics
-- Comprehensive testing results
+- Repository and knowledge-base layout
+- Measured build, knowledge-base mirror and pipeline behaviour
+- Testing situation (no automated suite; the standalone harness and its passing subsets)
+- Known gaps and unresolved items
+- Recent changes and a documentation map
 
-**Target Audience**: Project managers, stakeholders, contributors
+**Target Audience**: Contributors, maintainers, reviewers
 
 ### 9. [Technical Assessment](TECHNICAL_ASSESSMENT.md)
 **Purpose**: Specific technical issue resolution documentation
