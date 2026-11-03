@@ -1,5 +1,5 @@
 Flask==3.1.0
-Flask-Cors==5.0.0
+Flask-Cors==6.0.0
 python-dotenv==1.0.1
 supabase==2.13.0
 mistralai  # required by api/routes/chat.py
