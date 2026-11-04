@@ -4,6 +4,11 @@ This directory contains standalone analysis and utility scripts that demonstrate
 
 > **Status (audited 2026-08-02):** This document mixes verified behavior with historical and aspirational descriptions. `simulate-agents.ts` and `analyze-performance.ts` have no CLI argument parser (they run with defaults), and benchmark metrics shown below were not reproducible from the current parsers. Verify options with each script's `--help` output before relying on an example.
 
+## Tracked examples and run records
+
+- `examples/batch-test-headless.sh`: the headless batch example cited in `../docs/OUTPUT_DIRECTORY_STRUCTURE.md`.
+- `output/`, `outputs/`, and `test-batch/`: retained run records from the 2025-06-11 sessions, cited in `COHERENCE_ASSESSMENT.md` and `README_HEADLESS.md`. They are evidence, not disposable build output. This section is the guide for all timestamped run directories; do not add a README inside one.
+
 ## Script Overview
 
 | Script | Purpose | Dependencies |

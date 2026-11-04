@@ -18,6 +18,14 @@ Next.js 14 (App Router) site for the "Explore the Unknown" research-discovery co
 
 In development, `next.config.js` rewrites `/api/:path*` to the Flask service; the frontend calls the `/api_ts/:path*` alias for the Next.js route handlers.
 
+## Project layout
+
+- `app/`: App Router pages and route handlers. `app/api/` holds the Next.js handlers; `app/fonts/` holds the local font files.
+- `components/`: Shared React components. `components/ui/` holds the shadcn-style primitives; `components/kokonutui/` holds the background component.
+- `lib/`: Shared utility helpers.
+- `public/`: Static images and served assets.
+- `api/`: Flask blueprints and the older `chat_inital_version.py` draft.
+
 ## Development
 
 ```bash
