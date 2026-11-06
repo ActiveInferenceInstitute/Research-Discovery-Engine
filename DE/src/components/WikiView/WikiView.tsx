@@ -1,9 +1,8 @@
 // src/components/WikiView/WikiView.tsx
 import React, { useState, useEffect, useCallback, useRef, useMemo } from 'react';
 // Ensure ALL icons used in WIKI_CONFIG are imported
-import { 
-    BookOpen, Loader, AlertCircle, Search, ChevronRight, 
-    FlaskConical, Brain, Zap, ArrowLeft, Activity, Target, HelpCircle, ExternalLink, Link2 
+import { Loader, AlertCircle, Search,
+    FlaskConical, Brain, Zap, ArrowLeft, Activity, Target, HelpCircle, ExternalLink
 } from 'lucide-react';
 import { GraphData, NodeObject, ParsedSection } from '../../types';
 import { parseMarkdownToStructuredDocument, ParserOutput } from '../../utils/markdownParser';
@@ -11,7 +10,7 @@ import WikiContent from './WikiContent';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import rehypeRaw from 'rehype-raw';
-import { humanizeSlugForDisplay, findSectionById_local, flattenSections, findSectionByIdAcrossWikis } from './wikiViewUtils';
+import { humanizeSlugForDisplay, findSectionById_local, flattenSections } from './wikiViewUtils';
 
 interface WikiViewProps {
   data: GraphData;
@@ -59,7 +58,7 @@ const WikiView: React.FC<WikiViewProps> = ({
                     const response = await fetch(config.file.startsWith('/') ? config.file : `/${config.file}`);
                     if (!response.ok) {
                         console.warn(`[WikiView] Failed to fetch ${config.file}: ${response.status}`);
-                        fetchedData[config.key] = { sections: [] }; 
+                        fetchedData[config.key] = { sections: [] };
                         if (response.status !== 404) anyError = true;
                         continue;
                     }
@@ -107,7 +106,7 @@ const WikiView: React.FC<WikiViewProps> = ({
             onNavComplete(); // Signal completion regardless of whether the tab was switched or section found
         }
     }, [initialTarget, loading, activeTabKey, onNavComplete]);
-    
+
     // Effect to handle display state changes when activeTabKey or currentTabData changes,
     // especially after an initialTarget has set a new activeTabKey.
     useEffect(() => {
@@ -155,7 +154,7 @@ const WikiView: React.FC<WikiViewProps> = ({
             targetFileKey = parts[0] as WikiTabKey;
             targetSectionId = parts[1];
         }
-        
+
         const navigate = (tabDataForNav: ParserOutput | null) => {
             if (!tabDataForNav) {
                 setDisplayState({ mode: 'index', sectionId: null }); return;
@@ -167,7 +166,7 @@ const WikiView: React.FC<WikiViewProps> = ({
             } else {
                 const graphNode = data.nodes.find(n => n.id === targetSectionId || (n.sourceFileKey === targetFileKey && n.sourceWikiSectionId === targetSectionId));
                 if (graphNode) onSelectNode(graphNode, targetSectionId);
-                else setDisplayState({ mode: 'index', sectionId: null }); 
+                else setDisplayState({ mode: 'index', sectionId: null });
             }
         };
 
@@ -176,7 +175,7 @@ const WikiView: React.FC<WikiViewProps> = ({
             // Navigation will be picked up by the useEffect that watches activeTabKey/currentTabData
             // and initialTarget (if we were to re-set initialTarget, but that's for App->WikiView)
             // For direct inter-tab nav from within WikiView, we can set display state after tab change
-            setTimeout(() => navigate(wikiData[targetFileKey]), 50); 
+            setTimeout(() => navigate(wikiData[targetFileKey]), 50);
         } else {
             navigate(currentTabData);
         }
@@ -215,10 +214,10 @@ const WikiView: React.FC<WikiViewProps> = ({
                 const fileLabel = WIKI_CONFIG.find(c => c.key === config.key)?.label || config.key;
                 if (tabOutput.documentTitle?.toLowerCase().includes(lowerQuery) || tabOutput.preambleContent?.toLowerCase().includes(lowerQuery)) {
                     results.push({
-                        id: `${config.key}-introduction-preamble`, 
+                        id: `${config.key}-introduction-preamble`,
                         title: tabOutput.documentTitle || config.label,
                         content: tabOutput.preambleContent || "",
-                        level: 0, 
+                        level: 0,
                         sourceFileKey: config.key,
                         fileLabel: fileLabel,
                         subsections: [], // Preamble has no subsections in this context
@@ -237,7 +236,7 @@ const WikiView: React.FC<WikiViewProps> = ({
     const indexMarkdownComponents = {
         a: ({node: _n, href, children, ...props}: any) => {
             const linkText = React.Children.toArray(children).join('');
-            const displayTitle = humanizeSlugForDisplay(linkText); 
+            const displayTitle = humanizeSlugForDisplay(linkText);
             if (href && href.startsWith('#')) {
                 const targetId = href.substring(1);
                 return (
@@ -247,11 +246,11 @@ const WikiView: React.FC<WikiViewProps> = ({
                     </button>
                 );
             }
-            return ( <a href={href} {...props} target="_blank" rel="noopener noreferrer" className={`inline-flex items-center ${darkMode ? 'text-pink-400 hover:text-pink-300' : 'text-pink-600 hover:text-pink-700'} hover:underline text-sm`}> {displayTitle} <ExternalLink size={12} className="ml-1 opacity-70"/></a> ); 
+            return ( <a href={href} {...props} target="_blank" rel="noopener noreferrer" className={`inline-flex items-center ${darkMode ? 'text-pink-400 hover:text-pink-300' : 'text-pink-600 hover:text-pink-700'} hover:underline text-sm`}> {displayTitle} <ExternalLink size={12} className="ml-1 opacity-70"/></a> );
         },
         ul: ({node: _n,ordered, className, children, ...props}: any) => <ul className={`wiki-index-ul ${ordered ? 'list-decimal' : ''} ${className || ''} pl-3 space-y-0.5`} {...props}>{children}</ul>,
         li: ({node: _n,children, className, ...props}: any) => <li className={`wiki-index-li ${className|| ''}`} {...props}>{children}</li>,
-        p: ({node: _n, children, className, ...props}:any) => <span className={`block ${className || ''}`}>{children}</span>, 
+        p: ({node: _n, children, className}:any) => <span className={`block ${className || ''}`}>{children}</span>,
         h1: ({node: _n, ...props}: any) => <h1 className="text-sm font-semibold mt-1 mb-0.5" {...props} />,
         h2: ({node: _n, ...props}: any) => <h2 className="text-sm font-medium mt-1 mb-0.5" {...props} />,
         h3: ({node: _n, ...props}: any) => <h3 className="text-xs font-medium mt-1 mb-0.5" {...props} />,
@@ -284,7 +283,7 @@ const WikiView: React.FC<WikiViewProps> = ({
                        ) : ( <p className="text-xs text-gray-500 italic mt-2"> Index for '{WIKI_CONFIG.find(c=>c.key===activeTabKey)?.label}' not found or empty. </p> )}
                        {(!indexSidebarContent || !indexSidebarContent.content) && currentTabData && currentTabData.sections && currentTabData.sections.filter(s => s.level > 0).length > 0 && (
                            <ul className="mt-2 space-y-1 wiki-index-ul">
-                               {currentTabData.sections.filter(s => s.level <= 2 && s.level > 0).map(section => ( 
+                               {currentTabData.sections.filter(s => s.level <= 2 && s.level > 0).map(section => (
                                    <li key={section.id} className="wiki-index-li">
                                        <button onClick={() => handleNavigateToSectionById(section.id)}
                                             className={`wiki-index-link text-left w-full block py-1 px-1.5 focus:outline-none rounded-sm ${darkMode ? 'text-slate-300 hover:text-blue-300 hover:bg-slate-700' : 'text-slate-700 hover:text-blue-600 hover:bg-slate-100'} font-normal text-sm leading-snug ${section.level ===1 ? 'font-medium' : ''}`}>
@@ -304,9 +303,9 @@ const WikiView: React.FC<WikiViewProps> = ({
             {error && !loading && ( <div className={`p-4 rounded-lg ${darkMode ? 'bg-red-800/30 text-red-400' : 'bg-red-100 text-red-700'} flex flex-col items-center justify-center text-center h-full`}> <AlertCircle className="w-10 h-10 mb-3 flex-shrink-0" /> <p className="text-lg font-semibold mb-1">Content Load Error</p> <span className="text-sm">{error}</span> </div> )}
 
             {!loading && !error && (
-                 searchQuery ? ( 
+                 searchQuery ? (
                     <div className="space-y-4">
-                        <div className="flex items-center justify-between mb-4"> <h2 className="text-2xl font-bold flex items-center"> <Search size={20} className="mr-2" /> Results for "{searchQuery}" </h2> <span className={`text-sm ${darkMode ? 'text-gray-400' : 'text-gray-500'}`}> {searchResults.length} matches </span> </div> {searchResults.length > 0 ? ( <div className="space-y-3"> {searchResults.map(section => ( <button key={section.id + '-searchresult' + section.sourceFileKey} onClick={() => { handleNavigateToSectionById(`${section.sourceFileKey}::${section.id}`) }} className={`w-full text-left p-3 rounded-lg transition-colors ${darkMode ? 'bg-gray-700 hover:bg-gray-600' : 'bg-gray-100 hover:bg-gray-200'}`} > <h4 className="text-md font-semibold text-blue-500 dark:text-blue-400 hover:underline">{section.title}</h4> {section.sourceFileKey && section.sourceFileKey !== activeTabKey && ( <p className="text-xs text-gray-500 dark:text-gray-400">In: {section.fileLabel}</p> )} <p className={`mt-1 ${darkMode ? 'text-gray-300' : 'text-gray-600'} text-sm leading-snug`}> {section.content?.split('\n')[0]?.substring(0, 150)}...</p> </button> ))} </div> ) : ( <div className={`p-8 text-center rounded-lg ${darkMode ? 'bg-gray-700' : 'bg-gray-100'}`}> <p className="text-lg">No matches for "{searchQuery}"</p> </div> )} 
+                        <div className="flex items-center justify-between mb-4"> <h2 className="text-2xl font-bold flex items-center"> <Search size={20} className="mr-2" /> Results for "{searchQuery}" </h2> <span className={`text-sm ${darkMode ? 'text-gray-400' : 'text-gray-500'}`}> {searchResults.length} matches </span> </div> {searchResults.length > 0 ? ( <div className="space-y-3"> {searchResults.map(section => ( <button key={section.id + '-searchresult' + section.sourceFileKey} onClick={() => { handleNavigateToSectionById(`${section.sourceFileKey}::${section.id}`) }} className={`w-full text-left p-3 rounded-lg transition-colors ${darkMode ? 'bg-gray-700 hover:bg-gray-600' : 'bg-gray-100 hover:bg-gray-200'}`} > <h4 className="text-md font-semibold text-blue-500 dark:text-blue-400 hover:underline">{section.title}</h4> {section.sourceFileKey && section.sourceFileKey !== activeTabKey && ( <p className="text-xs text-gray-500 dark:text-gray-400">In: {section.fileLabel}</p> )} <p className={`mt-1 ${darkMode ? 'text-gray-300' : 'text-gray-600'} text-sm leading-snug`}> {section.content?.split('\n')[0]?.substring(0, 150)}...</p> </button> ))} </div> ) : ( <div className={`p-8 text-center rounded-lg ${darkMode ? 'bg-gray-700' : 'bg-gray-100'}`}> <p className="text-lg">No matches for "{searchQuery}"</p> </div> )}
                     </div>
                  ) : displayState.mode === 'index' ? (
                     <div className="wiki-preamble-content">
@@ -317,18 +316,18 @@ const WikiView: React.FC<WikiViewProps> = ({
                             <WikiContent
                                 key={`${activeTabKey}-preamble-display`}
                                 darkMode={darkMode}
-                                section={{ 
+                                section={{
                                     id: `${activeTabKey}-introduction-preamble-display`,
-                                    title: "Introduction", 
+                                    title: "Introduction",
                                     content: mainPageIntroPreambleContent, // Already preprocessed by parser stage if needed
-                                    level: 1, 
+                                    level: 1,
                                     subsections: [],
                                     sourceFileKey: activeTabKey,
                                 }}
                                 cnmNodes={data.nodes}
                                 onSelectNode={onSelectNode}
                                 onPaperClick={onPaperClick}
-                                activeSectionId={null} 
+                                activeSectionId={null}
                                 onNavigateToSection={handleNavigateToSectionById}
                             />
                         ) : (

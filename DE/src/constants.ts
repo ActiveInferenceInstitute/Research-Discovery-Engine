@@ -1,5 +1,5 @@
 // src/constants.ts
-import { Brain, FlaskConical, Zap, Activity, Target, HelpCircle, BookOpen, Layers } from 'lucide-react';
+import { Brain, FlaskConical, Zap, Activity, Target, HelpCircle, BookOpen } from 'lucide-react';
 
 // This config is for the KnowledgeBrowserSidebar's top-level categories.
 export const WIKI_BROWSER_CONFIG = [

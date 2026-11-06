@@ -1,7 +1,7 @@
 // src/components/NodeView/NodeView.tsx
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { NodeObject, LinkObject as CNMLinkObject } from '../../types';
-import { FileText, ExternalLink, Brain, Zap, FlaskConical, Lightbulb, Network, Link2, BookOpen, Activity, Target, HelpCircle, Layers, Hash, ArrowDownCircle, ArrowUpCircle, Tag, Loader } from 'lucide-react';
+import { FileText, ExternalLink, Brain, Zap, FlaskConical, Lightbulb, Network, Link2, BookOpen, Activity, Target, HelpCircle, Layers, Hash, ArrowDownCircle, ArrowUpCircle, Tag } from 'lucide-react';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import rehypeRaw from 'rehype-raw';
@@ -21,20 +21,20 @@ interface NodeViewProps {
   onPaperClick: (citationKey: string) => void;
 }
 
-const NodeViewHeader: React.FC<{ 
-    title: string; 
-    subtitle?: string; 
-    id?: string, 
-    type?: NodeObject['type'], 
-    status?: NodeObject['status'], 
-    sourceFileKey?: string, 
-    sourceWikiSectionId?: string, 
+const NodeViewHeader: React.FC<{
+    title: string;
+    subtitle?: string;
+    id?: string,
+    type?: NodeObject['type'],
+    status?: NodeObject['status'],
+    sourceFileKey?: string,
+    sourceWikiSectionId?: string,
     onNavigateToWikiSection: NodeViewProps['onNavigateToWikiSection'],
-    darkMode: boolean 
-}> = ({ title, subtitle, id, type, status, sourceFileKey, sourceWikiSectionId, onNavigateToWikiSection, darkMode }) => {
-  
+    darkMode: boolean
+}> = ({ title, subtitle, type, status, sourceFileKey, sourceWikiSectionId, onNavigateToWikiSection, darkMode }) => {
+
   const NodeIcon = ({ type, className }: { type?: NodeObject['type'], className?: string }) => {
-    const iconSize = 20; 
+    const iconSize = 20;
     const defaultClass = `mr-1.5 flex-shrink-0 ${className}`;
     if (!type) return <Layers size={iconSize} className={defaultClass} />;
     if (type.startsWith('Material')) return <FlaskConical size={iconSize} className={`${defaultClass} ${darkMode ? 'text-teal-400' : 'text-teal-500'}`} />;
@@ -89,8 +89,8 @@ const NodeViewDescription: React.FC<{ description: string; darkMode: boolean; ma
   return (
     <section className="mb-5" aria-labelledby="node-main-description">
       <h2 id="node-main-description" className="sr-only">Main Description</h2>
-      <div className={`prose prose-sm dark:prose-invert max-w-none 
-                      prose-p:my-1 prose-ul:my-1 prose-ol:my-1 prose-li:my-0.5 
+      <div className={`prose prose-sm dark:prose-invert max-w-none
+                      prose-p:my-1 prose-ul:my-1 prose-ol:my-1 prose-li:my-0.5
                       prose-headings:mt-2.5 prose-headings:mb-1 prose-headings:border-b prose-headings:pb-0.5 dark:prose-headings:border-slate-600/80
                       ${darkMode ? 'text-slate-300' : 'text-slate-700'}`}>
         <ReactMarkdown remarkPlugins={[remarkGfm]} rehypePlugins={[rehypeRaw]} components={markdownComponents}>
@@ -101,11 +101,11 @@ const NodeViewDescription: React.FC<{ description: string; darkMode: boolean; ma
   );
 };
 
-const NodeViewAttributes: React.FC<{ 
-    attributes: ParsedNodeDetails['attributes']; 
+const NodeViewAttributes: React.FC<{
+    attributes: ParsedNodeDetails['attributes'];
     inputs: ParsedNodeDetails['inputs'];
     outputs: ParsedNodeDetails['outputs'];
-    darkMode: boolean; markdownComponents: any; 
+    darkMode: boolean; markdownComponents: any;
 }> = ({ attributes, inputs, outputs, darkMode, markdownComponents }) => {
   const hasInputs = inputs && inputs.length > 0;
   const hasOutputs = outputs && outputs.length > 0;
@@ -116,7 +116,7 @@ const NodeViewAttributes: React.FC<{
   const renderLinkableItem = (item: { text: string; link?: string; originalMatch?: string }, index: number) => (
     <li key={index} className="text-xs sm:text-sm text-slate-600 dark:text-slate-300 leading-snug">
         {item.link ? (
-            <ReactMarkdown components={markdownComponents}> 
+            <ReactMarkdown components={markdownComponents}>
                 {`[${item.text}](${item.link})`}
             </ReactMarkdown>
         ) : (
@@ -152,7 +152,7 @@ const NodeViewAttributes: React.FC<{
         )}
         </div>
       )}
-      
+
       {hasAttributes && (
         <div className={`p-2.5 rounded-lg shadow-sm border ${darkMode ? 'bg-slate-800/50 border-slate-700' : 'bg-slate-50 border-slate-200'}`}>
           <h3 className="text-[11px] sm:text-xs font-semibold uppercase tracking-wider text-slate-600 dark:text-slate-300 mb-1.5">Other Attributes</h3>
@@ -181,17 +181,17 @@ const NodeViewConnections: React.FC<{
   markdownComponents: any;
   onSelectNode: NodeViewProps['onSelectNode'];
 }> = ({ connectionsText, relatedConcepts, exampleCitations, graphLinks, darkMode, markdownComponents, onSelectNode }) => {
-  
+
   const getInitialActiveTab = () => {
     if (relatedConcepts && relatedConcepts.length > 0) return 'related';
     if (Object.keys(graphLinks).length > 0) return 'graph';
     if (connectionsText && connectionsText.trim && connectionsText.trim() !== "") return 'text';
     if (exampleCitations && exampleCitations.length > 0) return 'citations';
-    return 'related'; 
+    return 'related';
   };
   const [activeTab, setActiveTab] = useState<'related' | 'graph' | 'text' | 'citations'>(getInitialActiveTab());
-  
-  useEffect(() => { 
+
+  useEffect(() => {
     setActiveTab(getInitialActiveTab());
   }, [relatedConcepts, graphLinks, connectionsText, exampleCitations]);
 
@@ -201,8 +201,8 @@ const NodeViewConnections: React.FC<{
   const hasCitations = exampleCitations && exampleCitations.length > 0;
 
   if (!hasRelated && !hasGraphLinks && !hasTextLinks && !hasCitations) return null;
-  
-  const NodeIconMini = ({ type, className }: { type?: NodeObject['type'], className?: string }) => { 
+
+  const NodeIconMini = ({ type, className }: { type?: NodeObject['type'], className?: string }) => {
     const iconSize = 10;
     const defaultClass = `mr-0.5 flex-shrink-0 ${className}`;
     if (!type) return <Layers size={iconSize} className={defaultClass} />;
@@ -240,7 +240,7 @@ const NodeViewConnections: React.FC<{
               ))}
             </div>
           )}
-          {activeTab === 'graph' && hasGraphLinks && ( 
+          {activeTab === 'graph' && hasGraphLinks && (
              <div className="space-y-2">
                 {Object.entries(graphLinks).map(([type, links]) => (
                     <div key={type}>
@@ -326,12 +326,12 @@ const NodeView: React.FC<NodeViewProps> = ({
     allNodes,
     onSelectNode,
     onPaperClick,
-    onNavigateToWikiSection, 
+    onNavigateToWikiSection,
     onNavigateToNodeViewSection: (sectionSlug) => {
         const element = scrollRef.current?.querySelector(`#${sectionSlug}`);
         element?.scrollIntoView({ behavior: 'smooth', block: 'start' });
     },
-    currentFileKey: node.sourceFileKey 
+    currentFileKey: node.sourceFileKey
   }), [darkMode, allNodes, onSelectNode, onPaperClick, onNavigateToWikiSection, node.sourceFileKey]);
 
   const nodeViewMarkdownComponents = useMemo(() => ({
@@ -384,7 +384,7 @@ const NodeView: React.FC<NodeViewProps> = ({
         darkMode={darkMode}
         markdownComponents={nodeViewMarkdownComponents}
       />
-      
+
       <NodeViewDescription
         description={mainDescription}
         darkMode={darkMode}

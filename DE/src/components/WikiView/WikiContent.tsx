@@ -1,5 +1,5 @@
 // src/components/WikiView/WikiContent.tsx
-import React, { useEffect, useRef, useMemo } from 'react';
+import React, { useRef, useMemo } from 'react';
 import ReactMarkdown from 'react-markdown';
 import { ChevronRight, Hash } from 'lucide-react';
 import { NodeObject, ParsedSection } from '../../types';
@@ -78,8 +78,8 @@ const WikiContent: React.FC<WikiContentProps> = ({
          {(
            React.createElement(
              `h${Math.min(6, section.level)}`, // Use actual level for H tag
-             { 
-               id: section.id, 
+             {
+               id: section.id,
                className: `font-semibold ${
                  section.level === 1 ? 'text-xl mt-3 mb-2 border-b pb-1 dark:border-slate-700' :
                  section.level === 2 ? 'text-lg mt-2 mb-1.5 border-b pb-0.5 dark:border-slate-700/70' :

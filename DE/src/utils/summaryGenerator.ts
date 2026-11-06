@@ -1,6 +1,6 @@
 /**
  * Summary Generator Utility
- * 
+ *
  * Generates comprehensive summaries from concept design states and related knowledge.
  * Can be used both as a standalone utility and integrated into the main framework.
  */
@@ -67,17 +67,17 @@ export const generateSummary = (
   graphData?: GraphData,
   config: SummaryConfig = DEFAULT_CONFIG
 ): GeneratedSummary => {
-  const { objective, components } = conceptState;
-  
+  const { objective } = conceptState;
+
   // Generate abstract first
   const abstract = generateAbstract(conceptState, config);
-  
+
   // Extract keywords
   const keywords = extractSummaryKeywords(conceptState, graphData);
-  
+
   // Find related concepts
   const relatedConcepts = findRelatedConcepts(conceptState, graphData);
-  
+
   const summary: GeneratedSummary = {
     title: `Concept Summary: ${objective}`,
     abstract,
@@ -109,34 +109,34 @@ export const generateSummary = (
  */
 const generateAbstract = (
   conceptState: ConceptDesignState,
-  config: SummaryConfig
+  _config: SummaryConfig
 ): string => {
   const { objective, components, cssVectorDraft } = conceptState;
   const css = cssVectorDraft || {};
-  
+
   let abstract = `This concept focuses on ${objective || 'a novel scientific approach'}.`;
-  
+
   // Add component information
   if (components.materials.length > 0) {
     abstract += ` The design incorporates ${components.materials.length === 1 ? 'the material' : 'materials including'} ${components.materials.slice(0, 3).join(', ')}${components.materials.length > 3 ? ', and others' : ''}.`;
   }
-  
+
   if (components.mechanisms.length > 0) {
     abstract += ` Key mechanisms involve ${components.mechanisms.slice(0, 2).join(' and ')}.`;
   }
-  
+
   // Add objective information
   if (css.constraints?.objective_type) {
     abstract += ` The primary objective is ${css.constraints.objective_type}.`;
   }
-  
+
   // Add validation status
   if (conceptState.status === 'Validated') {
     abstract += ' The concept has undergone initial validation.';
   } else if (conceptState.protocolOutline) {
     abstract += ' An experimental protocol has been developed for validation.';
   }
-  
+
   return abstract;
 };
 
@@ -181,11 +181,11 @@ const generateSummarySections = (
  */
 const generateOverviewSection = (
   conceptState: ConceptDesignState,
-  config: SummaryConfig
+  _config: SummaryConfig
 ): SummarySection => {
   const { objective, components, cssVectorDraft } = conceptState;
   const css = cssVectorDraft || {};
-  
+
   const content: string[] = [
     `**Concept ID:** ${conceptState.id}`,
     `**Objective:** ${objective || 'To be defined'}`,
@@ -201,7 +201,7 @@ const generateOverviewSection = (
   if (components.materials.length > 0 || components.mechanisms.length > 0) {
     content.push('', '**Concept Description:**');
     content.push(`This concept ${objective ? 'aims to ' + objective.toLowerCase() : 'represents a novel approach'} through the integration of specific materials and mechanisms.`);
-    
+
     if (css.context?.environment_type) {
       content.push(`The system operates in a ${css.context.environment_type} environment.`);
     }
@@ -234,10 +234,10 @@ const generateOverviewSection = (
  */
 const generateComponentsSection = (
   conceptState: ConceptDesignState,
-  config: SummaryConfig
+  _config: SummaryConfig
 ): SummarySection => {
   const { components } = conceptState;
-  
+
   const content: string[] = [];
 
   // Materials subsection
@@ -292,25 +292,25 @@ const generateComponentsSection = (
  */
 const generateTechnicalSection = (
   conceptState: ConceptDesignState,
-  config: SummaryConfig
+  _config: SummaryConfig
 ): SummarySection => {
   const { cssVectorDraft } = conceptState;
   const css = cssVectorDraft || {};
-  
+
   const content: string[] = [];
 
   // System architecture
   if (css.context || css.interface || css.dynamics) {
     content.push('### System Architecture');
-    
+
     if (css.context?.morphology_type) {
       content.push(`- **Morphology:** ${css.context.morphology_type} (Scale: ${css.context.morphology_scale || 'TBD'})`);
     }
-    
+
     if (css.context?.fabrication_primary?.length) {
       content.push(`- **Fabrication:** ${css.context.fabrication_primary.join(', ')}`);
     }
-    
+
     if (css.interface?.input_mechanism?.length || css.interface?.output_mechanism?.length) {
       content.push('- **Interface:**');
       if (css.interface.input_mechanism?.length) {
@@ -320,18 +320,18 @@ const generateTechnicalSection = (
         content.push(`  - Output: ${css.interface.output_mechanism.join(', ')}`);
       }
     }
-    
+
     content.push('');
   }
 
   // Operational parameters
   if (css.state || css.memory || css.adaptation) {
     content.push('### Operational Parameters');
-    
+
     if (css.state?.basis?.length) {
       content.push(`- **State Basis:** ${css.state.basis.join(', ')}`);
     }
-    
+
     if (css.memory?.mechanism_primary?.length) {
       content.push(`- **Memory System:** ${css.memory.mechanism_primary.join(', ')}`);
       if (css.memory.timescale_retention) {
@@ -341,14 +341,14 @@ const generateTechnicalSection = (
         content.push(`  - Capacity: ${css.memory.capacity_estimate}`);
       }
     }
-    
+
     if (css.adaptation?.mechanism_primary?.length) {
       content.push(`- **Adaptation:** ${css.adaptation.mechanism_primary.join(', ')}`);
       if (css.adaptation.timescale) {
         content.push(`  - Timescale: ${css.adaptation.timescale}`);
       }
     }
-    
+
     content.push('');
   }
 
@@ -372,16 +372,16 @@ const generateRelatedWorkSection = (
   config: SummaryConfig
 ): SummarySection => {
   const content: string[] = [];
-  
+
   // Find related nodes based on components
   const relatedNodes = findRelatedNodes(conceptState, graphData);
-  
+
   if (relatedNodes.length > 0) {
     content.push('### Related Concepts and Research');
-    
+
     // Group by type
     const groupedNodes = groupNodesByType(relatedNodes);
-    
+
     Object.entries(groupedNodes).forEach(([type, nodes]) => {
       if (nodes.length > 0) {
         content.push(``, `#### ${type}s`);
@@ -412,10 +412,10 @@ const generateRelatedWorkSection = (
  */
 const generateRecommendationsSection = (
   conceptState: ConceptDesignState,
-  config: SummaryConfig
+  _config: SummaryConfig
 ): SummarySection => {
   const content: string[] = [];
-  const { components, cssVectorDraft, status } = conceptState;
+  const { components, cssVectorDraft } = conceptState;
   const css = cssVectorDraft || {};
 
   content.push('### Next Steps');
@@ -458,7 +458,7 @@ const generateRecommendationsSection = (
  */
 const extractSummaryKeywords = (
   conceptState: ConceptDesignState,
-  graphData?: GraphData
+  _graphData?: GraphData
 ): string[] => {
   const keywords = new Set<string>();
 
@@ -474,7 +474,7 @@ const extractSummaryKeywords = (
   // Add from components
   conceptState.components.materials.forEach((material: string) => keywords.add(material));
   conceptState.components.mechanisms.forEach((mechanism: string) => keywords.add(mechanism));
-  
+
   if (conceptState.components.methods) {
     conceptState.components.methods.forEach((method: string) => keywords.add(method));
   }
@@ -531,7 +531,7 @@ const findRelatedNodes = (
  */
 const groupNodesByType = (nodes: NodeObject[]): Record<string, NodeObject[]> => {
   const groups: Record<string, NodeObject[]> = {};
-  
+
   nodes.forEach((node: NodeObject) => {
     const type = node.type || 'Unknown';
     if (!groups[type]) {
@@ -553,14 +553,14 @@ const isCommonWord = (word: string): boolean => {
 
 const determineComplexity = (
   conceptState: ConceptDesignState,
-  config: SummaryConfig
+  _config: SummaryConfig
 ): 'low' | 'medium' | 'high' => {
   let complexity = 0;
-  
+
   complexity += conceptState.components.materials.length;
   complexity += conceptState.components.mechanisms.length * 2;
   complexity += (conceptState.components.methods?.length || 0);
-  
+
   const css = conceptState.cssVectorDraft || {};
   if (css.adaptation?.mechanism_primary?.length) complexity += 3;
   if (css.memory?.mechanism_primary?.length) complexity += 3;
@@ -579,7 +579,7 @@ const calculateCompleteness = (conceptState: ConceptDesignState): number => {
   if (conceptState.components.mechanisms.length > 0) score += 2;
   if (conceptState.protocolOutline) score += 2;
   if (conceptState.status === 'Validated') score += 1;
-  
+
   const css = conceptState.cssVectorDraft || {};
   if (css.interface?.input_mechanism?.length) score += 0.5;
   if (css.interface?.output_mechanism?.length) score += 0.5;
@@ -589,7 +589,7 @@ const calculateCompleteness = (conceptState: ConceptDesignState): number => {
 
 const calculateWordCount = (summary: GeneratedSummary): number => {
   let words = summary.abstract.split(/\s+/).length;
-  
+
   summary.sections.forEach((section: SummarySection) => {
     section.content.forEach((line: string) => {
       words += line.split(/\s+/).filter((word: string) => word.length > 0).length;
@@ -610,7 +610,7 @@ const estimateReadingTime = (wordCount: number): string => {
  */
 export const formatSummaryAsMarkdown = (summary: GeneratedSummary): string => {
   let markdown = `# ${summary.title}\n\n`;
-  
+
   // Add metadata
   markdown += `**Generated:** ${new Date(summary.timestamp).toLocaleString()}\n`;
   markdown += `**Reading Time:** ${summary.metadata.readingTime}\n`;
@@ -628,11 +628,11 @@ export const formatSummaryAsMarkdown = (summary: GeneratedSummary): string => {
   // Add sections
   summary.sections.forEach((section: SummarySection) => {
     markdown += `## ${section.title}\n\n`;
-    
+
     section.content.forEach((line: string) => {
       markdown += line ? `${line}\n` : '\n';
     });
-    
+
     markdown += '\n';
   });
 
@@ -667,4 +667,4 @@ export const createStandaloneSummary = (
   const markdown = formatSummaryAsMarkdown(summary);
 
   return { summary, markdown };
-}; 
+};

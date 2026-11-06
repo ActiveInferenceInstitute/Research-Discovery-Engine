@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useRef } from 'react';
-import { X, Loader, Copy, Check, ExternalLink } from 'lucide-react';
+import { X, Loader, Copy, Check } from 'lucide-react';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import rehypeRaw from 'rehype-raw';
@@ -86,7 +86,7 @@ const LLMResultModal: React.FC<LLMResultModalProps> = ({
         </div>
 
         {/* Content */}
-        <div 
+        <div
           ref={contentRef}
           className={`flex-grow p-6 overflow-y-auto ${
             darkMode ? 'bg-gray-900' : 'bg-gray-50'
@@ -99,15 +99,15 @@ const LLMResultModal: React.FC<LLMResultModalProps> = ({
               <p className="text-sm text-gray-500 mt-2">This may take a moment</p>
             </div>
           ) : (
-            <div className={`prose max-w-none ${darkMode ? 'prose-invert' : ''} 
-                            prose-headings:font-bold prose-headings:border-b prose-headings:pb-1 
+            <div className={`prose max-w-none ${darkMode ? 'prose-invert' : ''}
+                            prose-headings:font-bold prose-headings:border-b prose-headings:pb-1
                             prose-headings:border-gray-200 dark:prose-headings:border-gray-700
                             prose-a:text-blue-600 dark:prose-a:text-blue-400
                             prose-code:bg-gray-100 dark:prose-code:bg-gray-800
                             prose-code:text-red-500 dark:prose-code:text-red-400
                             prose-code:p-1 prose-code:rounded`}>
-              <ReactMarkdown 
-                remarkPlugins={[remarkGfm]} 
+              <ReactMarkdown
+                remarkPlugins={[remarkGfm]}
                 rehypePlugins={[rehypeRaw]}
                 components={{
                   a: markdownLinkRenderer,
@@ -136,50 +136,3 @@ const LLMResultModal: React.FC<LLMResultModalProps> = ({
 };
 
 export default LLMResultModal;
-
-// Function to convert markdown to HTML
-function renderMarkdown() {
-  const contentElement = document.querySelector('.markdown-content');
-  if (!contentElement) return;
-  
-  // Simple markdown parsing for headings, lists, code blocks, etc.
-  let markdown = contentElement.innerHTML;
-  
-  // Convert headings
-  markdown = markdown.replace(/^# (.*$)/gm, '<h1>$1</h1>');
-  markdown = markdown.replace(/^## (.*$)/gm, '<h2>$1</h2>');
-  markdown = markdown.replace(/^### (.*$)/gm, '<h3>$1</h3>');
-  markdown = markdown.replace(/^#### (.*$)/gm, '<h4>$1</h4>');
-  
-  // Convert bold and italic
-  markdown = markdown.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
-  markdown = markdown.replace(/\*(.*?)\*/g, '<em>$1</em>');
-  
-  // Convert lists
-  markdown = markdown.replace(/^\s*- (.*$)/gm, '<li>$1</li>');
-  markdown = markdown.replace(/^\s*\d+\. (.*$)/gm, '<li>$1</li>');
-  
-  // Wrap lists
-  markdown = markdown.replace(/<li>.*?<\/li>(?:\s*<li>.*?<\/li>)+/gs, match => {
-    if (match.includes('1. ') || match.includes('2. ')) {
-      return '<ol>' + match + '</ol>';
-    } else {
-      return '<ul>' + match + '</ul>';
-    }
-  });
-  
-  // Convert code blocks - fixed regex
-  markdown = markdown.replace(/```([^`]*?)```/g, '<pre><code>$1</code></pre>');
-  
-  // Convert inline code - fixed regex
-  markdown = markdown.replace(/`([^`]*?)`/g, '<code>$1</code>');
-  
-  // Convert paragraphs (must come after other conversions)
-  markdown = markdown.replace(/^(?!<[a-z])(.*$)/gm, '<p>$1</p>');
-  
-  // Fix empty paragraphs
-  markdown = markdown.replace(/<p><\/p>/g, '<br>');
-  
-  // Set the HTML content
-  contentElement.innerHTML = markdown;
-}
