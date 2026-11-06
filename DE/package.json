@@ -10,7 +10,7 @@
     "prebuild": "node scripts/sync-kg.mjs",
     "build": "tsc && vite build",
     "postbuild": "node scripts/sync-kg.mjs --check-dist",
-    "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
+    "lint": "eslint . --report-unused-disable-directives --max-warnings 0",
     "preview": "vite preview"
   },
   "dependencies": {
@@ -48,6 +48,7 @@
     "tailwindcss": "^3.4.0",
     "tsx": "^4.23.15",
     "typescript": "^6.0.3",
+    "typescript-eslint": "^8.72.1",
     "vite": "^8.3.5"
   }
 }
