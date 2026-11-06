@@ -1,16 +1,16 @@
 /**
  * Summary LLM Service
- * 
+ *
  * Specialized service for generating research summaries using LLM
  */
 
 import { LLMService } from '../LLMService';
-import { 
-  SummaryLLMRequest, 
-  SummaryLLMResult, 
+import {
+  SummaryLLMRequest,
+  SummaryLLMResult,
   LLMConfig,
   ResearchLLMContext,
-  PromptTemplate 
+  PromptTemplate
 } from '../types';
 
 export class SummaryLLMService extends LLMService {
@@ -41,7 +41,7 @@ export class SummaryLLMService extends LLMService {
     };
 
     const result = await this.generateText(llmRequest);
-    
+
     if (!result.success) {
       return {
         ...result,
@@ -76,11 +76,11 @@ export class SummaryLLMService extends LLMService {
     const batchRequest = {
       requests: requests.map(req => ({
         systemPrompt: this.buildSystemPrompt(
-          this.getSummaryTemplate(req.summaryType, req.targetAudience), 
+          this.getSummaryTemplate(req.summaryType, req.targetAudience),
           req
         ),
         userPrompt: this.buildUserPrompt(
-          this.getSummaryTemplate(req.summaryType, req.targetAudience), 
+          this.getSummaryTemplate(req.summaryType, req.targetAudience),
           req
         ),
         context: this.formatContext(req.context)
@@ -109,7 +109,7 @@ export class SummaryLLMService extends LLMService {
     templates.set('technical-researcher', {
       name: 'Technical Summary for Researchers',
       description: 'Detailed technical summary for academic researchers',
-      systemPrompt: `You are an expert research scientist generating technical summaries for academic researchers. 
+      systemPrompt: `You are an expert research scientist generating technical summaries for academic researchers.
 Focus on scientific rigor, methodology, and detailed technical content. Use precise scientific language and include specific technical details.
 Format your response as a structured summary with clear sections.`,
       userPromptTemplate: `Generate a technical summary of the research concept: "{concept}" in the domain of {domain}.
@@ -238,7 +238,7 @@ Structure your response as:
   }
 
   private getSummaryTemplate(
-    summaryType: SummaryLLMRequest['summaryType'], 
+    summaryType: SummaryLLMRequest['summaryType'],
     targetAudience: SummaryLLMRequest['targetAudience']
   ): PromptTemplate {
     const key = `${summaryType}-${targetAudience}`;
@@ -263,7 +263,7 @@ Structure your response as:
     prompt = prompt.replace('{methods}', context.methods?.join(', ') || 'various methods');
     prompt = prompt.replace('{applications}', context.applications?.join(', ') || 'various applications');
     prompt = prompt.replace('{length}', request.length);
-    
+
     // Handle conditional sections
     prompt = prompt.replace(
       /\{includeReferences \? "([^"]*)" : "([^"]*)"\}/g,
@@ -279,7 +279,7 @@ Structure your response as:
 
   private formatContext(context: ResearchLLMContext): string {
     const parts = [`Research Domain: ${context.domain}`, `Main Concept: ${context.concept}`];
-    
+
     if (context.materials?.length) {
       parts.push(`Materials: ${context.materials.join(', ')}`);
     }
@@ -306,10 +306,10 @@ Structure your response as:
     }
   }
 
-  private parseSummaryContent(content: string, request: SummaryLLMRequest): SummaryLLMResult['summary'] {
+  private parseSummaryContent(content: string, _request: SummaryLLMRequest): SummaryLLMResult['summary'] {
     // Simple parsing - in production you might want more sophisticated extraction
     const lines = content.split('\n').filter(line => line.trim());
-    
+
     const sections = {
       abstract: '',
       keyFindings: [] as string[],
@@ -324,7 +324,7 @@ Structure your response as:
 
     for (const line of lines) {
       const trimmed = line.trim();
-      
+
       if (trimmed.match(/^(abstract|overview|introduction)/i)) {
         currentSection = 'abstract';
       } else if (trimmed.match(/^(key findings|findings|discoveries)/i)) {
@@ -374,4 +374,4 @@ Structure your response as:
       references: []
     };
   }
-} 
+}

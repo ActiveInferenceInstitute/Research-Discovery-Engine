@@ -7,7 +7,7 @@ import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import rehypeRaw from 'rehype-raw';
 import { WIKI_BROWSER_CONFIG } from '../App';
-import { humanizeSlugForDisplay, findSectionById_local, flattenSections } from './WikiView/wikiViewUtils'; // Ensure path is correct
+import { humanizeSlugForDisplay, findSectionById_local } from './WikiView/wikiViewUtils'; // Ensure path is correct
 
 interface KnowledgeBrowserSidebarProps {
   darkMode: boolean;
@@ -31,9 +31,6 @@ const KnowledgeBrowserSidebar: React.FC<KnowledgeBrowserSidebarProps> = ({
   graphData,
 }) => {
   const [filesContent, setFilesContent] = useState<FileContent[]>([]);
-  // Ensure a default key is selected if WIKI_BROWSER_CONFIG is not empty
-  const defaultOpenKey = WIKI_BROWSER_CONFIG.length > 0 ? WIKI_BROWSER_CONFIG[0].key : '';
-
 
   useEffect(() => {
     const fetchAllFiles = async () => {
@@ -81,7 +78,7 @@ const KnowledgeBrowserSidebar: React.FC<KnowledgeBrowserSidebarProps> = ({
     if (targetNode) {
       onSelectNode(targetNode);
     } else {
-        const overviewNodeId = slugify(fileKey); 
+        const overviewNodeId = slugify(fileKey);
         const overviewNode = graphData.nodes.find(n => n.id === overviewNodeId && n.sourceFileKey === fileKey);
         if (overviewNode) {
             onSelectNode(overviewNode);
@@ -103,8 +100,8 @@ const KnowledgeBrowserSidebar: React.FC<KnowledgeBrowserSidebarProps> = ({
           <li>
             <button
               onClick={() => handleSectionSelect(section.id, fileKey)}
-              className={`w-full text-left py-1 pr-2 text-xs flex items-center 
-                          ${darkMode ? 'hover:bg-slate-700 text-slate-300' : 'hover:bg-slate-100 text-slate-700'} 
+              className={`w-full text-left py-1 pr-2 text-xs flex items-center
+                          ${darkMode ? 'hover:bg-slate-700 text-slate-300' : 'hover:bg-slate-100 text-slate-700'}
                           ${level === 0 ? 'font-semibold' : 'font-normal'}`}
               style={{ paddingLeft: `${0.5 + level * 0.75}rem` }}
               title={section.title}
@@ -128,10 +125,10 @@ const KnowledgeBrowserSidebar: React.FC<KnowledgeBrowserSidebarProps> = ({
   const indexMarkdownComponents = useMemo(() => ({
     a: ({node: _n, href, children, ...props}: any) => {
         const linkText = React.Children.toArray(children).join('');
-        const displayTitle = humanizeSlugForDisplay(linkText); 
+        const displayTitle = humanizeSlugForDisplay(linkText);
         if (href && href.startsWith('#')) {
             const targetId = href.substring(1);
-            const currentFileKeyForIndex = filesContent.find(f => f.isOpen)?.key || WIKI_BROWSER_CONFIG[0]?.key || ""; 
+            const currentFileKeyForIndex = filesContent.find(f => f.isOpen)?.key || WIKI_BROWSER_CONFIG[0]?.key || "";
             return (
                 <button {...props} onClick={() => handleSectionSelect(targetId, currentFileKeyForIndex)}
                     className={`wiki-index-link text-left w-full block py-1 px-1.5 focus:outline-none rounded-sm
@@ -141,12 +138,12 @@ const KnowledgeBrowserSidebar: React.FC<KnowledgeBrowserSidebarProps> = ({
                 </button>
             );
         }
-        return ( <a href={href} {...props} target="_blank" rel="noopener noreferrer" className={`inline-flex items-center ${darkMode ? 'text-pink-400 hover:text-pink-300' : 'text-pink-600 hover:text-pink-700'} hover:underline text-sm`}> {displayTitle} <ExternalLink size={12} className="ml-1 opacity-70"/></a> ); 
+        return ( <a href={href} {...props} target="_blank" rel="noopener noreferrer" className={`inline-flex items-center ${darkMode ? 'text-pink-400 hover:text-pink-300' : 'text-pink-600 hover:text-pink-700'} hover:underline text-sm`}> {displayTitle} <ExternalLink size={12} className="ml-1 opacity-70"/></a> );
     },
     ul: ({node: _n,ordered, className, children, ...props}: any) => <ul className={`wiki-index-ul ${ordered ? 'list-decimal' : ''} ${className || ''} pl-3 space-y-0.5`} {...props}>{children}</ul>,
     li: ({node: _n,children, className, ...props}: any) => <li className={`wiki-index-li ${className|| ''}`} {...props}>{children}</li>,
    // Use span instead of p to avoid nesting issues
-   p: ({node: _n, children, className, ...props}:any) => <span className={`block ${className || ''}`}>{children}</span>,
+   p: ({node: _n, children, className}:any) => <span className={`block ${className || ''}`}>{children}</span>,
     h1: ({node: _n, ...props}: any) => <h2 className="text-xs font-semibold mt-1 mb-0.5" {...props} />,
     h2: ({node: _n, ...props}: any) => <h3 className="text-xs font-medium mt-1 mb-0.5" {...props} />,
     h3: ({node: _n, ...props}: any) => <h4 className="text-xs font-medium mt-1 mb-0.5" {...props} />,
@@ -181,7 +178,7 @@ const KnowledgeBrowserSidebar: React.FC<KnowledgeBrowserSidebarProps> = ({
                   {file.error && <div className="p-2 text-center text-xs text-red-500"><AlertCircle size={14} className="inline mr-1"/> {file.error}</div>}
                   {file.parsedDoc && (
                     <ul>
-                        {file.parsedDoc.documentTitle && ( 
+                        {file.parsedDoc.documentTitle && (
                          <li>
                             <button
                                 onClick={() => handleSectionSelect(slugify(file.key), file.key)}

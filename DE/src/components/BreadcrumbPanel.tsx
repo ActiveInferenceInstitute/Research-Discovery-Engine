@@ -1,7 +1,7 @@
 // src/components/BreadcrumbPanel.tsx
 import React from 'react';
 import { ChevronRight, Home } from 'lucide-react';
-import { BreadcrumbItem, NodeObject } from '../../types'; // NodeObject for onSelectNode type
+import { BreadcrumbItem } from '../../types'; // NodeObject for onSelectNode type
 
 interface BreadcrumbPanelProps {
   darkMode: boolean;
