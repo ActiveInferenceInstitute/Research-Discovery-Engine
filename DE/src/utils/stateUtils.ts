@@ -5,7 +5,7 @@
  * for complex state management without requiring external Redux dependencies.
  */
 
-import { useReducer, useCallback, useMemo, useContext, createContext, ReactNode } from 'react';
+import { useReducer, useCallback, useMemo, useContext, createContext, createElement, type Dispatch, type ReactNode } from 'react';
 
 /**
  * Generic action interface for reducer patterns
@@ -28,7 +28,7 @@ export type Reducer<S, A> = (state: S, action: A) => S;
  * @returns Object with reducer function and action creators
  */
 export function createReducer<S, A extends Action>(
-  initialState: S,
+  _initialState: S,
   reducerMap: Record<string, (state: S, action: A) => S>
 ) {
   const reducer: Reducer<S, A> = (state, action) => {
@@ -37,7 +37,7 @@ export function createReducer<S, A extends Action>(
   };
 
   const actionCreators = Object.keys(reducerMap).reduce((creators, type) => {
-    creators[type] = (payload?: any) => ({ type, payload });
+    creators[type] = (payload?: any) => ({ type, payload } as A);
     return creators;
   }, {} as Record<string, (payload?: any) => A>);
 
@@ -86,16 +86,17 @@ export function createStateProvider<S, A extends Action>(
 ) {
   const StateContext = createContext<{
     state: S;
-    dispatch: React.Dispatch<A>;
+    dispatch: Dispatch<A>;
   } | null>(null);
 
   const StateProvider = ({ children }: { children: ReactNode }) => {
     const [state, dispatch] = useReducer(reducer, initialState);
-    
-    return (
-      <StateContext.Provider value={{ state, dispatch }}>
-        {children}
-      </StateContext.Provider>
+
+    // JSX in a .ts file does not parse; createElement is the identical call.
+    return createElement(
+      StateContext.Provider,
+      { value: { state, dispatch } },
+      children
     );
   };
 
@@ -114,12 +115,12 @@ export function createStateProvider<S, A extends Action>(
  * Creates a selector hook for accessing specific parts of state
  * 
  * @param selector - Function to select data from state
- * @param equalityFn - Optional equality function for optimization
+ * @param _equalityFn - Reserved for a custom-equality memo; not applied yet
  * @returns Selected data from state
  */
 export function createSelector<S, T>(
   selector: (state: S) => T,
-  equalityFn?: (a: T, b: T) => boolean
+  _equalityFn?: (a: T, b: T) => boolean
 ) {
   return function useSelector(state: S): T {
     return useMemo(() => selector(state), [state]);
