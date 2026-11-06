@@ -1,7 +1,7 @@
 // src/components/ContextPanel/ConceptDetails.tsx
 import React from 'react';
-import { ConceptDesignState, CSSVector } from '../../types';
-import { Layers, Check, AlertCircle, Brain, Atom, GitMerge, FlaskConical, Loader } from 'lucide-react';
+import { ConceptDesignState } from '../../types';
+import { Layers, Check,  Atom, GitMerge, FlaskConical, Loader } from 'lucide-react';
 
 // Helper to render CSS fields recursively
 const renderCssFields = (data: any, darkMode: boolean, path = '', level = 0): JSX.Element | null => {
@@ -118,7 +118,7 @@ const ConceptDetails: React.FC<ConceptDetailsProps> = ({ darkMode, designState, 
             {renderCssFields(components, darkMode)}
          </div>
        )}
-       
+
        {/* Full CSS Vector Draft Preview */}
        {css && Object.keys(css).length > 1 && /* More than just meta */ (
          <div className={`mb-3 p-2 rounded-md border ${darkMode ? 'border-slate-700 bg-slate-700/30' : 'border-slate-200 bg-slate-50'}`}>
@@ -152,8 +152,8 @@ const ConceptDetails: React.FC<ConceptDetailsProps> = ({ darkMode, designState, 
             <h4 className="text-xs font-semibold mb-1.5 text-slate-500 dark:text-slate-400 uppercase tracking-wider">Concept Actions</h4>
             <div className="grid grid-cols-1 gap-1.5 text-xs">
                  <button
-                    className={`w-full text-left p-1.5 rounded-md flex items-center space-x-1.5 
-                                ${!isDraftPopulated || (status !== 'Proposed' && status !== 'Validated') ? 
+                    className={`w-full text-left p-1.5 rounded-md flex items-center space-x-1.5
+                                ${!isDraftPopulated || (status !== 'Proposed' && status !== 'Validated') ?
                                     (darkMode ? 'bg-slate-600 text-slate-400 cursor-not-allowed' : 'bg-slate-200 text-slate-400 cursor-not-allowed') :
                                     (darkMode ? 'bg-green-600 hover:bg-green-500 text-white' : 'bg-green-500 hover:bg-green-600 text-white')
                                 } transition-colors`}
@@ -164,8 +164,8 @@ const ConceptDetails: React.FC<ConceptDetailsProps> = ({ darkMode, designState, 
                      <FlaskConical size={14} /> <span>Generate Protocol</span>
                  </button>
                   <button
-                     className={`w-full text-left p-1.5 rounded-md flex items-center space-x-1.5 
-                       ${status !== 'Validated' || !protocolOutline ? 
+                     className={`w-full text-left p-1.5 rounded-md flex items-center space-x-1.5
+                       ${status !== 'Validated' || !protocolOutline ?
                         (darkMode ? 'bg-slate-600 text-slate-400 cursor-not-allowed' : 'bg-slate-200 text-slate-400 cursor-not-allowed') :
                         (darkMode ? 'bg-purple-600 hover:bg-purple-500 text-white' : 'bg-purple-500 hover:bg-purple-600 text-white')
                        } transition-colors`}

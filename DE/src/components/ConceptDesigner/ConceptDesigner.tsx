@@ -1,9 +1,9 @@
 // src/components/ConceptDesigner/ConceptDesigner.tsx
 import React, { useEffect, useState } from 'react';
-import { Brain, FlaskConical, GitMerge, Check, Loader, Lightbulb, FileText, Layers, Target, AlertTriangle, Activity, HelpCircle, Zap as MethodIcon, Sparkles } from 'lucide-react';
+import { Brain, FlaskConical,  Loader, Lightbulb, FileText, Layers, Target, AlertTriangle, Sparkles } from 'lucide-react';
 // CSSSection might not be needed if we use a simpler UI for component selection
 // import CSSSection from './CSSSection';
-import { ConceptDesignState, AgentMessage, CSSVector, GraphData, NodeObject } from '../../types';
+import { ConceptDesignState, AgentMessage,  GraphData } from '../../types';
 
 interface ConceptDesignerProps {
   darkMode: boolean;
@@ -23,8 +23,6 @@ const ConceptDesigner: React.FC<ConceptDesignerProps> = ({
   graphData,
   onUpdateObjective,
   onUpdateComponentSelection,
-  onUpdateCssField,
-  onAcceptSuggestion,
   onTriggerAgent,
   agentMessages,
 }) => {
@@ -198,7 +196,7 @@ const ConceptDesigner: React.FC<ConceptDesignerProps> = ({
               ))}
             </div>
           )}
-          
+
           <hr className={darkMode ? 'border-gray-600' : 'border-gray-300'} />
 
           <div>

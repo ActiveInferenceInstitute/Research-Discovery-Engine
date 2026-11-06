@@ -2,7 +2,7 @@
 import { NodeObject } from '../types';
 import { slugify, extractReferences } from './markdownParser';
 
-export const preprocessMarkdownForDisplayUtil = (content: string, currentFileKey?: string, allNodes?: NodeObject[]): string => {
+export const preprocessMarkdownForDisplayUtil = (content: string, _currentFileKey?: string, allNodes?: NodeObject[]): string => {
     if (typeof content !== 'string' || !content) return "";
     let processed = content;
 
@@ -14,10 +14,10 @@ export const preprocessMarkdownForDisplayUtil = (content: string, currentFileKey
     // Group 5: Optional closing backtick(s)
     const wikiLinkRegex = /(`*)(\[\[((?:[^#|\]`]*?)(?:\.md)?(?:#[^|\]`]+?)?|[^|\]`]+?)(?:\|([^\]`]+))?\]\])(`*)/g;
 
-    processed = processed.replace(wikiLinkRegex, (match, _openTicks, _fullLinkPattern, fullTargetPath, displayTextInput, _closeTicks) => {
+    processed = processed.replace(wikiLinkRegex, (_match, _openTicks, _fullLinkPattern, fullTargetPath, displayTextInput, _closeTicks) => {
         const targetPath = fullTargetPath.trim();
         let displayText = displayTextInput?.trim() || targetPath;
-        
+
         // Humanize display text if it's the same as the target path
         if (displayText === targetPath.replace(/\.md$/, '').replace(/^#/, '')) {
             const targetPartForDisplay = targetPath.includes('#') ? targetPath.split('#').pop()! : targetPath;
@@ -41,20 +41,20 @@ export const preprocessMarkdownForDisplayUtil = (content: string, currentFileKey
             href = `##WIKI_NAV__${fileKey}__${sectionSlug}`;
         } else if (cleanedTargetPath.startsWith('#')) {
             const sectionSlug = slugify(cleanedTargetPath.substring(1));
-            href = `#INTRA_CONTENT__${sectionSlug}`; 
-        } else if (cleanedTargetPath.includes('#')) { 
+            href = `#INTRA_CONTENT__${sectionSlug}`;
+        } else if (cleanedTargetPath.includes('#')) {
             const parts = cleanedTargetPath.split('#');
             const fileKey = parts[0];
             const sectionSlug = slugify(parts[1]);
             href = `##WIKI_NAV__${fileKey}__${sectionSlug}`;
-        } else { 
+        } else {
             const nodeIdOrFileKey = cleanedTargetPath.replace(/\.md$/, '');
             const slugifiedAttempt = slugify(nodeIdOrFileKey);
             const targetNode = allNodes?.find(n => n.id === slugifiedAttempt || n.id === nodeIdOrFileKey || n.label === nodeIdOrFileKey);
             if (targetNode) {
                  href = `#NODE__${targetNode.id}`;
             } else {
-                 href = `##WIKI_NAV__${nodeIdOrFileKey}__`; 
+                 href = `##WIKI_NAV__${nodeIdOrFileKey}__`;
             }
         }
         return `[${displayText || "link"}](${href})`;
@@ -62,7 +62,7 @@ export const preprocessMarkdownForDisplayUtil = (content: string, currentFileKey
 
     // Improved regex to better match citation keys like [author_year_title]
     const citationRegex = /(?<![`[![#<A-Za-z0-9\-_~])\[([a-zA-Z0-9_-]+(?:_\d{4}(?:[a-zA-Z0-9_-]*)?)?)\](?![(#\]])/g;
-    processed = processed.replace(citationRegex, (match, key) => {
+    processed = processed.replace(citationRegex, (_match, key) => {
         // Create a proper citation link that will open the publication file
         return `[${key}](#CITATION__${key})`;
     });
@@ -218,7 +218,7 @@ export const parseNodeDetails = (node: NodeObject, allNodes: NodeObject[]): Pars
         details.description = generalProse + '\n\n' + details.description;
     }
   }
-  
+
   // Ensure we always have a description
   if (!details.mainDescription || !details.mainDescription.trim()) {
     // Try to use the full node description if available

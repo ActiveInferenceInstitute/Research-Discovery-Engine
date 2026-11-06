@@ -1,11 +1,11 @@
 /**
  * Main Application Component - Discovery Engine (Refactored)
- * 
+ *
  * This is the completely refactored root component that uses centralized state management
  * through the useAppState hook, dramatically reducing complexity and improving maintainability.
  */
 
-import React, { useCallback } from 'react';
+import { useCallback } from 'react';
 import { AlertCircle, Loader, Search, Lightbulb, Compass, Layers, Upload, Menu, X as CloseIcon, Brain, FlaskConical, Zap, Activity, Target, HelpCircle, BookOpen } from 'lucide-react';
 
 // Components
@@ -85,25 +85,25 @@ function App() {
       <div className={`h-screen flex flex-col transition-colors duration-300 ${
         state.darkMode ? 'bg-slate-900 text-slate-100' : 'bg-slate-50 text-slate-900'
       }`}>
-        
+
         {/* Navigation Bar */}
         <ErrorBoundary componentName="Navbar">
-          <Navbar 
-            darkMode={state.darkMode} 
-            toggleDarkMode={actions.toggleDarkMode} 
+          <Navbar
+            darkMode={state.darkMode}
+            toggleDarkMode={actions.toggleDarkMode}
           />
         </ErrorBoundary>
 
         {/* Main Content Container */}
         <div className="flex flex-col flex-grow overflow-hidden container mx-auto px-2 sm:px-4 py-4 space-y-2">
-          
+
           {/* Top Controls */}
           <div className="flex flex-wrap items-center justify-between mb-2 flex-shrink-0 gap-y-2 gap-x-4">
             {/* Left Controls */}
             <div className="flex items-center space-x-2 sm:space-x-4 flex-wrap gap-y-2">
-              <button 
-                onClick={actions.toggleBrowserSidebar} 
-                title="Toggle Knowledge Browser" 
+              <button
+                onClick={actions.toggleBrowserSidebar}
+                title="Toggle Knowledge Browser"
                 className={`p-2 rounded-lg flex items-center space-x-1 sm:space-x-2 text-sm ${
                   state.darkMode ? 'bg-slate-700 hover:bg-slate-600' : 'bg-slate-200 hover:bg-slate-300'
                 }`}
@@ -111,12 +111,12 @@ function App() {
                 {state.isBrowserSidebarOpen ? <CloseIcon size={18} /> : <Menu size={18} />}
                 <span className="hidden xl:inline">Browse</span>
               </button>
-              
-              <button 
-                onClick={actions.handleSetExploreMode} 
-                title="Explore Knowledge Graph" 
+
+              <button
+                onClick={actions.handleSetExploreMode}
+                title="Explore Knowledge Graph"
                 className={`p-2 rounded-lg flex items-center space-x-1 sm:space-x-2 text-sm ${
-                  state.activeMode === 'explore' 
+                  state.activeMode === 'explore'
                     ? (state.darkMode ? 'bg-blue-600 text-white' : 'bg-blue-500 text-white')
                     : (state.darkMode ? 'bg-slate-700 hover:bg-slate-600' : 'bg-slate-200 hover:bg-slate-300')
                 }`}
@@ -124,10 +124,10 @@ function App() {
                 <Compass size={18} />
                 <span className="hidden sm:inline">Explore</span>
               </button>
-              
-              <button 
-                onClick={() => actions.handleSetCreateMode(null)} 
-                title="Create New Concept" 
+
+              <button
+                onClick={() => actions.handleSetCreateMode(null)}
+                title="Create New Concept"
                 className={`p-2 rounded-lg flex items-center space-x-1 sm:space-x-2 text-sm ${
                   state.activeMode === 'create'
                     ? (state.darkMode ? 'bg-green-600 text-white' : 'bg-green-500 text-white')
@@ -142,22 +142,22 @@ function App() {
             {/* Right Controls */}
             <div className="flex items-center space-x-2 flex-wrap">
               <form onSubmit={actions.handleSearchSubmit} className="relative">
-                <input 
-                  type="search" 
-                  placeholder="Search graph..." 
+                <input
+                  type="search"
+                  placeholder="Search graph..."
                   className={`pl-10 pr-4 py-2 rounded-full w-48 sm:w-64 text-sm focus:outline-none focus:ring-2 ${
-                    state.darkMode 
-                      ? 'bg-slate-800 text-white focus:ring-blue-500' 
+                    state.darkMode
+                      ? 'bg-slate-800 text-white focus:ring-blue-500'
                       : 'bg-slate-100 text-slate-900 focus:ring-blue-400'
                   }`}
-                  value={state.searchQuery} 
-                  onChange={actions.handleSearchInputChange} 
+                  value={state.searchQuery}
+                  onChange={actions.handleSearchInputChange}
                 />
                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-slate-400" />
               </form>
-              
-              <button 
-                onClick={actions.togglePDFUploader} 
+
+              <button
+                onClick={actions.togglePDFUploader}
                 className={`p-2 rounded-lg flex items-center space-x-1 sm:space-x-2 text-sm ${
                   state.darkMode ? 'bg-slate-700 hover:bg-slate-600' : 'bg-slate-100 hover:bg-slate-200'
                 }`}
@@ -168,21 +168,21 @@ function App() {
               </button>
             </div>
           </div>
-          
+
           {/* Breadcrumb Panel */}
           {state.activeMode === 'explore' && state.breadcrumbPath.length > 0 && (
             <ErrorBoundary componentName="BreadcrumbPanel">
-              <BreadcrumbPanel 
-                darkMode={state.darkMode} 
-                path={state.breadcrumbPath} 
-                onNavigate={actions.handleBreadcrumbNavigate} 
+              <BreadcrumbPanel
+                darkMode={state.darkMode}
+                path={state.breadcrumbPath}
+                onNavigate={actions.handleBreadcrumbNavigate}
               />
             </ErrorBoundary>
           )}
 
           {/* Main Content Area */}
           <div className="flex flex-1 space-x-4 overflow-hidden">
-            
+
             {/* Browser Sidebar */}
             {state.isBrowserSidebarOpen && state.activeMode === 'explore' && (
               <div className="w-60 md:w-72 flex-shrink-0 h-full overflow-hidden">
@@ -199,15 +199,15 @@ function App() {
             {/* Agent Console */}
             <div className="w-64 md:w-72 xl:w-80 flex-shrink-0 h-full overflow-hidden">
               <ErrorBoundary componentName="AgentConsole">
-                <AgentConsole 
-                  darkMode={state.darkMode} 
-                  messages={state.agentMessages} 
-                  cnmData={graphData} 
-                  activeMode={state.activeMode} 
-                  conceptDesignState={conceptDesignState} 
-                  selectedNodeId={state.selectedNodeId} 
-                  onTriggerAgent={actions.triggerAgent} 
-                  onSelectNode={actions.handleNodeSelect} 
+                <AgentConsole
+                  darkMode={state.darkMode}
+                  messages={state.agentMessages}
+                  cnmData={graphData}
+                  activeMode={state.activeMode}
+                  conceptDesignState={conceptDesignState}
+                  selectedNodeId={state.selectedNodeId}
+                  onTriggerAgent={actions.triggerAgent}
+                  onSelectNode={actions.handleNodeSelect}
                 />
               </ErrorBoundary>
             </div>
@@ -230,24 +230,24 @@ function App() {
                 ) : state.activeMode === 'explore' ? (
                   <div className="relative rounded-lg overflow-hidden flex-grow">
                     <GraphVisualization
-                      data={graphData} 
-                      darkMode={state.darkMode} 
+                      data={graphData}
+                      darkMode={state.darkMode}
                       searchQuery={state.searchQuery}
-                      onNodeSelect={actions.handleNodeSelect} 
+                      onNodeSelect={actions.handleNodeSelect}
                       showLabels={state.showLabels}
-                      showLinks={state.showLinks} 
+                      showLinks={state.showLinks}
                       enablePhysics={state.enablePhysics}
-                      showParticles={state.showParticles} 
+                      showParticles={state.showParticles}
                       selectedNodeId={state.selectedNodeId}
                       conceptDesignState={conceptDesignState}
                       onFilterComplete={actions.handleSearchFilterComplete}
                     />
-                    <GraphControls 
-                      darkMode={state.darkMode} 
-                      showLabels={state.showLabels} 
-                      showLinks={state.showLinks} 
-                      enablePhysics={state.enablePhysics} 
-                      showParticles={state.showParticles} 
+                    <GraphControls
+                      darkMode={state.darkMode}
+                      showLabels={state.showLabels}
+                      showLinks={state.showLinks}
+                      enablePhysics={state.enablePhysics}
+                      showParticles={state.showParticles}
                       onToggleLabels={actions.toggleLabels}
                       onToggleLinks={actions.toggleLinks}
                       onTogglePhysics={actions.togglePhysics}
@@ -257,8 +257,8 @@ function App() {
                 ) : (
                   <div className="h-full overflow-hidden rounded-lg">
                     <ConceptDesigner
-                      darkMode={state.darkMode} 
-                      designState={conceptDesignState} 
+                      darkMode={state.darkMode}
+                      designState={conceptDesignState}
                       graphData={graphData}
                       onUpdateObjective={updateObjective}
                       onUpdateComponentSelection={updateComponentSelection}
@@ -277,11 +277,11 @@ function App() {
               <div className="w-80 xl:w-96 flex-shrink-0 h-full overflow-hidden">
                 <ErrorBoundary componentName="ContextPanel">
                   <ContextPanel
-                    darkMode={state.darkMode} 
+                    darkMode={state.darkMode}
                     activeMode={state.activeMode}
-                    selectedNodeId={state.selectedNodeId} 
+                    selectedNodeId={state.selectedNodeId}
                     conceptDesignState={conceptDesignState}
-                    graphData={graphData} 
+                    graphData={graphData}
                     onSelectNode={actions.handleNodeSelect}
                     onStartDesign={(nodeId) => actions.triggerAgent('initiate-new-concept-from-selection', { nodeId })}
                     onTriggerAgent={actions.triggerAgent}
@@ -296,11 +296,11 @@ function App() {
         {/* PDF Uploader Modal */}
         {state.showPDFUploader && (
           <ErrorBoundary componentName="PDFUploader">
-            <PDFUploader 
-              darkMode={state.darkMode} 
-              onClose={actions.togglePDFUploader} 
-              onFileProcessed={(parsedData) => actions.triggerAgent('integrate-data', parsedData)} 
-              onTriggerAgent={actions.triggerAgent} 
+            <PDFUploader
+              darkMode={state.darkMode}
+              onClose={actions.togglePDFUploader}
+              onFileProcessed={(parsedData) => actions.triggerAgent('integrate-data', parsedData)}
+              onTriggerAgent={actions.triggerAgent}
             />
           </ErrorBoundary>
         )}
@@ -309,4 +309,4 @@ function App() {
   );
 }
 
-export default App; 
+export default App;

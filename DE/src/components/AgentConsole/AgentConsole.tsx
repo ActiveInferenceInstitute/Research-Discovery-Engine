@@ -2,10 +2,10 @@
 
 import React, { useState } from 'react';
 // Corrected and ensured ALL icons used are imported from lucide-react
-import { 
-    ChevronsLeft, ChevronsRight, Brain, Network, FlaskConical, 
-    Lightbulb, GitMerge, AlertTriangle, ChevronDown, ChevronUp, 
-    Loader, MessageSquare, Layers 
+import {
+    ChevronsLeft, ChevronsRight, Brain,  FlaskConical,
+    Lightbulb, GitMerge, AlertTriangle, ChevronDown, ChevronUp,
+    Loader, MessageSquare, Layers
 } from 'lucide-react';
 import AgentMessageStream from './AgentMessageStream'; // Correct import for AgentMessageStream
 import { AgentMessage, GraphData, NodeObject, ConceptDesignState } from '../../types';
@@ -23,8 +23,8 @@ interface AgentConsoleProps {
 
 const AgentConsole: React.FC<AgentConsoleProps> = ({
   darkMode,
-  messages = [], 
-  cnmData = { nodes: [], links: [] }, 
+  messages = [],
+  cnmData = { nodes: [], links: [] },
   activeMode,
   conceptDesignState,
   selectedNodeId,
@@ -91,7 +91,7 @@ const AgentConsole: React.FC<AgentConsoleProps> = ({
                       <Lightbulb size={14} /> <span>Start New Concept (Goal)</span>
                     </button>
                   </>
-                ) : ( 
+                ) : (
                   <>
                      <button
                       className={`w-full text-left p-1.5 rounded-md flex items-center space-x-1.5 ${darkMode ? 'bg-slate-700 hover:bg-slate-600' : 'bg-slate-100 hover:bg-slate-200'}`}
