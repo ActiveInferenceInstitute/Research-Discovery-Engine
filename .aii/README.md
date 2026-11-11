@@ -40,6 +40,7 @@ Institute repositories without touching this project's own content. The schema i
 | --- | --- | --- | --- |
 | `install` | `pip install -r requirements.txt` | `.` | Install dependencies. |
 | `inventory` | `git ls-files` | `.` | List tracked files. |
+| `build` | `npm ci && npm run build` | `DE` | Build the Discovery Engine frontend and assert the knowledge base in dist. |
 
 ## Links
 

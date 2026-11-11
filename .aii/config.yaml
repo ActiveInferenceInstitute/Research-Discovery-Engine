@@ -1,7 +1,7 @@
 # AII sidecar — InstituteOS metadata. Schema: aii_platform.aii_sidecar
 meta:
   sidecar_version: 1.2.1
-  updated: '2026-11-10'
+  updated: '2026-11-11'
 repo:
   name: Research-Discovery-Engine
   slug: research-discovery-engine
@@ -31,9 +31,28 @@ artifacts:
 - path: LICENSE
   kind: doc
   description: License.
+- path: DE
+  kind: code
+  description: React/TypeScript/Vite Discovery Engine frontend and its tests.
+- path: path
+  kind: code
+  description: Python network-analysis pipeline and checked-in results.
+- path: resnei
+  kind: code
+  description: Flask ResNei prototype.
+- path: website_explore_the_unknown
+  kind: code
+  description: Next.js website prototype.
+- path: Docs
+  kind: doc
+  description: Numbered Discovery Engine system-design series.
+- path: requirements.txt
+  kind: code
+  description: Root Python requirements.
 provenance:
   license: CC-BY-4.0
   citation:
+    doi: 10.5281/zenodo.15084931
     zenodo: https://zenodo.org/badge/latestdoi/948595787
     text: Active Inference Institute — Research-Discovery-Engine.
 instituteos:
@@ -53,6 +72,10 @@ tasks:
   inventory:
     cmd: git ls-files
     description: List tracked files.
+  build:
+    cmd: npm ci && npm run build
+    cwd: DE
+    description: Build the Discovery Engine frontend and assert the knowledge base in dist.
 docs:
 - README.md
 - AGENTS.md

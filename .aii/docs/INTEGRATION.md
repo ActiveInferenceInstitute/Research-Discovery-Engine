@@ -39,6 +39,12 @@
 | `README.md` | `doc` | Repository overview. |
 | `AGENTS.md` | `doc` | Agent guidance. |
 | `LICENSE` | `doc` | License. |
+| `DE` | `code` | React/TypeScript/Vite Discovery Engine frontend and its tests. |
+| `path` | `code` | Python network-analysis pipeline and checked-in results. |
+| `resnei` | `code` | Flask ResNei prototype. |
+| `website_explore_the_unknown` | `code` | Next.js website prototype. |
+| `Docs` | `doc` | Numbered Discovery Engine system-design series. |
+| `requirements.txt` | `code` | Root Python requirements. |
 
 ## Portable tasks
 
@@ -46,6 +52,7 @@
 | --- | --- | --- | --- |
 | `install` | `pip install -r requirements.txt` | `.` | Install dependencies. |
 | `inventory` | `git ls-files` | `.` | List tracked files. |
+| `build` | `npm ci && npm run build` | `DE` | Build the Discovery Engine frontend and assert the knowledge base in dist. |
 
 ## Validation
 

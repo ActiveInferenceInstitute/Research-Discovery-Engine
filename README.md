@@ -44,7 +44,7 @@ pip install -r requirements.txt
 python research_paths.py
 ```
 
-It reads the Markdown knowledge-base files in `path/` and writes staged artifacts beneath `path/results/`. See [`path/README.md`](path/README.md) for the current output layout.
+It reads the six category Markdown records from the canonical knowledge base in `DE/KG/` and writes staged artifacts beneath `path/results/`. See [`path/README.md`](path/README.md) for the current output layout.
 
 ## Design documentation
 
