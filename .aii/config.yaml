@@ -1,13 +1,14 @@
-# AII sidecar — InstituteOS metadata. Schema: instituteos.platform.aii_sidecar
+# AII sidecar — InstituteOS metadata. Schema: aii_platform.aii_sidecar
 meta:
-  updated: '2026-06-30'
+  sidecar_version: 1.2.1
+  updated: '2026-11-10'
 repo:
   name: Research-Discovery-Engine
   slug: research-discovery-engine
   full_name: ActiveInferenceInstitute/Research-Discovery-Engine
-  description: IntelliDE is an advanced platform that uses artificial intelligence
-    to accelerate scientific discovery, foster interdisciplinary collaboration, and
-    democratize access to knowledge.
+  description: 'Research prototypes for exploring scientific knowledge as structured,
+    connected information: a React/TypeScript knowledge-graph frontend, a Python network-analysis
+    pipeline, and design documentation for a Conceptual Nexus Model.'
 institute:
   category: research
   maturity: released
@@ -21,9 +22,15 @@ ecosystem:
     github: https://github.com/ActiveInferenceInstitute/Research-Discovery-Engine
     website: https://www.activeinference.org
 artifacts:
-- path: ReadMe.md
+- path: README.md
   kind: doc
   description: Repository overview.
+- path: AGENTS.md
+  kind: doc
+  description: Agent guidance.
+- path: LICENSE
+  kind: doc
+  description: License.
 provenance:
   license: CC-BY-4.0
   citation:
@@ -31,15 +38,25 @@ provenance:
     text: Active Inference Institute — Research-Discovery-Engine.
 instituteos:
   tags:
-  - research
-  - discovery
-  - engine
+  - research-discovery
+  - knowledge-graph
+  - literature
   - intellide
-  - advanced
-  - html
+  - python
 capabilities:
 - documentation
+- ci
 tasks:
   install:
     cmd: pip install -r requirements.txt
     description: Install dependencies.
+  inventory:
+    cmd: git ls-files
+    description: List tracked files.
+docs:
+- README.md
+- AGENTS.md
+- docs/INTEGRATION.md
+- docs/README.md
+- docs/AGENTS.md
+schema: aii-sidecar/v1

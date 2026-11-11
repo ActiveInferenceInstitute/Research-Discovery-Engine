@@ -1,6 +1,6 @@
 # Research-Discovery-Engine — agent guidance
 
-This repository is a set of related research prototypes, not one installable package. The human entry point is [ReadMe.md](ReadMe.md); contribution and validation expectations are in [CONTRIBUTING.md](CONTRIBUTING.md), and the open documentation backlog is [TO-DO.md](TO-DO.md).
+This repository is a set of related research prototypes, not one installable package. The human entry point is [README.md](README.md); contribution and validation expectations are in [CONTRIBUTING.md](CONTRIBUTING.md), and the open documentation backlog is [TO-DO.md](TO-DO.md).
 
 ## Components
 
@@ -10,7 +10,7 @@ This repository is a set of related research prototypes, not one installable pac
 | `path/` | Python network-analysis pipeline over `DE/KG/` | [path/README.md](path/README.md) |
 | `resnei/` | Flask ResNei prototype | [resnei/README.md](resnei/README.md) |
 | `website_explore_the_unknown/` | Next.js + Flask website prototype | [website README](website_explore_the_unknown/README.md) |
-| `Docs/` | Numbered system-design series, indexed by `Docs/0. DE-Paper-Outline.md` | root `ReadMe.md` |
+| `Docs/` | Numbered system-design series, indexed by `Docs/0. DE-Paper-Outline.md` | root `README.md` |
 | `ResNei SDD/` | ResNei software design document and figures | `ResNei SDD/resnei.md` |
 
 ## Generated and data trees: do not add guides inside them

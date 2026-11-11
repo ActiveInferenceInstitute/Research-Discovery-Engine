@@ -12,6 +12,10 @@ defaults:
   run:
     working-directory: DE
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   build:
     name: build, test harness and knowledge base (node 24, locked install)

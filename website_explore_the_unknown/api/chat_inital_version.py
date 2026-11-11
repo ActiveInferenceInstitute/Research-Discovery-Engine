@@ -26,25 +26,6 @@ def chat():
 if __name__ == "__main__":
     app.run(debug=True)
 
-
-
-
-
-def generate():
-            # Use the synchronous streaming API of Mistral
-            stream_response = client.chat.stream(
-                model=model,
-                messages=combined_messages
-            )
-            logger.debug("Initiating streaming response")
-            for chunk in stream_response:
-                # Each chunk will have a 'delta' part with new content
-                delta = chunk.data.choices[0].delta
-                if delta and delta.content:
-                    logger.debug("Sending chunk: %s", delta.content)
-                    # Following the SSE convention: prefix the data with "data:" and add a double newline
-                    yield f"data: {delta.content}\n\n"
-            # Optionally signal that the stream is done
-            yield "data: [DONE]\n\n"
-
-        return Response(generate(), mimetype="text/event-stream")
+# The maintained Mistral streaming endpoint lives in ``api/routes/chat.py``.
+# An earlier draft stream generator was never wired to a route and referenced an
+# undefined ``client``; it was removed so this module imports cleanly.

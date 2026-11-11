@@ -16,7 +16,7 @@ This document replaces the earlier "final status" report. That revision carried 
 | `resnei/` | Flask prototypes for the "ResNei" document-analyser experiments |
 | `website_explore_the_unknown/` | the separate Next.js marketing/onboarding site |
 | `Docs/` | the numbered design-document series |
-| `ReadMe.md`, `CONTRIBUTING.md`, `TO-DO.md`, `REVIEW_LOG_2026-08-02.md` | repository-level guides and records |
+| `README.md`, `CONTRIBUTING.md`, `TO-DO.md`, `REVIEW_LOG_2026-08-02.md` | repository-level guides and records |
 
 The application itself: 63 TypeScript/TSX files under `DE/src`, 8 component directories and 14 files in `DE/src/utils`.
 
@@ -65,7 +65,7 @@ The application itself: 63 TypeScript/TSX files under `DE/src`, 8 component dire
 
 | document | content |
 | --- | --- |
-| `ReadMe.md`, `CONTRIBUTING.md`, `TO-DO.md` | repository overview, contribution guide, open documentation items |
+| `README.md`, `CONTRIBUTING.md`, `TO-DO.md` | repository overview, contribution guide, open documentation items |
 | `DE/README.md`, `DE/docs/README.md` | application overview, LLM configuration, documentation index |
 | `DE/docs/DEVELOPMENT_GUIDE.md`, `STARTUP_GUIDE.md`, `TROUBLESHOOTING.md` | setup, development commands, coding standards, common failures |
 | `DE/docs/DEPLOYMENT.md` | static hosting, container and CI deployment options |

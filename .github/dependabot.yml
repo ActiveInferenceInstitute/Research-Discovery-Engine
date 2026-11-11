@@ -8,6 +8,8 @@ updates:
       github-actions:
         patterns:
           - "*"
+    cooldown:
+      default-days: 7
   - package-ecosystem: npm
     directory: /DE
     schedule:
@@ -16,6 +18,8 @@ updates:
       de-frontend:
         patterns:
           - "*"
+    cooldown:
+      default-days: 7
   - package-ecosystem: npm
     directory: /website_explore_the_unknown
     schedule:
@@ -24,6 +28,8 @@ updates:
       website-frontend:
         patterns:
           - "*"
+    cooldown:
+      default-days: 7
   - package-ecosystem: pip
     directory: /
     schedule:
@@ -32,6 +38,8 @@ updates:
       python-root:
         patterns:
           - "*"
+    cooldown:
+      default-days: 7
   - package-ecosystem: pip
     directory: /path
     schedule:
@@ -40,6 +48,8 @@ updates:
       python-path:
         patterns:
           - "*"
+    cooldown:
+      default-days: 7
   - package-ecosystem: pip
     directory: /website_explore_the_unknown
     schedule:
@@ -48,3 +58,5 @@ updates:
       python-website:
         patterns:
           - "*"
+    cooldown:
+      default-days: 7

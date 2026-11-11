@@ -63,3 +63,11 @@ See [`CONTRIBUTING.md`](CONTRIBUTING.md) for the scope of contributions and the 
 Repository materials are licensed under [CC BY 4.0](LICENSE). The repository has a Zenodo DOI: [10.5281/zenodo.15084931](https://doi.org/10.5281/zenodo.15084931).
 
 For the institute, see [Active Inference Institute](https://www.activeinference.institute/). The public project prototype is also presented at [explore-the-unknown.vercel.app](https://explore-the-unknown.vercel.app/).
+
+## InstituteOS sidecar
+
+This repository carries a committed [`.aii/`](.aii/README.md) sidecar with curated
+InstituteOS metadata (`aii-sidecar/v1`): category, maturity, ecosystem relations,
+key artifacts, provenance, and portable tasks. It is read by
+[InstituteOS](https://github.com/ActiveInferenceInstitute/InstituteOS) tooling and
+does not affect the project's build or runtime.
