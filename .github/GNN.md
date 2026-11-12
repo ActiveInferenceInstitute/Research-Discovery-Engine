@@ -40,7 +40,13 @@ an installed parser whose `gnn.__version__` does not match the pin's `tag`
    - `gnn.parsers.basic.parse_gnn_formal(...)` must return a parse with no
      `parse_errors`;
    - `gnn.parsers.basic.validate_gnn_syntax(...)` must report valid;
-   - the whole set must pass `gnn.type_checker.GNNTypeChecker().validate_gnn_files(...)`.
+   - the whole set must make
+     `gnn.type_checker.GNNTypeChecker().validate_gnn_files(...)` return literal
+     `True`. That call answers `2` when files were invalid **or none were
+     found**, and `False` on a hard failure; both are refusals, because `2` is
+     truthy and a truthiness test would print `"verified"` for a rejected
+     model. A refusal reports the returned value plus the checker's recorded
+     errors.
 3. When the repository has no sketch yet, it parses the pinned upstream exemplar
    `input/gnn_files/basics/static_perception.md` at the pinned revision and
    type-checks that instead. This is a pin and pipeline conformance baseline, not
@@ -51,6 +57,15 @@ On success it prints one JSON object:
 ```json
 {"gnn-version": "5.0.3", "models": 1, "pin-revision": "8f293d9ba810e6eda5c09842d9c7ed9ffa5f92c1", "result": "verified", "source": "pinned-exemplar"}
 ```
+
+## The verdict selftest
+
+`./run.sh gnn` first runs `scripts/gnn_conformance_selftest.py`. It drives
+`conformance_body` with a stub `gnn` package and asserts the accepted set:
+`True` reports `"verified"`, while `2`, `False`, `None` and `0` are refused and
+the refusal names the returned value. It needs no network, no pinned
+environment and touches no repository state, so the acceptance rule cannot
+silently regress to a truthiness test.
 
 ## Environment
 

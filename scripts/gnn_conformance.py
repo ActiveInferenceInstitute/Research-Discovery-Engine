@@ -10,7 +10,8 @@ yet, it parses the pinned upstream exemplar instead, so the job proves the pin
 and pipeline rather than a model this repository does not contain.
 
 Exit status is 0 only when the pin, the installed version and the parser results
-all agree.
+all agree. The type checker must return literal ``True``: its ``2`` verdict
+(invalid files, or none found) is a refusal, not a pass.
 """
 
 from __future__ import annotations
@@ -143,6 +144,36 @@ def build_environment(
     return python
 
 
+def require_verified_type_check(
+    result: bool | int | None, subject: str, output_dir: Path
+) -> None:
+    """Refuse every type-check verdict except the checker's literal ``True``.
+
+    ``GNNTypeChecker.validate_gnn_files`` returns ``True`` when every file
+    validates, ``2`` when the run completed but files were invalid **or none
+    were found**, and ``False`` on a hard failure. ``2`` is truthy, so a
+    truthiness test lets a rejected model print ``"verified"``; only ``True``
+    means the checked set passed.
+    """
+    if result is True:
+        return
+    details: list[str] = []
+    results_file = output_dir / "type_check_results.json"
+    if results_file.is_file():
+        try:
+            recorded = json.loads(results_file.read_text(encoding="utf-8"))
+        except (OSError, ValueError):
+            recorded = {}
+        details.extend(str(error) for error in recorded.get("errors", []))
+        for validation in recorded.get("validation_results", []):
+            details.extend(str(error) for error in validation.get("errors", []))
+    report = "".join(f"\n  - {detail}" for detail in details)
+    raise SystemExit(
+        f"GNN type checker did not verify the {subject}: it returned {result!r}, "
+        f"and only True passes{report}"
+    )
+
+
 def conformance_body(root: Path, pin: dict) -> None:
     """Runs inside the pinned interpreter's environment; imports the parser."""
     from gnn import __version__
@@ -176,8 +207,11 @@ def conformance_body(root: Path, pin: dict) -> None:
             model_dir.mkdir()
             for index, sketch in enumerate(sketches):
                 shutil.copy2(sketch, model_dir / f"{index:03d}_{sketch.name}")
-            if not GNNTypeChecker().validate_gnn_files(model_dir, Path(output_dir)):
-                raise SystemExit("GNN type checker rejected the repository sketches")
+            require_verified_type_check(
+                GNNTypeChecker().validate_gnn_files(model_dir, Path(output_dir)),
+                "repository sketches",
+                Path(output_dir),
+            )
         checked = len(sketches)
         source = "repository"
     else:
@@ -197,8 +231,11 @@ def conformance_body(root: Path, pin: dict) -> None:
             model_dir = Path(output_dir) / "models"
             model_dir.mkdir()
             shutil.copy2(exemplar, model_dir / exemplar.name)
-            if not GNNTypeChecker().validate_gnn_files(model_dir, Path(output_dir)):
-                raise SystemExit("GNN type checker rejected the pinned exemplar")
+            require_verified_type_check(
+                GNNTypeChecker().validate_gnn_files(model_dir, Path(output_dir)),
+                "pinned exemplar",
+                Path(output_dir),
+            )
         checked = 1
         source = "pinned-exemplar"
 
