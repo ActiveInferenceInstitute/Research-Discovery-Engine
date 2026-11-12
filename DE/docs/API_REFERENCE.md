@@ -238,7 +238,7 @@ const keywords = extractKeywords(content, {
 
 **State Management Patterns**:
 
-#### `createReducer(initialState, actionMap)`
+#### `createReducer(_initialState, actionMap)`
 Create Redux-like reducer with action creators
 ```typescript
 const { reducer, actionCreators } = createReducer(initialState, {
