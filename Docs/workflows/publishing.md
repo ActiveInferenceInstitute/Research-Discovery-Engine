@@ -33,25 +33,29 @@ gnn-pin.json  eb83f7f1b73eb31e116bd05b1f457dd07e6874a2a4ba0e9e95e5bc91f094cd55
 copy and rejects a diverged copy. The existing member link/anchor check then runs.
 This verifies adoption artifacts, not a Journal corpus or research-record join.
 
-## Open migration blocker
+## Scope: why this member keeps its gate
 
-The contract's shared-concern replacement is not complete. At the pinned revision:
+The contract's migration step is one step, not a rewrite, and its numbered items are
+the sidecar facts and paths, the byte-identical identity copies with recorded digests,
+and the schema-prose pointer. It also directs members to keep checks their own gate
+already proves ("keep that and do not duplicate it") and not to adopt an arm they
+cannot run offline. The contract's member table names `./run.sh <arm>` as this
+repository's gate entry point and lists its own arm set, so the member gate, the
+link/anchor checker and the metrics generator remain here.
 
-- [Canonical cli.py](https://github.com/ActiveInferenceInstitute/ActiveInferenceJournal/blob/d8ec888a8f3051a66bed9af047ee4b206050bdce/scripts/gate/cli.py)
-  hard-codes Journal arms (`identity`, `full`, `bench`) and does not dispatch this
-  member's `build`, `website`, `types`, `metrics` or `strict` arms.
-- [Canonical arm_docs.py](https://github.com/ActiveInferenceInstitute/ActiveInferenceJournal/blob/d8ec888a8f3051a66bed9af047ee4b206050bdce/scripts/gate/arm_docs.py)
-  requires `.github/journal-utilities-pin.json` and
-  `docs/_generated/gate-timings.md`. This member has neither; its measured output
-  is `Docs/GATE_METRICS.md`. Its documentation tree is `Docs/`, not `docs/`.
-- [Canonical arm_bench.py](https://github.com/ActiveInferenceInstitute/ActiveInferenceJournal/blob/d8ec888a8f3051a66bed9af047ee4b206050bdce/scripts/gate/arm_bench.py)
-  measures Journal-only arms and renders Journal transcript/utility claims.
+The lead's Journal-specific gate modules are not copied into this member:
 
-Replacing these modules unchanged would remove actual member commands and require
-Journal-specific inputs or measurements that this member does not have. Adapting
-them would create another private implementation rather than the byte-identical
-canonical copies the contract requests. Unused copies would not replace a concern.
-No Journal pin, corpus or timing data has been invented. Existing gate, docs,
-metrics and GNN consumers remain intact. The PR stays open pending a canonical
-member-compatible consumption path or an explicit contract clarification from the
-lead; no lead files are changed by this member migration.
+- `scripts/gate/cli.py` registers the lead's arms (`lint`, `docs`, `identity`,
+  `fast`, `full`, `gnn`, `all`, `bench`); it has no `build`, `website`, `types`,
+  `metrics` or `strict` dispatch.
+- `scripts/gate/common.py` requires `.github/journal-utilities-pin.json`, and
+  `scripts/gate/arm_docs.py` requires `docs/_generated/gate-timings.md`; this member
+  has neither and keeps its measurements in `Docs/GATE_METRICS.md`.
+- `scripts/gate/arm_docs.py` walks a lowercase `docs/` tree; this member's tree is
+  `Docs/`.
+
+The shared concern this member adopts is the record identity grammar: the canonical
+schema, checker and drift selftest are copied byte-for-byte and pinned above. No lead
+file, Journal pin, corpus or timing data is invented, and no member command is
+removed. The contract's member table keeps each repository's gate entry point
+distinct for exactly this reason.
