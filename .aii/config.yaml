@@ -68,10 +68,12 @@ capabilities:
 tasks:
   fast:
     cmd: ./run.sh fast
-    description: Run the credential-free unit, integration and validation harness subsets.
+    description: Run the credential-free unit, integration and validation harness
+      subsets.
   build:
     cmd: ./run.sh build
-    description: Build the Discovery Engine frontend and assert the knowledge base in dist.
+    description: Build the Discovery Engine frontend and assert the knowledge base
+      in dist.
   website:
     cmd: ./run.sh website
     description: Build the Next.js website.
@@ -99,9 +101,10 @@ tasks:
 docs:
 - README.md
 - AGENTS.md
-- .aii/docs/INTEGRATION.md
-- Docs/README.md
-- .aii/docs/AGENTS.md
-- Docs/documentation-index.md
-- Docs/workflows/publishing.md
+- docs/INTEGRATION.md
+- ../Docs/README.md
+- docs/AGENTS.md
+- ../Docs/documentation-index.md
+- ../Docs/workflows/publishing.md
+- docs/README.md
 schema: aii-sidecar/v1

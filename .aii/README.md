@@ -36,13 +36,18 @@ Institute repositories without touching this project's own content. The schema i
 
 ## Portable tasks
 
-The executable task registry is [`config.yaml`](config.yaml), with one task per
-documented `./run.sh` arm. Commands and known-red checks are described in the
-[run guide](../Docs/RUN_GUIDE.md); the docs index is
-[`Docs/documentation-index.md`](../Docs/documentation-index.md), the GNN pin is
-[`.github/gnn-pin.json`](../.github/gnn-pin.json), and this member has no manuscript
-command. Publishing migration status and canonical artifact digests are in the
-[member contract record](../Docs/workflows/publishing.md).
+| Task | Command | Working directory | Description |
+| --- | --- | --- | --- |
+| `fast` | `./run.sh fast` | `.` | Run the credential-free unit, integration and validation harness subsets. |
+| `build` | `./run.sh build` | `.` | Build the Discovery Engine frontend and assert the knowledge base in dist. |
+| `website` | `./run.sh website` | `.` | Build the Next.js website. |
+| `docs` | `./run.sh docs` | `.` | Check relative links and pinned Publishing artifacts; index is Docs/documentation-index.md. |
+| `gnn` | `./run.sh gnn` | `.` | Run parser conformance using .github/gnn-pin.json. |
+| `lint` | `./run.sh lint` | `.` | Run DE ESLint; admitted red and excluded from all. |
+| `types` | `./run.sh types` | `.` | Run DE TypeScript checks; admitted red and excluded from all. |
+| `metrics` | `./run.sh metrics` | `.` | Measure gate arms and regenerate Docs/GATE_METRICS.md. |
+| `all` | `./run.sh all` | `.` | Run the blocking gate; this member has no manuscript command. |
+| `strict` | `./run.sh strict` | `.` | Run all plus the admitted-red lint and types arms. |
 
 ## Links
 
