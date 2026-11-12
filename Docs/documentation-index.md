@@ -27,6 +27,8 @@ link to `Docs/` wherever a repository would otherwise say `docs/`.
 - [`../.github/gnn-pin.json`](../.github/gnn-pin.json) — canonical parser pin, schema `gnn-importer-pin/v1`.
 - [`../.github/workflows/ci.yml`](../.github/workflows/ci.yml) — the workflows that call the arms.
 - [`../.github/dependabot.yml`](../.github/dependabot.yml) — dependency update policy.
+- [`workflows/publishing.md`](workflows/publishing.md) — Publishing contract pointer, pinned artifacts and migration blocker.
+- [`workflows/record-identity.schema.json`](workflows/record-identity.schema.json) — byte-identical canonical record identity schema.
 
 ## System design
 

@@ -1,7 +1,7 @@
 # AII sidecar — InstituteOS metadata. Schema: aii_platform.aii_sidecar
 meta:
   sidecar_version: 1.2.1
-  updated: '2026-11-11'
+  updated: '2026-11-12'
 repo:
   name: Research-Discovery-Engine
   slug: research-discovery-engine
@@ -66,20 +66,42 @@ capabilities:
 - documentation
 - ci
 tasks:
-  install:
-    cmd: pip install -r requirements.txt
-    description: Install dependencies.
-  inventory:
-    cmd: git ls-files
-    description: List tracked files.
+  fast:
+    cmd: ./run.sh fast
+    description: Run the credential-free unit, integration and validation harness subsets.
   build:
-    cmd: npm ci && npm run build
-    cwd: DE
+    cmd: ./run.sh build
     description: Build the Discovery Engine frontend and assert the knowledge base in dist.
+  website:
+    cmd: ./run.sh website
+    description: Build the Next.js website.
+  docs:
+    cmd: ./run.sh docs
+    description: Check relative links and pinned Publishing artifacts; index is Docs/documentation-index.md.
+  gnn:
+    cmd: ./run.sh gnn
+    description: Run parser conformance using .github/gnn-pin.json.
+  lint:
+    cmd: ./run.sh lint
+    description: Run DE ESLint; admitted red and excluded from all.
+  types:
+    cmd: ./run.sh types
+    description: Run DE TypeScript checks; admitted red and excluded from all.
+  metrics:
+    cmd: ./run.sh metrics
+    description: Measure gate arms and regenerate Docs/GATE_METRICS.md.
+  all:
+    cmd: ./run.sh all
+    description: Run the blocking gate; this member has no manuscript command.
+  strict:
+    cmd: ./run.sh strict
+    description: Run all plus the admitted-red lint and types arms.
 docs:
 - README.md
 - AGENTS.md
-- docs/INTEGRATION.md
-- docs/README.md
-- docs/AGENTS.md
+- .aii/docs/INTEGRATION.md
+- Docs/README.md
+- .aii/docs/AGENTS.md
+- Docs/documentation-index.md
+- Docs/workflows/publishing.md
 schema: aii-sidecar/v1

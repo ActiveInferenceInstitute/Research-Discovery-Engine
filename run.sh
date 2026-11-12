@@ -8,7 +8,7 @@
 #   ./run.sh fast      credential-free test harness subsets (unit, integration, validation)
 #   ./run.sh build     DE production build, including the knowledge-base assertion
 #   ./run.sh website   website_explore_the_unknown production build (Next.js)
-#   ./run.sh docs      relative Markdown link and anchor check
+#   ./run.sh docs      relative Markdown links, anchors and Publishing artifact digests
 #   ./run.sh gnn       pinned GNN parser conformance (see .github/GNN.md)
 #   ./run.sh lint      ESLint over DE/ (known red: pre-existing findings, see docs)
 #   ./run.sh types     tsc -b over DE/ (known red: pre-existing errors, see docs)
@@ -82,6 +82,20 @@ arm_website() {
 
 arm_docs() {
   require_command "$PYTHON"
+  (
+    cd "$ROOT"
+    local checker=( "$PYTHON" scripts/gate/identity.py
+      --schema Docs/workflows/record-identity.schema.json
+      --contract Docs/workflows/publishing.md )
+    "${checker[@]}"
+    local artifact
+    for artifact in Docs/workflows/record-identity.schema.json \
+      scripts/gate/identity.py scripts/gate/identity_selftest.py .github/gnn-pin.json; do
+      "${checker[@]}" --verify-copy "$artifact"
+    done
+    "$PYTHON" scripts/gate/identity_selftest.py
+    echo "identity: selftest passed (matching copy accepted; drifted copy rejected)"
+  )
   "$PYTHON" "$ROOT/scripts/check_docs_links.py"
 }
 

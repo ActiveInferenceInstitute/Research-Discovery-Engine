@@ -36,11 +36,13 @@ Institute repositories without touching this project's own content. The schema i
 
 ## Portable tasks
 
-| Task | Command | Working directory | Description |
-| --- | --- | --- | --- |
-| `install` | `pip install -r requirements.txt` | `.` | Install dependencies. |
-| `inventory` | `git ls-files` | `.` | List tracked files. |
-| `build` | `npm ci && npm run build` | `DE` | Build the Discovery Engine frontend and assert the knowledge base in dist. |
+The executable task registry is [`config.yaml`](config.yaml), with one task per
+documented `./run.sh` arm. Commands and known-red checks are described in the
+[run guide](../Docs/RUN_GUIDE.md); the docs index is
+[`Docs/documentation-index.md`](../Docs/documentation-index.md), the GNN pin is
+[`.github/gnn-pin.json`](../.github/gnn-pin.json), and this member has no manuscript
+command. Publishing migration status and canonical artifact digests are in the
+[member contract record](../Docs/workflows/publishing.md).
 
 ## Links
 
