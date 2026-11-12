@@ -203,7 +203,7 @@ The Discovery Engine includes LLM-backed script tooling plus a standalone test h
 *   **Domain-Specific Analysis**: Tailored processing for materials science, nanotechnology, and related fields
 
 ### 🧪 **Test Harness**
-*   **`run-tests.ts`** is a standalone harness, not a CI test runner: `npx tsx scripts/run-tests.ts --test-type unit|integration|validation|llm|all`
+*   **`run-tests.ts`** is a standalone harness, not a CI test runner: `npx tsx scripts/run-tests.ts --test-type unit|integration|validation|llm|all`. The gate runs it as `./run.sh fast`.
 *   **Credential-free subsets** pass as measured on 2026-11-02: `unit` 5/5, `integration` 3/3, `validation` 3/3
 *   **The `llm` subset** exercises the LLM services and reports 7 failures without a provider key; it needs `VITE_OPENAI_API_KEY` or `VITE_OPENROUTER_API_KEY`
 *   **Exit codes are not a gate**: the harness exits 0 even when tests fail, so any gate must assert the reported failure count
@@ -229,6 +229,7 @@ A dedicated LLM extraction template directly maps to the CNM schema defined in `
 *   **Search & Navigation**: Real-time graph filtering and breadcrumb navigation
 *   **LLM Integration**: OpenAI and OpenRouter service classes under `src/llm/`, used by the script tooling
 *   **Test Harness**: `scripts/run-tests.ts`; the credential-free subsets pass, the LLM subset needs a provider key
+*   **Gate**: `./run.sh fast` asserts those subsets, `./run.sh build` asserts this directory's build and knowledge-base mirror; see [`../Docs/RUN_GUIDE.md`](../Docs/RUN_GUIDE.md)
 *   **Headless Mode**: Batch runs for the scripts are documented in `scripts/README_HEADLESS.md`
 
 ### 🔄 **In Active Development**

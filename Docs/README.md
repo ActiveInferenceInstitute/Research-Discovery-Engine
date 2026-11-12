@@ -9,6 +9,17 @@ not a claim that every proposed capability is implemented in the current prototy
 The human entry point for the repository is [`../README.md`](../README.md); the
 component the design targets is [`../DE/`](../DE/README.md).
 
+## Repository documentation
+
+| Need | Document |
+| --- | --- |
+| Every long-lived document, flat | [`documentation-index.md`](documentation-index.md) |
+| How to run the checks before a pull request | [`RUN_GUIDE.md`](RUN_GUIDE.md) |
+| Measured arm wall times, test counts and finding counts (**generated**) | [`GATE_METRICS.md`](GATE_METRICS.md) |
+| What the pinned GNN conformance job parses | [`../.github/GNN.md`](../.github/GNN.md) |
+| Canonical parser pin (`gnn-importer-pin/v1`) | [`../.github/gnn-pin.json`](../.github/gnn-pin.json) |
+| Repository overview, contribution scope, backlog | [`../README.md`](../README.md), [`../CONTRIBUTING.md`](../CONTRIBUTING.md), [`../TO-DO.md`](../TO-DO.md) |
+
 ## Reading order
 
 | # | Document | Topic |
@@ -34,6 +45,10 @@ component the design targets is [`../DE/`](../DE/README.md).
 
 ## Related documentation
 
+- [`documentation-index.md`](documentation-index.md) — flat index of every long-lived document.
+- [`RUN_GUIDE.md`](RUN_GUIDE.md) — the gate arms and the checks that are known red.
+- [`GATE_METRICS.md`](GATE_METRICS.md) — generated per-arm measurements.
 - [`../DE/docs/README.md`](../DE/docs/README.md) — the frontend's implementation documentation.
 - [`../path/README.md`](../path/README.md) — the Python network-analysis pipeline.
+- [`../website_explore_the_unknown/README.md`](../website_explore_the_unknown/README.md) — the Next.js site.
 - [`../ResNei SDD/resnei.md`](../ResNei%20SDD/resnei.md) — the ResNei software design document.
