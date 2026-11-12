@@ -7,6 +7,9 @@
 __pycache__/
 *.pyc
 
+# Gate scratch space (logs, per-arm timing runs, the pinned GNN environment)
+.gate/
+
 # OS files
 .DS_Store
 
