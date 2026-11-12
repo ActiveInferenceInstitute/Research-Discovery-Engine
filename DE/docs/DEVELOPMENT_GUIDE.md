@@ -34,20 +34,41 @@ npm run dev
 # Development server (with hot reload)
 npm run dev
 
-# Build for production
+# Build for production (bare tsc, vite build, and the dist/KG assertion)
 npm run build
 
 # Preview production build
 npm run preview
 
-# Linting
+# ESLint over this directory (flat config, ESLint 10)
 npm run lint
+
+# Real type check; tsconfig.json is a solution file, so a bare `tsc` checks nothing
+npx tsc -b
 
 # Mirror the knowledge base only (normally run by the hooks below)
 npm run sync-kg
 ```
 
 `npm run dev` and `npm run build` first run `scripts/sync-kg.mjs`, which mirrors the canonical knowledge base (`KG/` and `publications/`) into `public/KG/` — the path the app fetches at runtime (`/KG/<file>.md` and `/KG/publications/<key>.md`). The mirror is generated and ignored by git, and `npm run build` additionally asserts that the built `dist/KG/` carries every document.
+
+The repository gate wraps these commands; from the repository root:
+
+```bash
+./run.sh fast      # credential-free harness subsets
+./run.sh build     # this directory's production build
+./run.sh lint      # ESLint findings (currently red, see below)
+./run.sh types     # npx tsc -b (currently red, see below)
+./run.sh all       # what CI runs
+```
+
+`lint` and `types` are runnable but not green: after the ESLint 10 flat-config migration `npm run lint` reports pre-existing findings, and `npx tsc -b` reports the pre-existing error surface. Neither is enforced by CI yet; see [`../../Docs/RUN_GUIDE.md`](../../Docs/RUN_GUIDE.md#known-red-checks) and the measured counts in [`../../Docs/GATE_METRICS.md`](../../Docs/GATE_METRICS.md).
+
+### Styling and lint toolchain
+
+- Tailwind CSS 4 is loaded from CSS, not from a PostCSS preset file: `src/index.css` starts with `@import "tailwindcss";` and `@config "../tailwind.config.js";`, and `postcss.config.js` registers only `@tailwindcss/postcss` (plus `autoprefixer`, which Tailwind 4 no longer needs but the pipeline still runs).
+- ESLint 10 uses the flat config in `eslint.config.js`: `@eslint/js`, `typescript-eslint`, `eslint-plugin-react-hooks` and `eslint-plugin-react-refresh`. The script passes `--report-unused-disable-directives --max-warnings 0`, so a warning is a failure.
+- Vite 8 builds through rolldown; the build prints the bundle table and a chunk-size advisory for the visualization bundle, which is advisory only.
 
 ## 🏗️ Architecture Overview
 
@@ -263,46 +284,45 @@ const myService = {
 
 ## 🧪 Testing
 
+There is no Jest/Vitest/Playwright configuration and no `test` script. The
+repository ships a standalone harness, `scripts/run-tests.ts`, which reports a
+pass/fail count and exits 0 even when tests fail:
+
+```bash
+# From DE/: credential-free subsets
+npx tsx scripts/run-tests.ts --test-type unit|integration|validation
+
+# The gate asserts the reported count, not the exit status
+cd .. && ./run.sh fast
+```
+
+The `llm` subset exercises the LLM services and needs a provider key.
+
 ### Testing Utilities
-Use the comprehensive testing utilities:
+`src/utils/testUtils.ts` provides mock graph data, mock agent messages, mock
+concept state and graph assertions. They are plain functions; call them directly
+from a script or a harness case rather than from a runner that does not exist:
 
 ```typescript
-import { 
-  createMockGraphData, 
+import {
+  createMockGraphData,
+  createMockConceptDesignState,
   createMockAgentMessages,
-  graphTestUtils,
-  testSetup 
-} from '../utils/testUtils';
+  graphTestUtils
+} from '../src/utils/testUtils';
 
-describe('MyComponent', () => {
-  beforeEach(() => {
-    testSetup.setupMockEnvironment();
-  });
-  
-  afterEach(() => {
-    testSetup.cleanup();
-  });
-  
-  it('should handle graph data correctly', () => {
-    const mockData = createMockGraphData(10, 0.3);
-    const isValid = graphTestUtils.validateGraphStructure(mockData);
-    expect(isValid).toBe(true);
-  });
-});
+const mockData = createMockGraphData(10, 0.3);
+const isValid = graphTestUtils.validateGraphStructure(mockData);
+const messages = createMockAgentMessages(10);
+const conceptState = createMockConceptDesignState({ objective: 'Test concept' });
 ```
 
 ### Mock Data Generation
 ```typescript
-// Generate test data
 const mockGraphData = createMockGraphData(
-  nodeCount: 50,     // Number of nodes
-  linkDensity: 0.2   // Link density (0-1)
+  50,   // node count
+  0.2   // link density (0-1)
 );
-
-const mockMessages = createMockAgentMessages(10);
-const mockConceptState = createMockConceptDesignState({
-  objective: 'Test concept'
-});
 ```
 
 ## 🎨 Component Development
@@ -535,12 +555,15 @@ const stats = calculateGraphStats(graphData);
 # pre-existing errors — see FINAL_STATUS.md)
 npx tsc -b
 
-# Build for production
+# Build for production (also mirrors and asserts the knowledge base)
 npm run build
 
 # Preview build locally
 npm run preview
 ```
+
+From the repository root, `./run.sh build` is the same build and
+`./run.sh types` is the same type check; those are the commands CI runs.
 
 ### Environment Variables
 Create `.env.local` for local development:
@@ -580,7 +603,7 @@ For development questions and support:
 - **[Component Architecture](COMPONENTS.md)**: Detailed component documentation
 - **Current Status**: `FINAL_STATUS.md` records what the tree verifiably does and what remains incomplete
 - **Development History**: See the repository commit history and `REVIEW_LOG_2026-08-02.md`
-- **Coding Standards**: Project conventions documented in this guide. The `npm run lint` script cannot currently run (see `FINAL_STATUS.md`); the CI workflow does not invoke it.
+- **Coding Standards**: Project conventions documented in this guide. `npm run lint` runs under the ESLint 10 flat config and reports pre-existing findings; `npx tsc -b` reports the pre-existing type surface. Neither is enforced by CI — see [`../../Docs/RUN_GUIDE.md`](../../Docs/RUN_GUIDE.md#known-red-checks).
 - **TypeScript Documentation**: [Official TypeScript docs](https://www.typescriptlang.org/docs/)
 - **React Documentation**: [Official React docs](https://react.dev/)
 
