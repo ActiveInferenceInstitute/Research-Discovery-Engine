@@ -27,7 +27,7 @@ The Python arms need only `python3`; `./run.sh gnn` creates its own environment.
 | `fast` | `./run.sh fast` | the credential-free harness subsets (`unit`, `integration`, `validation`) pass and each report says `Failed: 0` | `gate` |
 | `build` | `./run.sh build` | `DE/` builds, the knowledge-base mirror is regenerated, and `dist/KG` carries every document and publication record | `gate` |
 | `website` | `./run.sh website` | the Next.js site builds, including its own TypeScript step | `website` |
-| `docs` | `./run.sh docs` | every relative Markdown link resolves with exact case, and every `#anchor` matches a heading | `gate` |
+| `docs` | `./run.sh docs` | relative Markdown links and anchors resolve; Publishing artifact digests match and the canonical drift selftest passes | `gate` |
 | `gnn` | `./run.sh gnn` | the pinned GNN parser installs at the pinned revision, then parses and type-checks the conformance target | `gnn-conformance` |
 | `lint` | `./run.sh lint` | ESLint findings in `DE/` (currently red — see below) | none |
 | `types` | `./run.sh types` | `tsc -b` findings in `DE/` (currently red — see below) | none |
@@ -55,6 +55,11 @@ than the harness. Use `./run.sh website` before touching `website_explore_the_un
   [`.github/GNN.md`](../.github/GNN.md).
 
 ### Docs arm
+
+The arm first runs the pinned lead identity checker and drift selftest against
+[`workflows/publishing.md`](workflows/publishing.md). The schema and checker are
+unmodified canonical copies; explicit `Docs/` paths preserve this member's case
+on case-sensitive systems. No Journal corpus is claimed or synthesized here.
 
 `scripts/check_docs_links.py` walks `git ls-files '*.md'` and skips generated
 content rather than a hand-maintained list: the knowledge base (`DE/KG/`), the
