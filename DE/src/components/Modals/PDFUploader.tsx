@@ -1,7 +1,7 @@
 // Modal to upload a file and trigger backend processing.
 
 import React, { useState, useRef } from 'react';
-import { X, Upload, FileText, CheckCircle, AlertCircle, Loader, BookOpen } from 'lucide-react';
+import { X,  FileText, CheckCircle, AlertCircle, Loader, BookOpen } from 'lucide-react';
 import { GraphData } from '../../types';
 import { createLLMService } from '../../llm/utils/factory';
 import * as pdfjs from 'pdfjs-dist';
@@ -73,7 +73,7 @@ const PDFUploader: React.FC<PDFUploaderProps> = ({ darkMode, onClose, onFileProc
       const arrayBuffer = await pdfFile.arrayBuffer();
       const pdf = await pdfjs.getDocument({ data: arrayBuffer }).promise;
       let fullText = '';
-      
+
       for (let i = 1; i <= pdf.numPages; i++) {
         const page = await pdf.getPage(i);
         const textContent = await page.getTextContent();
@@ -82,7 +82,7 @@ const PDFUploader: React.FC<PDFUploaderProps> = ({ darkMode, onClose, onFileProc
           .join(' ');
         fullText += pageText + '\n\n';
       }
-      
+
       return fullText;
     } catch (error) {
       console.error('Error extracting PDF text:', error);
@@ -94,7 +94,7 @@ const PDFUploader: React.FC<PDFUploaderProps> = ({ darkMode, onClose, onFileProc
   const generatePaperPrompt = (text: string, fileName: string): string => {
     // Load knowledge base context
     const knowledgeContext = `The entire knowledge graph is provided for your reference, including mechanisms.md, materials.md, methods.md, phenomena.md, applications.md, theoretical.md, vectors.md, css.md, and merged_ISM.md.`;
-    
+
     // Create publication data
     const publicationData = {
       key: fileName.replace(/\.[^/.]+$/, ""),
@@ -104,7 +104,7 @@ const PDFUploader: React.FC<PDFUploaderProps> = ({ darkMode, onClose, onFileProc
       authors: "Unknown",
       paper_type: "Research Paper"
     };
-    
+
     // Create prompt based on paper_analysis.md template
     return `
 # Paper Analysis Request
@@ -140,7 +140,7 @@ Format your response as a well-structured markdown document with clear headings 
   const processPDFWithLLM = async (text: string, fileName: string): Promise<string> => {
     try {
       const prompt = generatePaperPrompt(text, fileName);
-      
+
       // Send to LLM
       const response = await llmService.generateText({
         userPrompt: prompt,
@@ -149,11 +149,11 @@ Format your response as a well-structured markdown document with clear headings 
           maxTokens: 2000
         }
       });
-      
+
       if (!response.success) {
         throw new Error(response.error || 'Unknown error in LLM processing');
       }
-      
+
       return response.content;
     } catch (error) {
       console.error('Error in LLM processing:', error);
@@ -165,14 +165,14 @@ Format your response as a well-structured markdown document with clear headings 
   const parseMarkdownOutput = (markdown: string): Record<string, string> => {
     const sections: Record<string, string> = {};
     const sectionRegex = /## ([^\n]+)\n([\s\S]*?)(?=## |$)/g;
-    
+
     let match;
     while ((match = sectionRegex.exec(markdown)) !== null) {
       const sectionName = match[1].trim();
       const sectionContent = match[2].trim();
       sections[sectionName] = sectionContent;
     }
-    
+
     return sections;
   };
 
@@ -210,29 +210,29 @@ Format your response as a well-structured markdown document with clear headings 
       setStatusMessage('Extracting text from PDF...');
       fileContent = await extractPDFText(file);
       setExtractedText(fileContent);
-      
+
       setStatusMessage('Analyzing content with LLM...');
       const analysisResult = await processPDFWithLLM(fileContent, file.name);
-      
+
       // Parse the analysis into sections
       const parsedSections = parseMarkdownOutput(analysisResult);
-      
+
       // Create nodes from the analysis
       const mockParsedData: GraphData = {
         nodes: [
-          { 
-            id: `Paper_${file.name.replace(/\.[^/.]+$/, "")}`, 
-            type: 'Documentation', 
-            group: 4, 
-            value: 5, 
+          {
+            id: `Paper_${file.name.replace(/\.[^/.]+$/, "")}`,
+            type: 'Documentation',
+            group: 4,
+            value: 5,
             label: file.name,
-            description: analysisResult, 
-            references: [] 
+            description: analysisResult,
+            references: []
           }
         ],
         links: []
       };
-      
+
       // Add nodes for each section if they contain meaningful content
       if (parsedSections['Key Mechanisms']) {
         mockParsedData.nodes.push({
@@ -244,7 +244,7 @@ Format your response as a well-structured markdown document with clear headings 
           description: parsedSections['Key Mechanisms'],
           references: [`Paper_${file.name.replace(/\.[^/.]+$/, "")}`]
         });
-        
+
         mockParsedData.links.push({
           source: `Paper_${file.name.replace(/\.[^/.]+$/, "")}`,
           target: `Mechanism_${file.name.replace(/\.[^/.]+$/, "")}`,
@@ -252,7 +252,7 @@ Format your response as a well-structured markdown document with clear headings 
           value: 2
         });
       }
-      
+
       if (parsedSections['Materials Used']) {
         mockParsedData.nodes.push({
           id: `Material_${file.name.replace(/\.[^/.]+$/, "")}`,
@@ -263,7 +263,7 @@ Format your response as a well-structured markdown document with clear headings 
           description: parsedSections['Materials Used'],
           references: [`Paper_${file.name.replace(/\.[^/.]+$/, "")}`]
         });
-        
+
         mockParsedData.links.push({
           source: `Paper_${file.name.replace(/\.[^/.]+$/, "")}`,
           target: `Material_${file.name.replace(/\.[^/.]+$/, "")}`,
@@ -271,7 +271,7 @@ Format your response as a well-structured markdown document with clear headings 
           value: 2
         });
       }
-      
+
       if (parsedSections['Applications']) {
         mockParsedData.nodes.push({
           id: `Application_${file.name.replace(/\.[^/.]+$/, "")}`,
@@ -282,7 +282,7 @@ Format your response as a well-structured markdown document with clear headings 
           description: parsedSections['Applications'],
           references: [`Paper_${file.name.replace(/\.[^/.]+$/, "")}`]
         });
-        
+
         mockParsedData.links.push({
           source: `Paper_${file.name.replace(/\.[^/.]+$/, "")}`,
           target: `Application_${file.name.replace(/\.[^/.]+$/, "")}`,
@@ -290,38 +290,39 @@ Format your response as a well-structured markdown document with clear headings 
           value: 1
         });
       }
-      
+
       setStatus('success');
       setStatusMessage('File processed successfully! Extracted data is ready for integration.');
-      
+
       onTriggerAgent('add-message', {
         id: `process_success_${Date.now()}`,
         sourceAgent: 'Nexus Weaver',
         type: 'info',
         content: `Successfully processed "${file.name}". Found ${mockParsedData.nodes.length} nodes and ${mockParsedData.links.length} links. Ready to add to graph.`,
         timestamp: Date.now(),
-        action: { 
-          type: 'view-llm-result', 
+        action: {
+          type: 'view-llm-result',
           payload: {
             title: `Analysis: ${file.name}`,
             content: analysisResult
           }
         }
       });
-      
+
       onFileProcessed(mockParsedData);
       return;
     }
-    
+
     // Handle text or markdown files
     if (file.type === 'text/plain' || file.name.endsWith('.md')) {
       setStatusMessage('Reading text content...');
       fileContent = await file.text();
       setExtractedText(fileContent);
-      
+
       setStatusMessage('Analyzing content with LLM...');
-      const analysisResult = await processPDFWithLLM(fileContent, file.name);
-      
+      // Result intentionally discarded: the analysis runs for its side effects.
+      await processPDFWithLLM(fileContent, file.name);
+
       // Create nodes from the analysis (similar to PDF processing)
       // ... (similar code as above)
     }
@@ -378,9 +379,9 @@ Format your response as a well-structured markdown document with clear headings 
         type: 'info',
         content: `Successfully processed "${file.name}". Found ${mockParsedData.nodes.length} nodes and ${mockParsedData.links.length} links. Ready to add to graph.`,
         timestamp: Date.now(),
-        action: { 
-          type: 'integrate-data', 
-          payload: mockParsedData 
+        action: {
+          type: 'integrate-data',
+          payload: mockParsedData
         }
     });
 
@@ -432,7 +433,7 @@ Format your response as a well-structured markdown document with clear headings 
               <FileText className="mx-auto h-8 w-8 mb-2 text-blue-500" />
               <p className="mb-1 font-medium">{file.name}</p>
               <p className="text-sm text-gray-500 mb-2">{(file.size / 1024 / 1024).toFixed(2)} MB</p>
-              
+
               {file.type === 'application/pdf' && (
                 <p className="text-xs text-blue-500 mb-2">
                   <BookOpen className="inline-block mr-1" size={14} />

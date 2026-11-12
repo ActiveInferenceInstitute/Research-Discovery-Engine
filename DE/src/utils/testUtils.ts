@@ -1,23 +1,17 @@
 /**
  * Testing Utilities
- * 
+ *
  * This module provides utilities for testing React components and application logic
  * in the Discovery Engine application, including comprehensive LLM testing support.
  */
 
 import { GraphData, NodeObject, LinkObject, ConceptDesignState, AgentMessage } from '../types';
-import { calculateGraphStats, validateGraphData } from './dataTransformUtils';
 
 // Import real LLM services
-import { createLLMService, createSummaryService, createKnowledgeService, createProtocolService } from '../llm/utils/factory';
-import { LLMService } from '../llm/LLMService';
-import { SummaryLLMService } from '../llm/services/SummaryLLMService';
-import { KnowledgeLLMService } from '../llm/services/KnowledgeLLMService';
-import { ProtocolLLMService } from '../llm/services/ProtocolLLMService';
 
 /**
  * Creates mock graph data for testing
- * 
+ *
  * @param nodeCount - Number of nodes to create
  * @param linkDensity - Link density (0-1, ratio of actual links to possible links)
  * @returns Mock graph data
@@ -33,7 +27,7 @@ export const createMockGraphData = (
   for (let i = 0; i < nodeCount; i++) {
     const nodeTypes = ['Material', 'Mechanism', 'Application', 'TheoreticalConcept'];
     const statuses = ['Validated', 'Proposed', 'Experimental'];
-    
+
     nodes.push({
       id: `node-${i}`,
       type: nodeTypes[Math.floor(Math.random() * nodeTypes.length)] as any,
@@ -55,14 +49,14 @@ export const createMockGraphData = (
   for (let i = 0; i < targetLinkCount; i++) {
     const sourceIndex = Math.floor(Math.random() * nodeCount);
     let targetIndex = Math.floor(Math.random() * nodeCount);
-    
+
     // Ensure no self-links
     while (targetIndex === sourceIndex) {
       targetIndex = Math.floor(Math.random() * nodeCount);
     }
 
     // Check if link already exists
-    const linkExists = links.some(link => 
+    const linkExists = links.some(link =>
       (link.source === nodes[sourceIndex].id && link.target === nodes[targetIndex].id) ||
       (link.source === nodes[targetIndex].id && link.target === nodes[sourceIndex].id)
     );
@@ -81,7 +75,7 @@ export const createMockGraphData = (
 
 /**
  * Creates a mock concept design state for testing
- * 
+ *
  * @param overrides - Properties to override in the mock state
  * @returns Mock concept design state
  */
@@ -116,14 +110,14 @@ export const createMockConceptDesignState = (
 
 /**
  * Creates mock agent messages for testing
- * 
+ *
  * @param count - Number of messages to create
  * @returns Array of mock agent messages
  */
 export const createMockAgentMessages = (count: number = 5): AgentMessage[] => {
   const agents = ['Discovery Engine', 'Research Assistant', 'Exploration Agent', 'Consistency Agent'];
   const types: AgentMessage['type'][] = ['info', 'warning', 'suggestion', 'opportunity'];
-  
+
   return Array.from({ length: count }, (_, i) => ({
     id: `test-msg-${i}`,
     sourceAgent: agents[Math.floor(Math.random() * agents.length)],
@@ -141,7 +135,7 @@ export const createMockAgentMessages = (count: number = 5): AgentMessage[] => {
 
 /**
  * LLM Testing Utilities
- * 
+ *
  * Comprehensive utilities for testing LLM integration
  */
 export const llmTestUtils = {
@@ -349,10 +343,10 @@ export const mockLLMServices = {
    * Mock LLM service that returns predefined responses
    */
   createMockLLMService: () => ({
-    generateCompletion: mockFn((request: any) => 
+    generateCompletion: mockFn((_request: any) =>
       Promise.resolve(llmTestUtils.createMockLLMResponse())
     ),
-    processBatch: mockFn((requests: any[]) => 
+    processBatch: mockFn((requests: any[]) =>
       Promise.resolve({
         results: requests.map(() => llmTestUtils.createMockLLMResponse()),
         batchId: 'test-batch-123',
@@ -366,13 +360,13 @@ export const mockLLMServices = {
    * Mock summary LLM service
    */
   createMockSummaryService: () => ({
-    generateSummary: mockFn((request: any) => 
+    generateSummary: mockFn((request: any) =>
       Promise.resolve(llmTestUtils.createMockSummaryResult(request.context?.concept))
     ),
-    generateExecutiveSummary: mockFn((context: any) => 
+    generateExecutiveSummary: mockFn((context: any) =>
       Promise.resolve(`Executive summary for ${context.concept}`)
     ),
-    generateTechnicalSummary: mockFn((context: any) => 
+    generateTechnicalSummary: mockFn((context: any) =>
       Promise.resolve(`Technical summary for ${context.concept}`)
     )
   }),
@@ -381,22 +375,22 @@ export const mockLLMServices = {
    * Mock knowledge LLM service
    */
   createMockKnowledgeService: () => ({
-    extractConcepts: mockFn((text: string, domain: string) => 
+    extractConcepts: mockFn((_text: string, _domain: string) =>
       Promise.resolve(['Concept 1', 'Concept 2', 'Concept 3'])
     ),
-    findRelationships: mockFn((text: string, domain: string) => 
+    findRelationships: mockFn((_text: string, _domain: string) =>
       Promise.resolve([
         { source: 'Concept 1', relationship: 'relates to', target: 'Concept 2' }
       ])
     ),
-    generateQuestions: mockFn((text: string, domain: string) => 
+    generateQuestions: mockFn((_text: string, _domain: string) =>
       Promise.resolve([
         'What are the key challenges?',
         'How can this be improved?',
         'What are the applications?'
       ])
     ),
-    processKnowledge: mockFn((request: any) => 
+    processKnowledge: mockFn((request: any) =>
       Promise.resolve(llmTestUtils.createMockKnowledgeResult(request.domain))
     )
   }),
@@ -405,10 +399,10 @@ export const mockLLMServices = {
    * Mock protocol LLM service
    */
   createMockProtocolService: () => ({
-    generateProtocol: mockFn((request: any) => 
+    generateProtocol: mockFn((request: any) =>
       Promise.resolve(llmTestUtils.createMockProtocolResult(request.objective))
     ),
-    generateSafetyGuidelines: mockFn((materials: string[]) => 
+    generateSafetyGuidelines: mockFn((_materials: string[]) =>
       Promise.resolve([
         'Handle materials with care',
         'Use appropriate PPE',
@@ -442,7 +436,7 @@ export const llmPerformanceTestUtils = {
   calculateTokenEfficiency: (result: any) => {
     const { usage } = result;
     if (!usage) return { efficiency: 0, details: 'No usage data' };
-    
+
     const efficiency = usage.completionTokens / usage.totalTokens;
     return {
       efficiency: Math.round(efficiency * 100),
@@ -456,24 +450,24 @@ export const llmPerformanceTestUtils = {
   simulateLoad: async (service: any, requestCount: number = 10) => {
     const startTime = Date.now();
     const promises = [];
-    
+
     for (let i = 0; i < requestCount; i++) {
-      promises.push(service.generateText({ 
+      promises.push(service.generateText({
         userPrompt: `Test request ${i}`,
         config: { maxTokens: 10, temperature: 0 }
       }));
     }
-    
+
     const results = await Promise.allSettled(promises);
     const endTime = Date.now();
-    
-    const successful = results.filter(r => 
+
+    const successful = results.filter(r =>
       r.status === 'fulfilled' && (r.value as any)?.success
     ).length;
-    const failed = results.filter(r => 
+    const failed = results.filter(r =>
       r.status === 'rejected' || (r.status === 'fulfilled' && !(r.value as any)?.success)
     ).length;
-    
+
     return {
       totalRequests: requestCount,
       successful,
@@ -501,7 +495,7 @@ export const createMockHandlers = () => ({
   onSetActiveMode: mockFn(),
   onBreadcrumbNavigate: mockFn(),
   onFilterComplete: mockFn(),
-  
+
   // LLM-specific mock handlers
   onLLMSummaryGenerate: mockFn(),
   onLLMKnowledgeProcess: mockFn(),
@@ -511,11 +505,11 @@ export const createMockHandlers = () => ({
 
 /**
  * Helper to wait for async operations in tests
- * 
+ *
  * @param ms - Milliseconds to wait
  * @returns Promise that resolves after the specified time
  */
-export const waitFor = (ms: number): Promise<void> => 
+export const waitFor = (ms: number): Promise<void> =>
   new Promise(resolve => setTimeout(resolve, ms));
 
 /**
@@ -553,14 +547,14 @@ export const graphTestUtils = {
   /**
    * Finds a node by ID in test graph data
    */
-  findNodeById: (graphData: GraphData, id: string): NodeObject | undefined => 
+  findNodeById: (graphData: GraphData, id: string): NodeObject | undefined =>
     graphData.nodes.find(node => node.id === id),
 
   /**
    * Finds links connected to a specific node
    */
-  findLinksForNode: (graphData: GraphData, nodeId: string): LinkObject[] => 
-    graphData.links.filter(link => 
+  findLinksForNode: (graphData: GraphData, nodeId: string): LinkObject[] =>
+    graphData.links.filter(link =>
       link.source === nodeId || link.target === nodeId
     ),
 
@@ -581,7 +575,7 @@ export const graphTestUtils = {
    */
   validateGraphStructure: (graphData: GraphData): boolean => {
     const nodeIds = new Set(graphData.nodes.map(node => node.id));
-    
+
     // Check that all links reference existing nodes
     return graphData.links.every(link => {
       return nodeIds.has(link.source) && nodeIds.has(link.target);
@@ -638,7 +632,7 @@ export const mockImplementations = {
   openai: {
     chat: {
       completions: {
-        create: mockFn((params: any) => 
+        create: mockFn((params: any) =>
           Promise.resolve({
             id: 'test-completion-123',
             object: 'chat.completion',
@@ -720,7 +714,7 @@ export const testDataGenerators = {
   /**
    * Creates large graph data for performance testing
    */
-  createLargeGraphData: (nodeCount: number = 1000): GraphData => 
+  createLargeGraphData: (nodeCount: number = 1000): GraphData =>
     createMockGraphData(nodeCount, 0.1),
 
   /**
@@ -769,15 +763,15 @@ export const customMatchers = {
   /**
    * Checks if a graph contains a specific node
    */
-  toContainNode: (graphData: GraphData, nodeId: string): boolean => 
+  toContainNode: (graphData: GraphData, nodeId: string): boolean =>
     graphData.nodes.some(node => node.id === nodeId),
 
   /**
    * Checks if a graph contains a specific link
    */
-  toContainLink: (graphData: GraphData, sourceId: string, targetId: string): boolean => 
+  toContainLink: (graphData: GraphData, sourceId: string, targetId: string): boolean =>
     graphData.links.some(link => {
-      return (link.source === sourceId && link.target === targetId) || 
+      return (link.source === sourceId && link.target === targetId) ||
              (link.source === targetId && link.target === sourceId);
     }),
 
@@ -785,23 +779,23 @@ export const customMatchers = {
    * Checks if an agent message has specific properties
    */
   toHaveAgentMessage: (
-    messages: AgentMessage[], 
-    sourceAgent: string, 
+    messages: AgentMessage[],
+    sourceAgent: string,
     type: AgentMessage['type']
-  ): boolean => 
+  ): boolean =>
     messages.some(msg => msg.sourceAgent === sourceAgent && msg.type === type),
 
   /**
    * Checks if LLM result has expected structure
    */
-  toHaveValidLLMResult: (result: any): boolean => 
-    result && typeof result.success === 'boolean' && 
+  toHaveValidLLMResult: (result: any): boolean =>
+    result && typeof result.success === 'boolean' &&
     result.content && result.usage && result.metadata,
 
   /**
    * Checks if LLM usage is within expected bounds
    */
-  toHaveReasonableTokenUsage: (result: any, maxTokens: number = 5000): boolean => 
+  toHaveReasonableTokenUsage: (result: any, maxTokens: number = 5000): boolean =>
     result.usage && result.usage.totalTokens <= maxTokens && result.usage.totalTokens > 0
 };
 
@@ -875,4 +869,4 @@ if (typeof (globalThis as any).jest === 'undefined') {
     fn: mockFn,
     clearAllMocks: clearAllMocks
   };
-} 
+}

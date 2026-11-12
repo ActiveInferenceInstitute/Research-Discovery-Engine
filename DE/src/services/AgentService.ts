@@ -1,6 +1,6 @@
 /**
  * Agent Service - Handles AI agent simulation and message generation
- * 
+ *
  * This service encapsulates all agent-related logic, providing a clean interface
  * for agent interactions and removing this complexity from the main App component.
  */
@@ -54,14 +54,14 @@ export class AgentService {
     // Load knowledge base in the background
     this.loadKnowledgeBase();
   }
-  
+
   /**
    * Load the knowledge base content from file
    */
   private loadKnowledgeBase() {
     if (this.isLoadingKnowledgeBase) return;
     this.isLoadingKnowledgeBase = true;
-    
+
     try {
       // List of all knowledge graph files to load
       const kgFiles = [
@@ -75,7 +75,7 @@ export class AgentService {
         'css.md',
         'merged_ISM.md'
       ];
-      
+
       // Load all files sequentially
       this.loadKnowledgeFiles(kgFiles)
         .then(() => {
@@ -98,17 +98,17 @@ export class AgentService {
    */
   private async loadKnowledgeFiles(files: string[]): Promise<void> {
     this.knowledgeBase = ""; // Reset knowledge base
-    
+
     for (const file of files) {
       try {
         const path = file === 'merged_ISM.md' ? `/KG/${file}` : `/KG/${file}`;
         const response = await fetch(path);
-        
+
         if (!response.ok) {
           console.warn(`Failed to load knowledge file ${file}: ${response.status}`);
           continue;
         }
-        
+
         const content = await response.text();
         if (content) {
           // Add file header and content to knowledge base
@@ -119,7 +119,7 @@ export class AgentService {
         console.error(`Error loading knowledge file ${file}:`, error);
       }
     }
-    
+
     console.log(`Total knowledge base size: ${Math.round(this.knowledgeBase.length / 1024)} KB`);
   }
 
@@ -131,16 +131,16 @@ export class AgentService {
    * @param graphData - Current graph data
    */
   public triggerAgent(
-    action: string, 
+    action: string,
     payload?: AgentActionPayload,
     conceptState?: ConceptDesignState,
     graphData?: { nodes: NodeObject[] }
   ): void {
     const response = this.getAgentResponse(action, payload, conceptState, graphData);
-    
+
     // Send immediate message
     this.messageCallback(response.message);
-    
+
     // Handle follow-up actions with delays
     if (response.followUpActions) {
       response.followUpActions.forEach(followUp => {
@@ -169,47 +169,47 @@ export class AgentService {
     if (this.shouldUseLLM(action)) {
       return this.getLLMResponse(action, payload, conceptState, graphData);
     }
-    
+
     switch (action) {
       case 'search-graph':
         return this.handleSearchGraph(payload);
-        
+
       case 'initiate-new-concept-from-selection':
         return this.handleInitiateConceptFromSelection(payload, graphData);
-        
+
       case 'initiate-new-concept-from-goal':
         return this.handleInitiateConceptFromGoal(payload);
-        
+
       case 'launch-exploratory-analysis':
         return this.handleExploratoryAnalysis(payload, conceptState);
-        
+
       case 'add-component-to-design':
         return this.handleAddComponent(payload);
-        
+
       case 'suggest-compatible-components':
         return this.handleSuggestComponents(conceptState);
-        
+
       case 'find-analogies':
         return this.handleFindAnalogies(conceptState);
-        
+
       case 'check-consistency':
         return this.handleCheckConsistency(conceptState);
-        
+
       case 'generate-protocol-outline':
         return this.handleGenerateProtocol(conceptState);
-        
+
       case 'generate-concept-summary':
         return this.handleGenerateSummary(conceptState);
-        
+
       case 'package-knowledge-artifact':
         return this.handlePackageArtifact(conceptState);
-        
+
       case 'deliver-protocol':
         return this.handleDeliverProtocol(payload, conceptState);
-        
+
       case 'deliver-summary':
         return this.handleDeliverSummary(payload, conceptState);
-        
+
       default:
         return this.handleGenericAction(action, payload);
     }
@@ -227,7 +227,7 @@ export class AgentService {
       'generate-concept-summary',
       'launch-exploratory-analysis'
     ];
-    
+
     return llmActions.includes(action);
   }
 
@@ -242,7 +242,7 @@ export class AgentService {
   ): AgentResponse {
     // Create initial response message
     const initialMessage = this.createInitialMessage(action, payload, conceptState);
-    
+
     // Prepare to make LLM call
     this.callLLMAsync(action, payload, conceptState, graphData)
       .then(llmContent => {
@@ -258,7 +258,7 @@ export class AgentService {
           content: `Error generating response: ${error.message}`
         });
       });
-    
+
     // Return initial response
     return { message: initialMessage };
   }
@@ -268,12 +268,12 @@ export class AgentService {
    */
   private createInitialMessage(
     action: string,
-    payload?: AgentActionPayload,
-    conceptState?: ConceptDesignState
+    _payload?: AgentActionPayload,
+    _conceptState?: ConceptDesignState
   ): Omit<AgentMessage, 'id' | 'timestamp'> {
     const agentName = this.getAgentForAction(action);
     let content = '';
-    
+
     switch (action) {
       case 'suggest-compatible-components':
         content = `Analyzing current design to suggest compatible components...`;
@@ -296,7 +296,7 @@ export class AgentService {
       default:
         content = `Processing ${action}...`;
     }
-    
+
     return {
       sourceAgent: agentName,
       type: 'info',
@@ -313,17 +313,17 @@ export class AgentService {
     conceptState?: ConceptDesignState
   ): Omit<AgentMessage, 'id' | 'timestamp'> {
     const agentName = this.getAgentForAction(action);
-    
+
     // Create a summary of the content for the message
     const contentSummary = this.createContentSummary(llmContent, action);
-    
+
     // Create appropriate action payload for viewing in new window
     let messageAction = {
       type: 'view-llm-result',
       label: 'View Full Analysis',
       payload: {}
     };
-    
+
     // Customize action based on action type
     switch (action) {
       case 'generate-protocol-outline':
@@ -339,7 +339,7 @@ export class AgentService {
           }
         };
         break;
-        
+
       case 'generate-concept-summary':
         messageAction = {
           type: 'view-llm-result',
@@ -352,7 +352,7 @@ export class AgentService {
           }
         };
         break;
-        
+
       case 'check-consistency':
         messageAction = {
           type: 'view-llm-result',
@@ -363,7 +363,7 @@ export class AgentService {
           }
         };
         break;
-        
+
       case 'find-analogies':
         messageAction = {
           type: 'view-llm-result',
@@ -374,7 +374,7 @@ export class AgentService {
           }
         };
         break;
-        
+
       case 'launch-exploratory-analysis':
         messageAction = {
           type: 'view-llm-result',
@@ -385,7 +385,7 @@ export class AgentService {
           }
         };
         break;
-        
+
       case 'suggest-compatible-components':
         messageAction = {
           type: 'view-llm-result',
@@ -396,7 +396,7 @@ export class AgentService {
           }
         };
         break;
-        
+
       default:
         messageAction = {
           type: 'view-llm-result',
@@ -407,7 +407,7 @@ export class AgentService {
           }
         };
     }
-    
+
     return {
       sourceAgent: agentName,
       type: 'info',
@@ -415,28 +415,28 @@ export class AgentService {
       action: messageAction
     };
   }
-  
+
   /**
    * Create a summary of the LLM content for display in the agent message
    */
   private createContentSummary(content: string, action: string): string {
     // Extract the first section or a limited number of characters
     const maxLength = 300;
-    
+
     // Try to find the first heading and extract content until the next heading
     const headingMatch = content.match(/^#\s+(.+)$/m);
     const firstHeading = headingMatch ? headingMatch[0] : '';
-    
+
     let summary = '';
-    
+
     if (firstHeading) {
       // Include the first heading
       summary = firstHeading + '\n\n';
-      
+
       // Find the content after the first heading until the next heading or end
       const contentAfterHeading = content.substring(content.indexOf(firstHeading) + firstHeading.length);
       const nextHeadingIndex = contentAfterHeading.search(/^#/m);
-      
+
       if (nextHeadingIndex !== -1) {
         summary += contentAfterHeading.substring(0, nextHeadingIndex).trim();
       } else {
@@ -452,13 +452,13 @@ export class AgentService {
         summary += '...';
       }
     }
-    
+
     // Add a note about viewing the full result
     summary += `\n\n*Click "View Full ${this.getActionResultName(action)}" to see the complete analysis in a new window.*`;
-    
+
     return summary;
   }
-  
+
   /**
    * Get a user-friendly name for the action result
    */
@@ -485,18 +485,18 @@ export class AgentService {
   ): Promise<string> {
     // Build prompt based on action type
     const prompt = this.buildPrompt(action, payload, conceptState, graphData);
-    
+
     try {
       // Make LLM call
       const response = await this.llmService.generateText({
         userPrompt: prompt,
         config: this.getLLMConfigForAction(action)
       });
-      
+
       if (!response.success) {
         throw new Error(response.error || 'Unknown error');
       }
-      
+
       return response.content;
     } catch (error) {
       console.error(`Error in LLM call for ${action}:`, error);
@@ -547,13 +547,13 @@ export class AgentService {
   ): string {
     // Get the prompt template
     const promptTemplate = this.getBuiltInPrompt(action);
-    
+
     // Add knowledge base context to all prompts
     let prompt = `KNOWLEDGE BASE CONTEXT:\n${this.getRelevantKnowledgeExcerpt(action, conceptState)}\n\n`;
-    
+
     // Add the prompt template with variables replaced
     prompt += this.replacePromptVariables(promptTemplate, action, payload, conceptState, graphData);
-    
+
     return prompt;
   }
 
@@ -949,7 +949,7 @@ Provide scientifically grounded analysis with specific, actionable research dire
     graphData?: { nodes: NodeObject[] }
   ): string {
     let prompt = promptTemplate;
-    
+
     // Replace concept state variables
     if (conceptState) {
       prompt = prompt.replace(/{objective}/g, conceptState.objective || 'Not specified');
@@ -958,34 +958,34 @@ Provide scientifically grounded analysis with specific, actionable research dire
       prompt = prompt.replace(/{methods}/g, conceptState.components.methods.join(', ') || 'None selected');
       prompt = prompt.replace(/{theoretical_concepts}/g, conceptState.components.theoretical_concepts.join(', ') || 'None selected');
     }
-    
+
     // Replace payload variables for exploratory analysis
     if (action === 'launch-exploratory-analysis' && payload) {
       prompt = prompt.replace(/{targetId}/g, payload.targetId || 'Unknown');
-      
+
       // Find the target node in the graph data
       const targetNode = graphData?.nodes.find(n => n.id === payload.targetId);
-      
+
       prompt = prompt.replace(/{targetNodeType}/g, targetNode?.type || payload.targetNodeType || 'Unknown');
       prompt = prompt.replace(/{targetNodeLabel}/g, targetNode?.label || payload.targetNodeLabel || 'Unknown');
       prompt = prompt.replace(/{targetNodeDescription}/g, targetNode?.description || payload.targetNodeDescription || 'No description available');
     }
-    
+
     return prompt;
   }
 
   /**
    * Get relevant knowledge excerpt for the action
    */
-  private getRelevantKnowledgeExcerpt(action: string, conceptState?: ConceptDesignState): string {
+  private getRelevantKnowledgeExcerpt(_action: string, _conceptState?: ConceptDesignState): string {
     // For now, return a subset of the knowledge base
     // In the future, this could be more sophisticated with semantic search
     const maxLength = 2000; // Limit knowledge context to avoid token limits
-    
+
     if (this.knowledgeBase.length <= maxLength) {
       return this.knowledgeBase;
     }
-    
+
     // Return first part of knowledge base with truncation notice
     return this.knowledgeBase.substring(0, maxLength) + '\n\n[Knowledge base truncated for brevity...]';
   }
@@ -1012,55 +1012,6 @@ Provide scientifically grounded analysis with specific, actionable research dire
     }
   }
 
-  /**
-   * Get appropriate temperature for LLM based on action
-   */
-  private getTemperatureForAction(action: string): number {
-    switch (action) {
-      case 'generate-protocol-outline':
-        return 0.3; // More deterministic for structured content
-      case 'check-consistency':
-        return 0.2; // Very deterministic for analysis
-      case 'suggest-compatible-components':
-      case 'find-analogies':
-        return 0.7; // More creative
-      default:
-        return 0.5; // Balanced default
-    }
-  }
-
-  /**
-   * Get appropriate max tokens for LLM based on action
-   */
-  private getMaxTokensForAction(action: string): number {
-    switch (action) {
-      case 'generate-protocol-outline':
-      case 'generate-concept-summary':
-        return 3000; // Longer for detailed content
-      case 'launch-exploratory-analysis':
-        return 2000; // Medium length
-      default:
-        return 1500; // Default for most responses
-    }
-  }
-
-  /**
-   * Load a prompt template from file
-   */
-  private async loadPromptTemplate(promptFileName: string): Promise<string> {
-    try {
-      const response = await fetch(`/prompts/${promptFileName}.txt`);
-      if (!response.ok) {
-        console.warn(`Failed to load prompt template: ${promptFileName}.txt`);
-        return this.getBuiltInPrompt(promptFileName);
-      }
-      return await response.text();
-    } catch (error) {
-      console.error(`Error loading prompt template ${promptFileName}:`, error);
-      return this.getBuiltInPrompt(promptFileName);
-    }
-  }
-
   // Placeholder methods for non-LLM actions
   private handleSearchGraph(payload?: AgentActionPayload): AgentResponse {
     return {
@@ -1072,7 +1023,7 @@ Provide scientifically grounded analysis with specific, actionable research dire
     };
   }
 
-  private handleInitiateConceptFromSelection(payload?: AgentActionPayload, graphData?: { nodes: NodeObject[] }): AgentResponse {
+  private handleInitiateConceptFromSelection(payload?: AgentActionPayload, _graphData?: { nodes: NodeObject[] }): AgentResponse {
     return {
       message: {
         sourceAgent: 'Concept Initiator',
@@ -1092,7 +1043,7 @@ Provide scientifically grounded analysis with specific, actionable research dire
     };
   }
 
-  private handleExploratoryAnalysis(payload?: AgentActionPayload, conceptState?: ConceptDesignState): AgentResponse {
+  private handleExploratoryAnalysis(_payload?: AgentActionPayload, _conceptState?: ConceptDesignState): AgentResponse {
     return {
       message: {
         sourceAgent: 'Knowledge Explorer',
@@ -1112,7 +1063,7 @@ Provide scientifically grounded analysis with specific, actionable research dire
     };
   }
 
-  private handleSuggestComponents(conceptState?: ConceptDesignState): AgentResponse {
+  private handleSuggestComponents(_conceptState?: ConceptDesignState): AgentResponse {
     return {
       message: {
         sourceAgent: 'Component Advisor',
@@ -1122,7 +1073,7 @@ Provide scientifically grounded analysis with specific, actionable research dire
     };
   }
 
-  private handleFindAnalogies(conceptState?: ConceptDesignState): AgentResponse {
+  private handleFindAnalogies(_conceptState?: ConceptDesignState): AgentResponse {
     return {
       message: {
         sourceAgent: 'Analogy Finder',
@@ -1132,7 +1083,7 @@ Provide scientifically grounded analysis with specific, actionable research dire
     };
   }
 
-  private handleCheckConsistency(conceptState?: ConceptDesignState): AgentResponse {
+  private handleCheckConsistency(_conceptState?: ConceptDesignState): AgentResponse {
     return {
       message: {
         sourceAgent: 'Consistency Checker',
@@ -1142,7 +1093,7 @@ Provide scientifically grounded analysis with specific, actionable research dire
     };
   }
 
-  private handleGenerateProtocol(conceptState?: ConceptDesignState): AgentResponse {
+  private handleGenerateProtocol(_conceptState?: ConceptDesignState): AgentResponse {
     return {
       message: {
         sourceAgent: 'Protocol Generator',
@@ -1152,7 +1103,7 @@ Provide scientifically grounded analysis with specific, actionable research dire
     };
   }
 
-  private handleGenerateSummary(conceptState?: ConceptDesignState): AgentResponse {
+  private handleGenerateSummary(_conceptState?: ConceptDesignState): AgentResponse {
     return {
       message: {
         sourceAgent: 'Summary Generator',
@@ -1172,7 +1123,7 @@ Provide scientifically grounded analysis with specific, actionable research dire
     };
   }
 
-  private handleDeliverProtocol(payload?: AgentActionPayload, conceptState?: ConceptDesignState): AgentResponse {
+  private handleDeliverProtocol(_payload?: AgentActionPayload, conceptState?: ConceptDesignState): AgentResponse {
     return {
       message: {
         sourceAgent: 'Protocol Deliverer',
@@ -1182,7 +1133,7 @@ Provide scientifically grounded analysis with specific, actionable research dire
     };
   }
 
-  private handleDeliverSummary(payload?: AgentActionPayload, conceptState?: ConceptDesignState): AgentResponse {
+  private handleDeliverSummary(_payload?: AgentActionPayload, conceptState?: ConceptDesignState): AgentResponse {
     return {
       message: {
         sourceAgent: 'Summary Deliverer',
@@ -1192,7 +1143,7 @@ Provide scientifically grounded analysis with specific, actionable research dire
     };
   }
 
-  private handleGenericAction(action: string, payload?: AgentActionPayload): AgentResponse {
+  private handleGenericAction(action: string, _payload?: AgentActionPayload): AgentResponse {
     return {
       message: {
         sourceAgent: 'Generic Agent',

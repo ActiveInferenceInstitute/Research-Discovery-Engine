@@ -9,15 +9,14 @@ import rehypeRaw from 'rehype-raw';
 interface NodeConnectionsTabsProps {
   parsedNodeData: FormattedNodeData;
   darkMode: boolean;
-  allNodes: NodeObject[]; 
+  allNodes: NodeObject[];
   onSelectNode: (node: NodeObject, sectionSlug?: string) => void;
   onNavigateToWikiSection: (fileKey: string, sectionSlug: string) => void;
   onPaperClick: (pubKey: string) => void;
 }
 
-const NodeConnectionsTabs: React.FC<NodeConnectionsTabsProps> = ({ 
-    parsedNodeData, darkMode, allNodes,
-    onSelectNode, onNavigateToWikiSection, onPaperClick 
+const NodeConnectionsTabs: React.FC<NodeConnectionsTabsProps> = ({
+    parsedNodeData
 }) => {
   const [activeTab, setActiveTab] = useState<'connections' | 'theory' | 'methods' | 'citations'>('connections');
 
