@@ -101,6 +101,9 @@ arm_docs() {
 
 arm_gnn() {
   require_command "$PYTHON"
+  # The verdict selftest runs first: it proves the accepted set (only literal
+  # True) without network, the pinned environment, or repository state.
+  "$PYTHON" "$ROOT/scripts/gnn_conformance_selftest.py"
   "$PYTHON" "$ROOT/scripts/gnn_conformance.py"
 }
 
