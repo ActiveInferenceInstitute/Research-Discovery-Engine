@@ -7,20 +7,20 @@ the whole arm, including the runner's own overhead; they are observations,
 not targets. Arms marked **known red** are reported, not enforced — see
 [`RUN_GUIDE.md`](RUN_GUIDE.md#known-red-checks).
 
-- source revision: `63c36e0fbadd` (clean)
+- source revision: `51627b1ea902` (clean)
 - host: macOS-27.0.1-arm64-arm-64bit-Mach-O (arm64)
 - node v26.13.0 · npm 11.20.0 · Python 3.15.2
-- measured: 2026-11-12 05:06:52 PST
+- measured: 2026-11-12 05:07:43 PST
 
 | Arm | Kind | Wall time (s) | Exit | Result |
 | --- | --- | --- | --- | --- |
-| `fast` | blocking | 3.84 | 0 | pass (failures: 0) |
-| `build` | blocking | 4.7 | 0 | pass |
-| `website` | blocking | 9.75 | 0 | pass |
-| `docs` | blocking | 0.24 | 0 | pass (docs links: 189 relative links in 57 files resolve) |
-| `gnn` | blocking | 2.62 | 0 | pass ({"gnn-version": "5.0.3", "models": 1, "pin-revision": "8f293d9ba810e6eda5c09842d9c7ed9ffa5f92c1", "result": "verified", "source": "pinned-exemplar"}) |
-| `lint` | strict | 6.51 | 1 | **fail** (400 problems (387 errors, 13 warnings)) |
-| `types` | strict | 13.0 | 2 | **fail** (97 type errors) |
+| `fast` | blocking | 4.36 | 0 | pass (failures: 0) |
+| `build` | blocking | 5.85 | 0 | pass |
+| `website` | blocking | 8.68 | 0 | pass |
+| `docs` | blocking | 0.21 | 0 | pass (docs links: 189 relative links in 57 files resolve) |
+| `gnn` | blocking | 2.27 | 0 | pass ({"gnn-version": "5.0.3", "models": 1, "pin-revision": "8f293d9ba810e6eda5c09842d9c7ed9ffa5f92c1", "result": "verified", "source": "pinned-exemplar"}) |
+| `lint` | strict | 4.47 | 1 | **fail** (400 problems (387 errors, 13 warnings)) |
+| `types` | strict | 8.53 | 2 | **fail** (97 type errors) |
 
 ## Test counts
 
