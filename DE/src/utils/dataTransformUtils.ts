@@ -1,6 +1,6 @@
 /**
  * Data Transformation Utilities
- * 
+ *
  * This module contains utilities for transforming and processing data
  * specifically for the Discovery Engine application, including graph data,
  * knowledge artifacts, and scientific content processing.
@@ -30,7 +30,7 @@ export interface GraphStats {
 
 /**
  * Filters graph data based on a search query
- * 
+ *
  * @param graphData - The graph data to filter
  * @param searchQuery - The search query string
  * @param searchFields - Fields to search in (defaults to common searchable fields)
@@ -40,14 +40,14 @@ export const filterGraphBySearch = (
   graphData: GraphData,
   searchQuery: string,
   searchFields: (keyof NodeObject)[] = ['label', 'description', 'id']
-): { 
-  filteredData: GraphData; 
+): {
+  filteredData: GraphData;
   highlights: Map<string, SearchHighlight[]>;
 } => {
   if (!searchQuery.trim()) {
-    return { 
-      filteredData: graphData, 
-      highlights: new Map() 
+    return {
+      filteredData: graphData,
+      highlights: new Map()
     };
   }
 
@@ -56,7 +56,9 @@ export const filterGraphBySearch = (
   const highlights = new Map<string, SearchHighlight[]>();
 
   // Find matching nodes
-  const filteredNodes = graphData.nodes.filter(node => {
+  // Kept as an expression statement: the filter callback records highlights
+  // into `highlights` as a side effect; the filtered array is not consumed.
+  graphData.nodes.filter(node => {
     const nodeHighlights: SearchHighlight[] = [];
     let hasMatch = false;
 
@@ -88,7 +90,7 @@ export const filterGraphBySearch = (
   graphData.links.forEach(link => {
     const sourceId = typeof link.source === 'string' ? link.source : link.source.id;
     const targetId = typeof link.target === 'string' ? link.target : link.target.id;
-    
+
     if (matchedNodes.has(sourceId)) {
       connectedNodeIds.add(targetId);
     }
@@ -99,7 +101,7 @@ export const filterGraphBySearch = (
 
   // Add connected nodes to filtered results
   const allRelevantNodeIds = new Set([...matchedNodes, ...connectedNodeIds]);
-  const allFilteredNodes = graphData.nodes.filter(node => 
+  const allFilteredNodes = graphData.nodes.filter(node =>
     allRelevantNodeIds.has(node.id)
   );
 
@@ -121,7 +123,7 @@ export const filterGraphBySearch = (
 
 /**
  * Calculates comprehensive statistics for graph data
- * 
+ *
  * @param graphData - The graph data to analyze
  * @returns Graph statistics object
  */
@@ -144,7 +146,7 @@ export const calculateGraphStats = (graphData: GraphData): GraphStats => {
 
     const sourceId = typeof link.source === 'string' ? link.source : link.source.id;
     const targetId = typeof link.target === 'string' ? link.target : link.target.id;
-    
+
     nodeDegrees[sourceId] = (nodeDegrees[sourceId] || 0) + 1;
     nodeDegrees[targetId] = (nodeDegrees[targetId] || 0) + 1;
   });
@@ -165,7 +167,7 @@ export const calculateGraphStats = (graphData: GraphData): GraphStats => {
 
 /**
  * Groups nodes by a specified property
- * 
+ *
  * @param nodes - Array of nodes to group
  * @param groupBy - Property to group by
  * @returns Map of grouped nodes
@@ -175,7 +177,7 @@ export const groupNodesByProperty = <K extends keyof NodeObject>(
   groupBy: K
 ): Map<NodeObject[K], NodeObject[]> => {
   const groups = new Map<NodeObject[K], NodeObject[]>();
-  
+
   nodes.forEach(node => {
     const key = node[groupBy];
     if (!groups.has(key)) {
@@ -183,13 +185,13 @@ export const groupNodesByProperty = <K extends keyof NodeObject>(
     }
     groups.get(key)!.push(node);
   });
-  
+
   return groups;
 };
 
 /**
  * Finds the shortest path between two nodes in the graph
- * 
+ *
  * @param graphData - The graph data
  * @param startNodeId - Starting node ID
  * @param endNodeId - Target node ID
@@ -211,7 +213,7 @@ export const findShortestPath = (
   graphData.links.forEach(link => {
     const sourceId = typeof link.source === 'string' ? link.source : link.source.id;
     const targetId = typeof link.target === 'string' ? link.target : link.target.id;
-    
+
     adjacencyList.get(sourceId)?.push(targetId);
     adjacencyList.get(targetId)?.push(sourceId); // Treat as undirected
   });
@@ -222,7 +224,7 @@ export const findShortestPath = (
 
   while (queue.length > 0) {
     const { nodeId, path } = queue.shift()!;
-    
+
     if (nodeId === endNodeId) {
       return path;
     }
@@ -241,7 +243,7 @@ export const findShortestPath = (
 
 /**
  * Extracts keywords from text content using simple NLP techniques
- * 
+ *
  * @param text - Text to extract keywords from
  * @param maxKeywords - Maximum number of keywords to return
  * @returns Array of extracted keywords
@@ -283,7 +285,7 @@ export const extractKeywords = (
 
 /**
  * Transforms concept design state into a knowledge artifact node
- * 
+ *
  * @param conceptState - The concept design state
  * @returns Knowledge artifact node object
  */
@@ -312,7 +314,7 @@ export const createKnowledgeArtifact = (
 
 /**
  * Validates graph data integrity and reports issues
- * 
+ *
  * @param graphData - The graph data to validate
  * @returns Validation report with errors and warnings
  */
@@ -338,7 +340,7 @@ export const validateGraphData = (graphData: GraphData): {
   graphData.links.forEach(link => {
     const sourceId = typeof link.source === 'string' ? link.source : link.source.id;
     const targetId = typeof link.target === 'string' ? link.target : link.target.id;
-    
+
     if (!nodeIds.has(sourceId)) {
       errors.push(`Link references non-existent source node: ${sourceId}`);
     }
@@ -361,7 +363,7 @@ export const validateGraphData = (graphData: GraphData): {
   graphData.links.forEach(link => {
     const sourceId = typeof link.source === 'string' ? link.source : link.source.id;
     const targetId = typeof link.target === 'string' ? link.target : link.target.id;
-    
+
     if (sourceId === targetId) {
       warnings.push(`Self-referencing link found on node: ${sourceId}`);
     }
@@ -376,7 +378,7 @@ export const validateGraphData = (graphData: GraphData): {
 
 /**
  * Merges multiple graph datasets intelligently
- * 
+ *
  * @param graphs - Array of graph data to merge
  * @returns Merged graph data
  */
@@ -398,7 +400,7 @@ export const mergeGraphData = (...graphs: GraphData[]): GraphData => {
       const sourceId = typeof link.source === 'string' ? link.source : link.source.id;
       const targetId = typeof link.target === 'string' ? link.target : link.target.id;
       const linkKey = `${sourceId}-${targetId}-${link.type || 'default'}`;
-      
+
       if (!allLinks.has(linkKey)) {
         allLinks.add(linkKey);
         mergedLinks.push(link);
@@ -414,7 +416,7 @@ export const mergeGraphData = (...graphs: GraphData[]): GraphData => {
 
 /**
  * Sanitizes and formats agent messages for display
- * 
+ *
  * @param messages - Array of agent messages
  * @returns Sanitized and formatted messages
  */
@@ -431,7 +433,7 @@ export const sanitizeAgentMessages = (messages: AgentMessage[]): AgentMessage[] 
 
 /**
  * Formats a timestamp for display in the UI
- * 
+ *
  * @param timestamp - Unix timestamp
  * @param format - Format type ('relative' | 'absolute' | 'time-only')
  * @returns Formatted time string
@@ -442,7 +444,7 @@ export const formatTimestamp = (
 ): string => {
   const date = new Date(timestamp);
   const now = new Date();
-  
+
   switch (format) {
     case 'relative':
       const diffMs = now.getTime() - timestamp;
@@ -450,21 +452,21 @@ export const formatTimestamp = (
       const diffMins = Math.floor(diffSecs / 60);
       const diffHours = Math.floor(diffMins / 60);
       const diffDays = Math.floor(diffHours / 24);
-      
+
       if (diffSecs < 60) return 'just now';
       if (diffMins < 60) return `${diffMins}m ago`;
       if (diffHours < 24) return `${diffHours}h ago`;
       if (diffDays < 7) return `${diffDays}d ago`;
       return date.toLocaleDateString();
-      
+
     case 'time-only':
-      return date.toLocaleTimeString(undefined, { 
-        hour: '2-digit', 
-        minute: '2-digit' 
+      return date.toLocaleTimeString(undefined, {
+        hour: '2-digit',
+        minute: '2-digit'
       });
-      
+
     case 'absolute':
     default:
       return date.toLocaleString();
   }
-}; 
+};

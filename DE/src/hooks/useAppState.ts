@@ -1,18 +1,15 @@
 /**
  * App State Management Hook
- * 
+ *
  * This hook centralizes and manages the core application state,
  * extracting complex state logic from the main App component.
  */
 
 import { useState, useCallback, useMemo, useEffect } from 'react';
-import { AgentMessage, ConceptDesignState, BreadcrumbItem, NodeObject, LinkObject, GraphData } from '../types';
+import { AgentMessage,  BreadcrumbItem, NodeObject, LinkObject } from '../types';
 import { AgentService } from '../services/AgentService';
 import { useGraphData } from './useGraphData';
 import { useConceptDesign } from './useConceptDesign';
-import { useDebouncedValue } from '../utils/performanceUtils';
-import { generateProtocol, formatProtocolAsMarkdown } from '../utils/protocolGenerator';
-import { generateSummary, formatSummaryAsMarkdown } from '../utils/summaryGenerator';
 
 /**
  * App state interface for centralized state management
@@ -24,7 +21,7 @@ interface AppState {
   searchQuery: string;
   selectedNodeId: string | null;
   breadcrumbPath: BreadcrumbItem[];
-  
+
   // Control States
   showLabels: boolean;
   showLinks: boolean;
@@ -32,17 +29,17 @@ interface AppState {
   showParticles: boolean;
   showPDFUploader: boolean;
   isBrowserSidebarOpen: boolean;
-  
+
   // LLM Result Modal State
   showLLMResultModal: boolean;
   llmResultTitle: string;
   llmResultContent: string;
   isLLMResultLoading: boolean;
-  
+
   // Search Filter States
   lastFilterCounts: { nodes: number; links: number } | null;
   pendingSearchFilterCounts: { nodes: number; links: number } | null;
-  
+
   // Agent Messages
   agentMessages: AgentMessage[];
 }
@@ -57,7 +54,7 @@ interface AppActions {
   setSearchQuery: (query: string) => void;
   setSelectedNodeId: (id: string | null) => void;
   setBreadcrumbPath: (path: BreadcrumbItem[]) => void;
-  
+
   // Control Actions
   toggleLabels: () => void;
   toggleLinks: () => void;
@@ -65,32 +62,32 @@ interface AppActions {
   toggleParticles: () => void;
   togglePDFUploader: () => void;
   toggleBrowserSidebar: () => void;
-  
+
   // Agent Actions
   addAgentMessage: (message: Omit<AgentMessage, 'id' | 'timestamp'>) => void;
   triggerAgent: (action: string, payload?: any) => void;
-  
+
   // Graph Actions
   handleNodeSelect: (node: NodeObject | null, sectionSlug?: string) => void;
   handleBreadcrumbNavigate: (nodeId: string) => void;
   handleSearchSubmit: (e: React.FormEvent) => void;
   handleSearchInputChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
-  
+
   // Mode Actions
   handleSetExploreMode: () => void;
   handleSetCreateMode: (seedNode?: NodeObject | null) => void;
-  
+
   // Search Filter Actions
   handleSearchFilterComplete: (filteredNodeCount: number, filteredLinkCount: number) => void;
 }
 
 /**
  * Custom hook for comprehensive app state management
- * 
+ *
  * This hook provides centralized state management for the entire application,
  * reducing the complexity of the main App component and providing a clean
  * interface for state access and mutations.
- * 
+ *
  * @returns Object containing app state, graph data, concept design state, and actions
  */
 export const useAppState = () => {
@@ -102,7 +99,7 @@ export const useAppState = () => {
     searchQuery: '',
     selectedNodeId: null,
     breadcrumbPath: [],
-    
+
     // Control States
     showLabels: true,
     showLinks: true,
@@ -116,11 +113,11 @@ export const useAppState = () => {
     llmResultTitle: '',
     llmResultContent: '',
     isLLMResultLoading: false,
-    
+
     // Search Filter States
     lastFilterCounts: null,
     pendingSearchFilterCounts: null,
-    
+
     // Agent Messages
     agentMessages: [{
       id: `welcome_initial_app_${Date.now()}`,
@@ -178,7 +175,7 @@ export const useAppState = () => {
         initializeConcept(seedNode);
         agentService.triggerAgent(action, payload, conceptDesignState, { nodes: graphData.nodes });
         break;
-        
+
       case 'initiate-new-concept-from-goal':
         setState(prev => ({
           ...prev,
@@ -190,7 +187,7 @@ export const useAppState = () => {
         if (payload && payload.goalText) updateObjective(payload.goalText);
         agentService.triggerAgent(action, payload, conceptDesignState, { nodes: graphData.nodes });
         break;
-        
+
       case 'package-knowledge-artifact':
         // Create artifact and update graph
         const newArtifactNode: NodeObject = {
@@ -202,7 +199,7 @@ export const useAppState = () => {
           size: 1,
           color: '#10B981'
         };
-        
+
         const newLinks: LinkObject[] = [];
         conceptDesignState.components.materials.forEach(materialId => {
           if (graphData.nodes.find(n => n.id === materialId)) {
@@ -214,12 +211,12 @@ export const useAppState = () => {
             });
           }
         });
-        
+
         setGraphData(prev => ({
           nodes: [...prev.nodes, newArtifactNode],
           links: [...prev.links, ...newLinks]
         }));
-        
+
         agentService.triggerAgent(action, payload, conceptDesignState, { nodes: graphData.nodes });
         addAgentMessage({
           sourceAgent: 'ConceptAgent',
@@ -228,7 +225,7 @@ export const useAppState = () => {
           action: { type: 'select-node', payload: newArtifactNode.id, label: "View Artifact" }
         });
         break;
-        
+
       case 'integrate-data':
         const newData = payload;
         if (newData && newData.nodes && newData.links) {
@@ -243,7 +240,7 @@ export const useAppState = () => {
               isLLMResultLoading: false
             }));
           }
-          
+
           setGraphData(prevData => ({
             nodes: [...prevData.nodes, ...newData.nodes],
             links: [...prevData.links, ...newData.links]
@@ -255,23 +252,23 @@ export const useAppState = () => {
           });
         }
         break;
-        
+
       case 'add-field-suggestion':
         if (payload && payload.field && payload.suggestion) {
           addFieldSuggestions(payload.field, [payload.suggestion]);
         }
         break;
-        
+
       case 'clear-suggestions':
         if (payload && payload.field) {
           clearFieldSuggestions(payload.field);
         }
         break;
-        
+
       case 'add-message':
         addAgentMessage(payload);
         break;
-        
+
       case 'open-publication':
         window.open(`/KG/publications/${payload.key}.md`, '_blank');
         addAgentMessage({
@@ -280,7 +277,7 @@ export const useAppState = () => {
           content: `Opening publication source: ${payload.key}.md`
         });
         break;
-        
+
       case 'check-consistency':
         agentService.triggerAgent(action, payload, conceptDesignState, { nodes: graphData.nodes });
         setTimeout(() => {
@@ -290,11 +287,11 @@ export const useAppState = () => {
           }
         }, 1500);
         break;
-        
+
       case 'generate-protocol-outline':
         agentService.triggerAgent(action, payload, conceptDesignState, { nodes: graphData.nodes });
         break;
-        
+
       default:
         // Delegate to agent service for standard actions
         agentService.triggerAgent(action, payload, conceptDesignState, { nodes: graphData.nodes });
@@ -329,7 +326,7 @@ export const useAppState = () => {
             const lastItem = prev.breadcrumbPath.length > 0 ? prev.breadcrumbPath[prev.breadcrumbPath.length - 1] : null;
             let isChild = false;
             if (lastItem && graphData.links) {
-              isChild = graphData.links.some(link => 
+              isChild = graphData.links.some(link =>
                 (link.source === lastItem.id && link.target === node.id && (link.type === 'categorizes' || link.type === 'PartOfEdge')) ||
                 (link.target === lastItem.id && link.source === node.id && (link.type === 'categorizes' || link.type === 'PartOfEdge'))
               );
@@ -342,7 +339,7 @@ export const useAppState = () => {
           }
         })()
       }));
-      
+
       if (state.activeMode === 'create') {
         setState(prev => ({ ...prev, activeMode: 'explore' }));
       }
@@ -391,13 +388,13 @@ export const useAppState = () => {
     // Handle LLM result actions
     if (latestMessage.action.type === 'view-llm-result') {
       const payload = latestMessage.action.payload;
-      
+
       // Handle protocol generation completion
       if (payload.protocolGenerated && latestMessage.sourceAgent === 'Protocol Agent') {
         try {
           // Use the protocol from the LLM response
           const protocolMarkdown = payload.protocol || '';
-          
+
           setConceptDesignState({
             protocolOutline: protocolMarkdown,
             status: 'Validated'
@@ -424,18 +421,18 @@ export const useAppState = () => {
   useEffect(() => {
     if (state.pendingSearchFilterCounts) {
       setState(prev => ({ ...prev, lastFilterCounts: prev.pendingSearchFilterCounts }));
-      
-      const currentSearchAgentMsgIndex = state.agentMessages.findIndex(m => 
-        m.sourceAgent === "Search Agent" && 
-        m.content.startsWith(`Searching graph for: "${state.searchQuery}"`) && 
+
+      const currentSearchAgentMsgIndex = state.agentMessages.findIndex(m =>
+        m.sourceAgent === "Search Agent" &&
+        m.content.startsWith(`Searching graph for: "${state.searchQuery}"`) &&
         m.content.endsWith("...")
       );
-      
+
       if (state.searchQuery && currentSearchAgentMsgIndex !== -1) {
         setState(prev => ({
           ...prev,
-          agentMessages: prev.agentMessages.map((msg, index) => 
-            index === currentSearchAgentMsgIndex 
+          agentMessages: prev.agentMessages.map((msg, index) =>
+            index === currentSearchAgentMsgIndex
               ? { ...msg, content: `Search for "${state.searchQuery}" filtered to ${state.pendingSearchFilterCounts!.nodes} relevant nodes.` }
               : msg
           ),
@@ -452,7 +449,7 @@ export const useAppState = () => {
 
     if (latestMessage.action.type === 'view-llm-result') {
       const payload = latestMessage.action.payload;
-      
+
       if (payload.protocolGenerated) {
         actions.showLLMResult(
           payload.title || 'Protocol',
@@ -480,7 +477,7 @@ export const useAppState = () => {
     setSearchQuery: (query) => setState(prev => ({ ...prev, searchQuery: query })),
     setSelectedNodeId: (id) => setState(prev => ({ ...prev, selectedNodeId: id })),
     setBreadcrumbPath: (path) => setState(prev => ({ ...prev, breadcrumbPath: path })),
-    
+
     // Control Actions
     toggleLabels: () => setState(prev => ({ ...prev, showLabels: !prev.showLabels })),
     toggleLinks: () => setState(prev => ({ ...prev, showLinks: !prev.showLinks })),
@@ -488,28 +485,28 @@ export const useAppState = () => {
     toggleParticles: () => setState(prev => ({ ...prev, showParticles: !prev.showParticles })),
     togglePDFUploader: () => setState(prev => ({ ...prev, showPDFUploader: !prev.showPDFUploader })),
     toggleBrowserSidebar: () => setState(prev => ({ ...prev, isBrowserSidebarOpen: !prev.isBrowserSidebarOpen })),
-    
+
     // LLM Result Modal Actions
-    showLLMResult: (title: string, content: string) => setState(prev => ({ 
-      ...prev, 
-      showLLMResultModal: true, 
-      llmResultTitle: title, 
+    showLLMResult: (title: string, content: string) => setState(prev => ({
+      ...prev,
+      showLLMResultModal: true,
+      llmResultTitle: title,
       llmResultContent: content,
       isLLMResultLoading: false
     })),
-    startLLMLoading: (title: string) => setState(prev => ({ 
-      ...prev, 
-      showLLMResultModal: true, 
-      llmResultTitle: title, 
+    startLLMLoading: (title: string) => setState(prev => ({
+      ...prev,
+      showLLMResultModal: true,
+      llmResultTitle: title,
       llmResultContent: '',
       isLLMResultLoading: true
     })),
     closeLLMResultModal: () => setState(prev => ({ ...prev, showLLMResultModal: false })),
-    
+
     // Agent Actions
     addAgentMessage,
     triggerAgent,
-    
+
     // Graph Actions
     handleNodeSelect,
     handleBreadcrumbNavigate: useCallback((nodeId: string) => {
@@ -522,18 +519,18 @@ export const useAppState = () => {
         handleNodeSelect(nodeToSelect);
       }
     }, [graphData.nodes, handleNodeSelect]),
-    
+
     handleSearchSubmit: useCallback((e: React.FormEvent) => {
       e.preventDefault();
       if (state.searchQuery.trim()) {
         triggerAgent('search-graph', { query: state.searchQuery });
       }
     }, [state.searchQuery, triggerAgent]),
-    
+
     handleSearchInputChange: useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
       setState(prev => ({ ...prev, searchQuery: e.target.value }));
     }, []),
-    
+
     // Mode Actions
     handleSetExploreMode: () => setState(prev => ({
       ...prev,
@@ -541,7 +538,7 @@ export const useAppState = () => {
       selectedNodeId: null,
       breadcrumbPath: []
     })),
-    
+
     handleSetCreateMode: useCallback((seedNode?: NodeObject | null) => {
       setState(prev => ({
         ...prev,
@@ -556,7 +553,7 @@ export const useAppState = () => {
         content: "Switched to Concept Creation mode."
       });
     }, [initializeConcept, addAgentMessage]),
-    
+
     // Search Filter Actions
     handleSearchFilterComplete: useCallback((filteredNodeCount: number, filteredLinkCount: number) => {
       setState(prev => ({
@@ -570,13 +567,13 @@ export const useAppState = () => {
     // State
     state,
     actions,
-    
+
     // External hook data
     graphData,
     graphLoading,
     graphError,
     conceptDesignState,
-    
+
     // External hook actions
     initializeConcept,
     updateObjective,
@@ -586,10 +583,10 @@ export const useAppState = () => {
     clearFieldSuggestions,
     setConceptDesignState,
     setGraphData,
-    
+
     // Computed values
     isContextPanelVisible: state.activeMode === 'create' || state.selectedNodeId !== null,
-    
+
     // LLM Result Modal State
     llmResultModalState: {
       show: state.showLLMResultModal,

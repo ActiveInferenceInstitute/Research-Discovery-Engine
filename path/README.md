@@ -1,6 +1,6 @@
 # Conceptual Ecology: Knowledge-graph analysis
 
-`path/` contains the Python analysis pipeline used to analyse the linked Markdown knowledge base in this directory. The pipeline builds a directed graph from the category files, computes network and innovation measures, identifies probabilistic knowledge gaps, and synthesises a trajectory between two configured concepts.
+`path/` contains the Python analysis pipeline used to analyse the linked Markdown knowledge base in the canonical `DE/KG/` directory. The pipeline builds a directed graph from the category files, computes network and innovation measures, identifies probabilistic knowledge gaps, and synthesises a trajectory between two configured concepts.
 
 ## Setup
 

@@ -44,11 +44,11 @@ pip install -r requirements.txt
 python research_paths.py
 ```
 
-It reads the Markdown knowledge-base files in `path/` and writes staged artifacts beneath `path/results/`. See [`path/README.md`](path/README.md) for the current output layout.
+It reads the six category Markdown records from the canonical knowledge base in `DE/KG/` and writes staged artifacts beneath `path/results/`. See [`path/README.md`](path/README.md) for the current output layout.
 
 ## Design documentation
 
-The system-design series is indexed by [`Docs/0. DE-Paper-Outline.md`](Docs/0.%20DE-Paper-Outline.md). It describes the proposed Conceptual Nexus Model, template system, synthesis pipeline, FAIR goals, limitations, assumptions, and future direction. These documents describe the design and research direction; they should not be read as a claim that every proposed capability is implemented in the current prototypes.
+The system-design series (13 documents) is indexed by [`Docs/README.md`](Docs/README.md), with the condensed paper-aligned outline at [`Docs/0. DE-Paper-Outline.md`](Docs/0.%20DE-Paper-Outline.md). It describes the proposed Conceptual Nexus Model, template system, synthesis pipeline, FAIR goals, limitations, assumptions, and future direction. These documents describe the design and research direction; they should not be read as a claim that every proposed capability is implemented in the current prototypes.
 
 ## Configuration and credentials
 

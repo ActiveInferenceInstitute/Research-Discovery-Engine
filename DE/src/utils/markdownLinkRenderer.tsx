@@ -2,7 +2,6 @@
 import React from 'react';
 import { ExternalLink, FileText, Link2, BookOpen } from 'lucide-react';
 import { NodeObject } from '../types';
-import { slugify } from './markdownParser';
 
 interface LinkRendererSharedProps {
   darkMode: boolean;
@@ -31,8 +30,8 @@ export const createMarkdownLinkRenderer = (rendererProps: LinkRendererSharedProp
                 className={`font-mono text-sm px-2.5 py-1.5 rounded-md mx-0.5 inline-flex items-center group transition-colors
                             ${darkMode ? 'bg-slate-600 hover:bg-slate-500 text-teal-300 hover:text-teal-200'
                                       : 'bg-slate-200 hover:bg-slate-300 text-teal-700 hover:text-teal-600'}`}
-                onClick={() => onPaperClick(refKey)} 
-                title={`Open publication source: ${refKey}.md`} 
+                onClick={() => onPaperClick(refKey)}
+                title={`Open publication source: ${refKey}.md`}
                 {...props} >
                 <FileText size={14} className="mr-2 flex-shrink-0" />
                 <span className="group-hover:underline font-medium">{linkText || refKey}</span>

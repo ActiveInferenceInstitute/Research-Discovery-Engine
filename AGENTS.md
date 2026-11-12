@@ -10,7 +10,7 @@ This repository is a set of related research prototypes, not one installable pac
 | `path/` | Python network-analysis pipeline over `DE/KG/` | [path/README.md](path/README.md) |
 | `resnei/` | Flask ResNei prototype | [resnei/README.md](resnei/README.md) |
 | `website_explore_the_unknown/` | Next.js + Flask website prototype | [website README](website_explore_the_unknown/README.md) |
-| `Docs/` | Numbered system-design series, indexed by `Docs/0. DE-Paper-Outline.md` | root `README.md` |
+| `Docs/` | Numbered system-design series, indexed by `Docs/README.md` | [Docs/README.md](Docs/README.md) |
 | `ResNei SDD/` | ResNei software design document and figures | `ResNei SDD/resnei.md` |
 
 ## Generated and data trees: do not add guides inside them
@@ -23,7 +23,8 @@ This repository is a set of related research prototypes, not one installable pac
 
 ## Validation
 
-- Frontend (`DE/`): `cd DE && npm ci && npm run build`. CI also runs the credential-free harness subsets with `npx tsx scripts/run-tests.ts --test-type unit|integration|validation` and asserts `Failed: 0`; the harness exits 0 even when tests fail, so a gate must parse the report. `npm run lint` is currently broken and `npm run build` runs `tsc` before Vite; see `DE/docs/FINAL_STATUS.md`.
+- Frontend (`DE/`): `cd DE && npm ci && npm run build`. CI also runs the credential-free harness subsets with `npx tsx scripts/run-tests.ts --test-type unit|integration|validation` and asserts `Failed: 0`; the harness exits 0 even when tests fail, so a gate must parse the report. The workflow also runs the pinned GNN
+conformance baseline (see `.github/GNN.md`). `npm run lint` is currently broken and `npm run build` runs `tsc` before Vite; see `DE/docs/FINAL_STATUS.md`.
 - Analysis (`path/`): `cd path && python -m venv .venv && source .venv/bin/activate && pip install -r requirements.txt && python research_paths.py`.
 - Flask prototypes: `resnei/` needs `flask` and `markdown`; `website_explore_the_unknown/` needs its Node dependencies and Python `requirements.txt`. See each component guide.
 - There is no repository-wide test runner. Change one component at a time, run its check, and state what you could not run.
