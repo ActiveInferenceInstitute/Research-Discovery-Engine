@@ -8,10 +8,10 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Loader2 } from "lucide-react";
-import type { Message } from "ai/react"; // import the UIMessage type
+import { isTextUIPart, type UIMessage } from "ai";
 
 interface ChatInterfaceProps {
-  messages: Message[]; // use UIMessage instead of any
+  messages: UIMessage[];
   input: string;
   handleInputChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
   handleSubmit: (e: React.FormEvent<HTMLFormElement>) => void;
@@ -43,7 +43,10 @@ export default function ChatInterface({
                   : "bg-gray-800 text-gray-200"
               }`}
             >
-              {m.content}
+              {m.parts
+                .filter(isTextUIPart)
+                .map((part) => part.text)
+                .join("")}
             </span>
           </div>
         ))}

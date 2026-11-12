@@ -21,7 +21,8 @@ import {
   FaMicrophone,
   FaPaperclip,
 } from "react-icons/fa";
-import { useChat } from "ai/react";
+import { DefaultChatTransport, isTextUIPart } from "ai";
+import { useChat } from "@ai-sdk/react";
 import {
   ResizablePanelGroup,
   ResizablePanel,
@@ -40,6 +41,8 @@ import {
 } from "recharts";
 import { motion, AnimatePresence } from "framer-motion";
 import { ProjectOverviewModal } from "@/components/project-overview-modal";
+
+const chatTransport = new DefaultChatTransport({ api: "/api_ts/chat" });
 
 // Define a Project interface with all the properties used in the Collaboration section
 interface Project {
@@ -69,18 +72,30 @@ function MainComponent() {
     progress: number;
     subgoals?: Goal[];
   }
+  const [input, setInput] = useState("");
   const {
     messages: aiMessages,
-    input,
-    handleInputChange,
-    handleSubmit,
-    isLoading,
+    sendMessage,
+    status,
   } = useChat({
-    api: "/api_ts/chat",
+    transport: chatTransport,
     onError: (error) => {
       console.error("Chat error:", error);
     },
   });
+  const isLoading = status === "submitted" || status === "streaming";
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setInput(e.target.value);
+  };
+
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    const text = input.trim();
+    if (!text) return;
+    setInput("");
+    await sendMessage({ text });
+  };
 
   const handleFirstMessageSubmit = async (
     e: React.FormEvent<HTMLFormElement>
@@ -318,12 +333,12 @@ function MainComponent() {
       </div>
 
       {/* Panel view */}
-      <ResizablePanelGroup direction="horizontal" className="h-full">
+      <ResizablePanelGroup orientation="horizontal" className="h-full">
         {/* Left/chat Panel */}
         <ResizablePanel
-          defaultSize={50}
-          minSize={0}
-          maxSize={50}
+          defaultSize="50%"
+          minSize="0%"
+          maxSize="50%"
           style={{ display: isChatVisible ? "block" : "none" }}
         >
           <div className="h-full bg-[#1e1e1e] flex flex-col overflow-hidden relative">
@@ -351,7 +366,12 @@ function MainComponent() {
                       message.role === "user" ? "ml-8" : "mr-8"
                     }`}
                   >
-                    <AlertDescription>{message.content}</AlertDescription>
+                    <AlertDescription>
+                      {message.parts
+                        .filter(isTextUIPart)
+                        .map((part) => part.text)
+                        .join("")}
+                    </AlertDescription>
                   </Alert>
                 </div>
               ))}
@@ -389,7 +409,7 @@ function MainComponent() {
         />
 
         {/* Right Panel */}
-        <ResizablePanel defaultSize={isChatVisible ? 50 : 100}>
+        <ResizablePanel defaultSize={isChatVisible ? "50%" : "100%"}>
           <div className="h-full bg-[#1e1e1e] flex flex-col">
             {!isChatVisible && (
               <Button

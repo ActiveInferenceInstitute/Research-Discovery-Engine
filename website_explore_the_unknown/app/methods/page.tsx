@@ -1,5 +1,6 @@
 "use client";
-import { ExternalLink, Github, X, ChevronDown, ChevronUp } from "lucide-react";
+import { ExternalLink, X, ChevronDown, ChevronUp } from "lucide-react";
+import { FaGithub } from "react-icons/fa";
 import Image from "next/image";
 import { useState } from "react";
 
@@ -504,7 +505,7 @@ export default function MethodsPage() {
                 rel="noopener noreferrer"
                 className="inline-flex items-center space-x-2 text-blue-400 hover:text-blue-300"
               >
-                <Github className="w-5 h-5" />
+                <FaGithub className="w-5 h-5" />
                 <span>View Repository</span>
                 <ExternalLink className="w-4 h-4" />
               </a>
@@ -525,7 +526,7 @@ export default function MethodsPage() {
                 rel="noopener noreferrer"
                 className="inline-flex items-center space-x-2 text-blue-400 hover:text-blue-300"
               >
-                <Github className="w-5 h-5" />
+                <FaGithub className="w-5 h-5" />
                 <span>View Repository</span>
                 <ExternalLink className="w-4 h-4" />
               </a>
@@ -546,7 +547,7 @@ export default function MethodsPage() {
                 rel="noopener noreferrer"
                 className="inline-flex items-center space-x-2 text-blue-400 hover:text-blue-300"
               >
-                <Github className="w-5 h-5" />
+                <FaGithub className="w-5 h-5" />
                 <span>View FieldSHIFT-2 Repository</span>
                 <ExternalLink className="w-4 h-4" />
               </a>
@@ -556,7 +557,7 @@ export default function MethodsPage() {
                 rel="noopener noreferrer"
                 className="inline-flex items-center space-x-2 text-blue-400 hover:text-blue-300"
               >
-                <Github className="w-5 h-5" />
+                <FaGithub className="w-5 h-5" />
                 <span>View InelliDE Repository</span>
                 <ExternalLink className="w-4 h-4" />
               </a>
@@ -598,7 +599,7 @@ export default function MethodsPage() {
                 rel="noopener noreferrer"
                 className="inline-flex items-center space-x-2 text-blue-400 hover:text-blue-300"
               >
-                <Github className="w-5 h-5" />
+                <FaGithub className="w-5 h-5" />
                 <span>View Diffusion of thoughts Repository</span>
                 <ExternalLink className="w-4 h-4" />
               </a>

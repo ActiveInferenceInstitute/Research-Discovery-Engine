@@ -1,11 +1,6 @@
 import { createClient } from "@supabase/supabase-js";
 import { NextResponse } from "next/server";
 
-// Initialize the Supabase client with env variables (service role key recommended for server-side)
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
-const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY!;
-const supabase = createClient(supabaseUrl, supabaseKey);
-
 // Added GET handler to prevent Next.js from trying to pre-render this route.
 export async function GET(_request: Request) {
   void _request;
@@ -14,6 +9,13 @@ export async function GET(_request: Request) {
 
 export async function POST(request: Request) {
   try {
+    // Created per request: module-scope initialization fails `next build`, which
+    // evaluates this module while collecting page data without deployment secrets.
+    const supabase = createClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.SUPABASE_SERVICE_ROLE_KEY!
+    );
+
     // Parse the request body (make sure your client sends JSON)
     const { email } = await request.json();
 
