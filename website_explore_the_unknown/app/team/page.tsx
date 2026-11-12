@@ -1,7 +1,7 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import BackgroundPaths from "@/components/kokonutui/background-paths";
 import Image from "next/image";
-import { Github, Twitter } from "lucide-react";
+import { FaGithub, FaTwitter } from "react-icons/fa";
 import { Button } from "@/components/ui/button";
 
 const teamMembers = [
@@ -115,10 +115,10 @@ export default function TeamPage() {
                 </p>
                 <div className="flex space-x-1">
                   <Button variant="ghost" size="icon" className="h-6 w-6">
-                    <Twitter className="h-3 w-3" />
+                    <FaTwitter className="h-3 w-3" />
                   </Button>
                   <Button variant="ghost" size="icon" className="h-6 w-6">
-                    <Github className="h-3 w-3" />
+                    <FaGithub className="h-3 w-3" />
                   </Button>
                 </div>
               </CardContent>
