@@ -23,8 +23,7 @@ This repository is a set of related research prototypes, not one installable pac
 
 ## Validation
 
-- Frontend (`DE/`): `cd DE && npm ci && npm run build`. CI also runs the credential-free harness subsets with `npx tsx scripts/run-tests.ts --test-type unit|integration|validation` and asserts `Failed: 0`; the harness exits 0 even when tests fail, so a gate must parse the report. The workflow also runs the pinned GNN
-conformance baseline (see `.github/GNN.md`). `npm run lint` is currently broken and `npm run build` runs `tsc` before Vite; see `DE/docs/FINAL_STATUS.md`.
+- Repository gate: `./run.sh <arm>` at the repository root is the only definition of the checks. `./run.sh all` runs `fast` (the credential-free harness subsets with their `Failed: 0` assertion), `build` (DE bundle, knowledge-base mirror and the `dist/KG` assertion), `website` (Next.js 16 build), `docs` (relative Markdown links and anchors) and `gnn` (the pinned conformance baseline, see `.github/GNN.md`). `.github/workflows/ci.yml` calls those same arms and has no second copy of any command. `./run.sh lint` and `./run.sh types` are runnable but report pre-existing findings and are not in `all` — counts are generated in `Docs/GATE_METRICS.md`; the rules are in `Docs/RUN_GUIDE.md`. `npm run build` runs a bare `tsc` that checks nothing; `npx tsc -b` is the real type check.
 - Analysis (`path/`): `cd path && python -m venv .venv && source .venv/bin/activate && pip install -r requirements.txt && python research_paths.py`.
 - Flask prototypes: `resnei/` needs `flask` and `markdown`; `website_explore_the_unknown/` needs its Node dependencies and Python `requirements.txt`. See each component guide.
 - There is no repository-wide test runner. Change one component at a time, run its check, and state what you could not run.

@@ -16,6 +16,8 @@ This directory contains comprehensive documentation for the Research Discovery E
 - **[Component Architecture](COMPONENTS.md)** - Detailed component documentation
 - **[API Reference](API_REFERENCE.md)** - Complete API and utility reference
 - **[Script Usage Guide](SCRIPT_USAGE.md)** - Standalone utilities documentation
+- **[Repository gate](../../Docs/RUN_GUIDE.md)** - `./run.sh` arms, including the checks that are currently red
+- **[Gate metrics](../../Docs/GATE_METRICS.md)** - Generated per-arm wall times, test counts and finding counts
 
 ### For DevOps/Deployment
 - **[Deployment Guide](DEPLOYMENT.md)** - Production deployment strategies
@@ -115,7 +117,7 @@ This directory contains comprehensive documentation for the Research Discovery E
 **Content**:
 - Repository and knowledge-base layout
 - Measured build, knowledge-base mirror and pipeline behaviour
-- Testing situation (no automated suite; the standalone harness and its passing subsets)
+- Testing and automation: the standalone harness and its passing subsets, the one gate entry point and the CI jobs that call it, and the two checks that are currently red
 - Known gaps and unresolved items
 - Recent changes and a documentation map
 
@@ -221,17 +223,21 @@ Performance targets are planning goals, not measured guarantees; no benchmark ar
 
 ## 🧪 Testing
 
-### Testing Strategy
-- **Unit Tests**: Component-level testing
-- **Integration Tests**: Feature workflow testing
-- **Performance Tests**: Load and stress testing
-- **Browser Tests**: Cross-browser compatibility
+There is no test runner: no Jest, Vitest, Playwright or Cypress configuration, and
+no `test` script. What exists:
 
-### Test Utilities
-- **Mock Data Generators**: Realistic test data creation
-- **Component Test Helpers**: React component testing utilities
-- **Graph Test Utilities**: Graph data validation and analysis
-- **Performance Benchmarks**: Automated performance monitoring
+- **Standalone harness**: `scripts/run-tests.ts` with `--test-type
+  unit|integration|validation|llm|all`. The credential-free subsets report their
+  own counts and the harness exits 0 even when tests fail.
+- **Gate arm**: `./run.sh fast` (from the repository root) runs those three
+  subsets and asserts each report says `Failed: 0`. That is what CI runs.
+- **LLM subset**: `--test-type llm` needs `VITE_OPENAI_API_KEY` or
+  `VITE_OPENROUTER_API_KEY` and reports 7 failures without one, so it is not part
+  of the gate.
+- **Testing utilities** in `src/utils/testUtils.ts`: mock graph data, mock agent
+  messages, mock concept state and graph assertions, as plain functions.
+- **Red checks**: `./run.sh lint` and `./run.sh types` are runnable and report
+  pre-existing findings; see [`../../Docs/RUN_GUIDE.md`](../../Docs/RUN_GUIDE.md#known-red-checks).
 
 ## 🔒 Security
 

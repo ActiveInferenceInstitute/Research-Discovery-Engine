@@ -5,7 +5,7 @@ Thank you for contributing to the Research Discovery Engine. The repository cont
 ## Before opening a pull request
 
 1. Confirm the working tree and inspect the component you intend to change.
-2. For `DE/`, install from the lockfile with `npm ci` and run `npm run build` (bundle plus the knowledge-base mirror and its `dist/KG` assertion; the build's `tsc` step does not currently type-check, and the real check `npx tsc -b` reports pre-existing errors — see `DE/docs/FINAL_STATUS.md`). The `npm run lint` script cannot currently run; see the same document. `.github/workflows/ci.yml` runs exactly that build plus the credential-free `run-tests.ts` subsets, and the pinned GNN conformance baseline (see `.github/GNN.md`).
+2. Run the gate from the repository root: `./run.sh all`. It runs the credential-free harness subsets, the DE build with its `dist/KG` assertion, the Next.js build, the relative-link check and the pinned GNN conformance check. Install first with `npm ci` in `DE/` and in `website_explore_the_unknown/`. `./run.sh lint` and `./run.sh types` also exist and are runnable, but they report pre-existing findings, so they are not part of `all`; see [`Docs/RUN_GUIDE.md`](Docs/RUN_GUIDE.md#known-red-checks). `npm run build`'s `tsc` step does not type-check — the real check is `npx tsc -b`, which the `types` arm runs.
 3. For Python changes, run a syntax check (for example, `python -m compileall`) and the component's available checks.
 4. Update documentation and examples when commands, paths, configuration names, or outputs change.
 5. Never commit `.env` files, API keys, generated caches, or private research data.

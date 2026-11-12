@@ -7,7 +7,7 @@ The Research Discovery Engine is a collection of research prototypes and support
 - `DE/`: a React, TypeScript, Vite, and Tailwind frontend for browsing the Discovery Engine knowledge graph and experimenting with concept design and LLM-assisted workflows.
 - `path/`: a Python network-analysis pipeline over the linked Markdown knowledge base, with checked-in outputs under `path/results/`.
 - `resnei/`: a small Flask-based ResNei prototype.
-- `website_explore_the_unknown/`: a Next.js website prototype.
+- `website_explore_the_unknown/`: a Next.js 16 site with a companion Flask API.
 - `Docs/`: the numbered Discovery Engine system-design documentation.
 - `ResNei SDD/`: the ResNei software design document and diagrams.
 
@@ -53,6 +53,30 @@ The system-design series (13 documents) is indexed by [`Docs/README.md`](Docs/RE
 ## Configuration and credentials
 
 The root `.env.example` documents configuration used by the Python tooling. Keep credentials in an untracked `.env` file and never commit API keys. The DE frontend uses Vite-prefixed variables such as `VITE_API_PROVIDER`, `VITE_OPENAI_API_KEY`, and `VITE_OPENROUTER_API_KEY`; see `DE/src/llm/config/LLMConfig.ts` for the current names.
+
+## Checks
+
+`./run.sh` is the single gate entry point; each arm is one command and the CI
+workflows call these arms rather than restating them.
+
+```bash
+./run.sh fast      # credential-free test harness subsets
+./run.sh build     # DE production build + knowledge-base assertion
+./run.sh website   # Next.js 16 production build
+./run.sh docs      # relative Markdown links and anchors
+./run.sh gnn       # pinned GNN parser conformance
+./run.sh all       # everything CI runs
+```
+
+Install each component from its lockfile first (`npm ci` in `DE/` and in
+`website_explore_the_unknown/`). `./run.sh lint` and `./run.sh types` exist and
+are runnable but currently report pre-existing findings: see
+[`Docs/RUN_GUIDE.md`](Docs/RUN_GUIDE.md#known-red-checks). Measured wall times,
+test counts and finding counts are generated in
+[`Docs/GATE_METRICS.md`](Docs/GATE_METRICS.md) by `./run.sh metrics`.
+
+GitHub Actions is billing-locked for this estate, so the local gate is the
+authority.
 
 ## Contributing
 
