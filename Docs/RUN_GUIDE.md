@@ -71,9 +71,14 @@ heading anchor.
 
 Two checks are runnable and non-zero today. They are reported by `./run.sh
 strict` and by the generated [gate metrics](GATE_METRICS.md); they are **not**
-enforced by `./run.sh all` or by CI, because driving them to zero is a repair of
-the frontend, not a gate change, and the repository's own backlog already tracks
-it ([`TO-DO.md`](../TO-DO.md)).
+enforced by `./run.sh all` or by CI.
+
+**This is a blocking debt, not an exemption.** [Issue
+#79](https://github.com/ActiveInferenceInstitute/Research-Discovery-Engine/issues/79)
+is the acceptance line: `./run.sh strict` must exit 0, and adding `lint` and
+`types` to `./run.sh all` (and therefore to CI) is the closure action for that
+issue — not a separate decision. The gate landed with both arms red; that is
+recorded here and in the issue so the deviation stays visible.
 
 | Check | Command | State |
 | --- | --- | --- |
