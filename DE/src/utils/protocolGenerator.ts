@@ -1,6 +1,6 @@
 /**
  * Protocol Generator Utility
- * 
+ *
  * Generates experimental protocols from concept design states and CSS vectors.
  * Can be used both as a standalone utility and integrated into the main framework.
  */
@@ -63,7 +63,7 @@ export const generateProtocol = (
 ): GeneratedProtocol => {
   const { objective, components, cssVectorDraft } = conceptState;
   const css = cssVectorDraft || {};
-  
+
   const protocol: GeneratedProtocol = {
     title: `Experimental Protocol: ${objective}`,
     objective: objective || 'Design and validate a novel concept',
@@ -133,7 +133,7 @@ const generateMaterialsSection = (
   config: ProtocolConfig
 ): ProtocolSection => {
   const content: string[] = ['### Required Materials:'];
-  
+
   if (conceptState.components.materials.length > 0) {
     conceptState.components.materials.forEach(material => {
       content.push(`- ${material}`);
@@ -143,7 +143,7 @@ const generateMaterialsSection = (
   }
 
   content.push('', '### Required Equipment:');
-  
+
   if (css.context?.fabrication_primary?.length) {
     css.context.fabrication_primary.forEach(method => {
       content.push(`- Equipment for ${method}`);
@@ -163,7 +163,7 @@ const generateMaterialsSection = (
  * Generate fabrication section
  */
 const generateFabricationSection = (
-  conceptState: ConceptDesignState,
+  _conceptState: ConceptDesignState,
   css: Partial<CSSVector>,
   config: ProtocolConfig
 ): ProtocolSection => {
@@ -193,7 +193,7 @@ const generateFabricationSection = (
  * Generate characterization section
  */
 const generateCharacterizationSection = (
-  conceptState: ConceptDesignState,
+  _conceptState: ConceptDesignState,
   css: Partial<CSSVector>,
   config: ProtocolConfig
 ): ProtocolSection => {
@@ -226,7 +226,7 @@ const generateCharacterizationSection = (
  * Generate experiment section
  */
 const generateExperimentSection = (
-  conceptState: ConceptDesignState,
+  _conceptState: ConceptDesignState,
   css: Partial<CSSVector>,
   config: ProtocolConfig
 ): ProtocolSection => {
@@ -257,7 +257,7 @@ const generateExperimentSection = (
  * Generate analysis section
  */
 const generateAnalysisSection = (
-  conceptState: ConceptDesignState,
+  _conceptState: ConceptDesignState,
   css: Partial<CSSVector>,
   config: ProtocolConfig
 ): ProtocolSection => {
@@ -291,10 +291,10 @@ const estimateProtocolDuration = (
   config: ProtocolConfig
 ): string => {
   let baseDuration = 8; // hours
-  
+
   baseDuration += conceptState.components.materials.length * 2;
   baseDuration += conceptState.components.mechanisms.length * 1;
-  
+
   switch (config.detailLevel) {
     case 'basic':
       baseDuration *= 0.7;
@@ -303,7 +303,7 @@ const estimateProtocolDuration = (
       baseDuration *= 1.5;
       break;
   }
-  
+
   if (baseDuration < 24) {
     return `${Math.round(baseDuration)} hours`;
   } else {
@@ -320,9 +320,9 @@ const determineSkillLevel = (
   config: ProtocolConfig
 ): string => {
   let complexity = conceptState.components.materials.length + conceptState.components.mechanisms.length * 2;
-  
+
   if (config.detailLevel === 'advanced') complexity += 5;
-  
+
   if (complexity <= 5) return 'Beginner';
   if (complexity <= 10) return 'Intermediate';
   return 'Advanced';
@@ -341,7 +341,7 @@ export const formatProtocolAsMarkdown = (protocol: GeneratedProtocol): string =>
 
   protocol.sections.forEach(section => {
     markdown += `## ${section.title}\n\n`;
-    
+
     if (section.timeEstimate) {
       markdown += `*Estimated Time: ${section.timeEstimate}*\n\n`;
     }
@@ -349,7 +349,7 @@ export const formatProtocolAsMarkdown = (protocol: GeneratedProtocol): string =>
     section.content.forEach(line => {
       markdown += line ? `${line}\n` : '\n';
     });
-    
+
     markdown += '\n';
   });
 
@@ -382,4 +382,4 @@ export const createStandaloneProtocol = (
   const markdown = formatProtocolAsMarkdown(protocol);
 
   return { protocol, markdown };
-}; 
+};

@@ -1,6 +1,6 @@
 /**
  * App Layout Component - Main application layout structure
- * 
+ *
  * This component handles the overall layout and positioning of major UI sections,
  * extracting layout concerns from the main App component for better modularity.
  */
@@ -56,13 +56,6 @@ const AppLayout: React.FC<AppLayoutProps> = ({
   onToggleDarkMode,
   isBrowserSidebarOpen,
   onToggleBrowserSidebar,
-  activeMode,
-  onSetExploreMode,
-  onSetCreateMode,
-  onShowPDFUploader,
-  searchQuery,
-  onSearchInputChange,
-  onSearchSubmit,
   sidebarContent,
   mainContent,
   contextPanelContent,
@@ -95,7 +88,7 @@ const AppLayout: React.FC<AppLayoutProps> = ({
           <div className={`${
             isBrowserSidebarOpen ? 'w-80' : 'w-0'
           } transition-all duration-300 overflow-hidden border-r border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 relative`}>
-            
+
             {/* Sidebar Toggle Button */}
             <button
               onClick={onToggleBrowserSidebar}
@@ -146,4 +139,4 @@ const AppLayout: React.FC<AppLayoutProps> = ({
   );
 };
 
-export default AppLayout; 
+export default AppLayout;

@@ -1,10 +1,10 @@
 // src/components/ContextPanel/ContextPanel.tsx
 import React from 'react';
-import { NodeObject, GraphData, ConceptDesignState, LinkObject as CNMLinkObject, NodeType } from '../../types';
+import { NodeObject, GraphData, ConceptDesignState } from '../../types';
 import NodeView from '../NodeView/NodeView';
 import ConceptDetails from './ConceptDetails';
 // Corrected: Added X as CloseIcon
-import { X as CloseIcon, Link2, Lightbulb, Network, Brain, Zap, FlaskConical, Activity, Target, HelpCircle, Layers, BookOpen } from 'lucide-react';
+import { X as CloseIcon } from 'lucide-react';
 
 interface ContextPanelProps {
   darkMode: boolean;
@@ -29,7 +29,7 @@ const ContextPanel: React.FC<ContextPanelProps> = ({
         (typeof link.source === 'object' ? (link.source as NodeObject).id : String(link.source)) === selectedNode.id ||
         (typeof link.target === 'object' ? (link.target as NodeObject).id : String(link.target)) === selectedNode.id
     ) : [];
-    
+
   return (
     <div
       className={`rounded-lg shadow-lg flex flex-col ${
@@ -44,18 +44,18 @@ const ContextPanel: React.FC<ContextPanelProps> = ({
         </h3>
         {/* Show close button if a node is selected (in explore or create mode) OR if in create mode without a node selected (to go back to explore) */}
         {(selectedNodeId || activeMode === 'create') && (
-             <button 
+             <button
                 onClick={() => {
                     if (activeMode === 'create' && !selectedNodeId) { // If in create mode and no node is selected, this implies wanting to exit create mode
                         onTriggerAgent('set-explore-mode', {}); // App.tsx needs to handle this to set activeMode='explore'
                     } else {
                         onSelectNode(null); // Deselect node
                     }
-                }} 
-                className={`p-1 rounded-full ${darkMode ? 'hover:bg-slate-700' : 'hover:bg-slate-200'}`} 
+                }}
+                className={`p-1 rounded-full ${darkMode ? 'hover:bg-slate-700' : 'hover:bg-slate-200'}`}
                 title={activeMode === 'create' && !selectedNodeId ? "Back to Explore" : "Close Details"}
-            > 
-                <CloseIcon size={18} /> 
+            >
+                <CloseIcon size={18} />
             </button>
         )}
       </div>
