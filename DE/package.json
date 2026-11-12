@@ -31,6 +31,8 @@
     "three-spritetext": "^1.10.0"
   },
   "devDependencies": {
+    "@eslint/js": "^10.0.1",
+    "@tailwindcss/postcss": "^4.3.5",
     "@types/d3": "^7.4.3",
     "@types/lodash": "^4.17.27",
     "@types/node": "^26.6.6",
@@ -44,6 +46,7 @@
     "eslint": "^10.14.0",
     "eslint-plugin-react-hooks": "^7.1.1",
     "eslint-plugin-react-refresh": "^0.5.7",
+    "globals": "^17.14.0",
     "postcss": "^8.5.32",
     "tailwindcss": "^4.3.4",
     "tsx": "^4.23.15",
