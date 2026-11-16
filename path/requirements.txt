@@ -7,6 +7,6 @@ python-louvain>=0.16
 adjustText>=1.4.0
 plotly>=7.1.0
 holoviews>=1.23.2
-bokeh>=3.10.1
+bokeh>=3.10.2
 scipy>=1.18.1
 tqdm>=4.70.1
