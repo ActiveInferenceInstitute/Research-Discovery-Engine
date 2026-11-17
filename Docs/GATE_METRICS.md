@@ -7,20 +7,21 @@ the whole arm, including the runner's own overhead; they are observations,
 not targets. Arms marked **known red** are reported, not enforced — see
 [`RUN_GUIDE.md`](RUN_GUIDE.md#known-red-checks).
 
-- source revision: `d63ffa5384f8` (clean)
-- host: macOS-27.0.1-arm64-arm-64bit-Mach-O (arm64)
-- node v26.13.0 · npm 11.20.0 · Python 3.15.2
-- measured: 2026-11-12 05:10:43 PST
+- source revision: `87104e3cda11` (clean)
+- host: macOS-27.2.1-arm64-arm-64bit-Mach-O (arm64)
+- node v26.13.1 · npm 11.20.0 · Python 3.15.2
+- measured: 2026-11-17 11:51:49 PST
 
 | Arm | Kind | Wall time (s) | Exit | Result |
 | --- | --- | --- | --- | --- |
-| `fast` | blocking | 1.7 | 0 | pass (failures: 0) |
-| `build` | blocking | 3.51 | 0 | pass |
-| `website` | blocking | 7.79 | 0 | pass |
-| `docs` | blocking | 0.21 | 0 | pass (docs links: 189 relative links in 57 files resolve) |
-| `gnn` | blocking | 2.4 | 0 | pass ({"gnn-version": "5.0.3", "models": 1, "pin-revision": "8f293d9ba810e6eda5c09842d9c7ed9ffa5f92c1", "result": "verified", "source": "pinned-exemplar"}) |
-| `lint` | strict | 4.28 | 1 | **fail** (400 problems (387 errors, 13 warnings)) |
-| `types` | strict | 6.66 | 2 | **fail** (97 type errors) |
+| `fast` | blocking | 1.67 | 0 | pass (failures: 0) |
+| `build` | blocking | 4.33 | 0 | pass |
+| `website` | blocking | 5.71 | 0 | pass |
+| `python` | blocking | 134.09 | 0 | pass (path: research_paths.py completed over DE/KG and wrote 12 non-empty files; website-api: 7 modules under api/ compile) |
+| `docs` | blocking | 0.92 | 0 | pass (docs links: 196 relative links in 58 files resolve) |
+| `gnn` | blocking | 7.55 | 0 | pass ({"gnn-version": "5.0.3", "models": 1, "pin-revision": "8f293d9ba810e6eda5c09842d9c7ed9ffa5f92c1", "result": "verified", "source": "pinned-exemplar"}) |
+| `lint` | strict | 3.5 | 1 | **fail** (400 problems (387 errors, 13 warnings)) |
+| `types` | strict | 5.53 | 2 | **fail** (97 type errors) |
 
 ## Test counts
 
@@ -37,6 +38,7 @@ not targets. Arms marked **known red** are reported, not enforced — see
 | `fast` | `./run.sh fast` | the three credential-free harness subsets pass and report `Failed: 0` |
 | `build` | `./run.sh build` | the DE bundle builds and `dist/KG` carries every document and publication record |
 | `website` | `./run.sh website` | the Next.js site builds, including its own TypeScript step |
+| `python` | `./run.sh python` | `path/research_paths.py` runs over `DE/KG` and the website's Flask API answers in-process, each from a fresh `requirements.txt` environment |
 | `docs` | `./run.sh docs` | every relative Markdown link and anchor resolves, with exact case |
 | `gnn` | `./run.sh gnn` | the pinned parser version parses and type-checks the conformance target |
 | `lint` | `./run.sh lint` | ESLint findings in DE/ (**known red**) |
