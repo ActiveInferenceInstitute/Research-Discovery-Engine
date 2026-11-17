@@ -1,5 +1,6 @@
 // src/types/index.ts
-import { CSSVector } from './css';
+import type { CSSVector } from './css';
+export type { CSSVector } from './css';
 
 export type CoreNodeType =
   | 'Material' | 'Mechanism' | 'Method' | 'Phenomenon' | 'Application' | 'TheoreticalConcept'
@@ -21,6 +22,7 @@ export interface NodeObject {
   cssVector?: Partial<CSSVector>;
   sourceWikiSectionId?: string; sourceFileKey?: string;
   references?: string[];
+  keywords?: string[];
   validationScore?: number; cognitionScore?: number; criticalityScore?: number;
   x?: number; y?: number; z?: number; fx?: number; fy?: number; fz?: number;
   color?: string;
@@ -30,10 +32,10 @@ export type EdgeType =
   | 'categorizes' | 'cites-source' | 'concept-uses-component' | 'related-to' | 'interplay'
   | 'EnablesMechanismEdge' | 'ComposedOfMaterialEdge' | 'UtilizesMethodEdge' | 'ValidatedByEdge'
   | 'SuggestsKnowledgeGapEdge' | 'AddressesKnowledgeGapEdge' | 'ImplementsMechanismEdge'
-  | 'RequiresEnergyEdge' | 'Defines' | 'PackagedInArtifactEdge';
+  | 'PartOfEdge' | 'RequiresEnergyEdge' | 'Defines' | 'PackagedInArtifactEdge';
 
 export interface LinkObject {
-  source: string; target: string; type: EdgeType;
+  source: string | NodeObject; target: string | NodeObject; type: EdgeType;
   value?: number; justification?: string;
 }
 
@@ -47,7 +49,7 @@ export interface ParsedSection {
 
 export interface AgentMessage { /* ... (as before) ... */
   id: string; sourceAgent: string;
-  type: 'info' | 'opportunity' | 'suggestion' | 'warning' | 'error' | 'command_confirmation' | 'user_query';
+  type: 'info' | 'success' | 'opportunity' | 'suggestion' | 'warning' | 'error' | 'command_confirmation' | 'user_query';
   content: string; timestamp: number; relatedNodeIds?: string[]; relatedFieldId?: string;
   action?: { type: 'accept-suggestion' | 'view-details' | 'view-llm-result' | 'trigger-agent-action' | 'integrate-data' | 'explore-node'; label?: string; payload?: any; };
 }

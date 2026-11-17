@@ -101,12 +101,13 @@ function parseArgs(): CliOptions {
       case '--validate-links':
         options.validateLinks = true;
         break;
-      case '--output-format':
+      case '--output-format': {
         const format = args[++i];
         if (['json', 'readable'].includes(format)) {
           options.outputFormat = format as 'json' | 'readable';
         }
         break;
+      }
       case '--output-file':
         options.outputFile = args[++i];
         break;

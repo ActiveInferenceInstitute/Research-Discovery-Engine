@@ -15,7 +15,7 @@ const getInitialConceptDesignState = (seedNode?: NodeObject | null): ConceptDesi
     applications: [],
     theoretical_concepts: [],
   };
-  let cssVectorDraft: Partial<CSSVector> = {
+  const cssVectorDraft: Partial<CSSVector> = {
     meta: { id: newId, analysis_date: new Date().toISOString(), source_keys: [] },
     context: {}, state: {}, interface: {}, dynamics: {}, memory: {},
     adaptation: {}, constraints: {}, interactions: {}, hierarchy: {}

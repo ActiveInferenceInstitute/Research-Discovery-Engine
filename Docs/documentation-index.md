@@ -21,7 +21,7 @@ link to `Docs/` wherever a repository would otherwise say `docs/`.
 
 ## Gate and CI
 
-- [`RUN_GUIDE.md`](RUN_GUIDE.md) — the arms of `./run.sh`, the CI mapping, and the checks that are known red.
+- [`RUN_GUIDE.md`](RUN_GUIDE.md) — the arms of `./run.sh`, the CI mapping, and the blocking frontend checks.
 - [`GATE_METRICS.md`](GATE_METRICS.md) — **generated**: per-arm wall time, test counts and finding counts.
 - [`../.github/GNN.md`](../.github/GNN.md) — what the pinned GNN conformance job parses.
 - [`../.github/gnn-pin.json`](../.github/gnn-pin.json) — canonical parser pin, schema `gnn-importer-pin/v1`.

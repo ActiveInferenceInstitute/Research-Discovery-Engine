@@ -64,7 +64,7 @@ interface GeneratedSummary {
  */
 export const generateSummary = (
   conceptState: ConceptDesignState,
-  graphData?: GraphData,
+  graphData: GraphData | undefined,
   config: SummaryConfig = DEFAULT_CONFIG
 ): GeneratedSummary => {
   const { objective } = conceptState;
@@ -145,7 +145,7 @@ const generateAbstract = (
  */
 const generateSummarySections = (
   conceptState: ConceptDesignState,
-  graphData?: GraphData,
+  graphData: GraphData | undefined,
   config: SummaryConfig
 ): SummarySection[] => {
   const sections: SummarySection[] = [];

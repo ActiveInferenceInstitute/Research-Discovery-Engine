@@ -123,7 +123,7 @@ export class LLMService {
       // Make the API call with retry logic
       const response = await this.makeRequestWithRetry(async () => {
         // Create request parameters based on provider
-        const requestParams: any = {
+        const requestParams = {
           model: finalConfig.model || this.config.model,
           messages,
           max_tokens: finalConfig.maxTokens || this.config.maxTokens,
@@ -132,7 +132,6 @@ export class LLMService {
           frequency_penalty: finalConfig.frequencyPenalty,
           presence_penalty: finalConfig.presencePenalty,
           stop: finalConfig.stop,
-          stream: false,
           seed: finalConfig.seed,
           logit_bias: finalConfig.logitBias,
         };
@@ -144,7 +143,7 @@ export class LLMService {
           headers['X-Title'] = 'Research Discovery Engine';
         }
 
-        return await this.openai.chat.completions.create(requestParams, { headers });
+        return await this.openai.chat.completions.create({ ...requestParams, stream: false }, { headers });
       });
 
       const endTime = Date.now();
@@ -222,12 +221,11 @@ export class LLMService {
       const finalConfig = this.mergeConfig(request.config);
 
       // Create request parameters based on provider
-      const requestParams: any = {
+      const requestParams = {
         model: finalConfig.model || this.config.model,
         messages,
         max_tokens: finalConfig.maxTokens || this.config.maxTokens,
         temperature: finalConfig.temperature ?? this.config.temperature,
-        stream: true
       };
 
       // Add OpenRouter-specific headers if needed
@@ -236,7 +234,7 @@ export class LLMService {
         headers['HTTP-Referer'] = 'https://research-discovery-engine.example.com';
         headers['X-Title'] = 'Research Discovery Engine';
       }
-      const stream = await this.openai.chat.completions.create(requestParams, { headers });
+      const stream = await this.openai.chat.completions.create({ ...requestParams, stream: true }, { headers });
 
       for await (const chunk of stream) {
         const content = chunk.choices[0]?.delta?.content;
@@ -260,7 +258,7 @@ export class LLMService {
 
     let successfulRequests = 0;
     let failedRequests = 0;
-    let totalUsage = { promptTokens: 0, completionTokens: 0, totalTokens: 0 };
+    const totalUsage = { promptTokens: 0, completionTokens: 0, totalTokens: 0 };
 
     // Process requests in batches
     for (let i = 0; i < batchRequest.requests.length; i += concurrency) {

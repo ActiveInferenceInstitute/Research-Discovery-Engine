@@ -76,7 +76,7 @@ export const useDebouncedValue = <T>(value: T, delay: number): T => {
  * const prevCount = usePrevious(count);
  */
 export const usePrevious = <T>(value: T): T | undefined => {
-  const ref = useRef<T>();
+  const ref = useRef<T>(undefined);
   useEffect(() => {
     ref.current = value;
   });
@@ -145,7 +145,7 @@ export const useDebounce = <T extends (...args: any[]) => any>(
   callback: T,
   delay: number
 ): T => {
-  const timeoutRef = useRef<NodeJS.Timeout>();
+  const timeoutRef = useRef<NodeJS.Timeout>(undefined);
   
   return useCallback(
     ((...args) => {
@@ -289,7 +289,7 @@ export const createMemoComponent = <P extends object>(
 export const useBatchedState = <T>(initialState: T) => {
   const [state, setState] = useState(initialState);
   const pendingUpdates = useRef<((prev: T) => T)[]>([]);
-  const timeoutRef = useRef<NodeJS.Timeout>();
+  const timeoutRef = useRef<NodeJS.Timeout>(undefined);
 
   const batchedSetState = useCallback((updater: T | ((prev: T) => T)) => {
     const updateFn = typeof updater === 'function' ? updater as (prev: T) => T : () => updater;

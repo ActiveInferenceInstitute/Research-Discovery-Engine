@@ -20,16 +20,16 @@ import time
 from pathlib import Path
 
 # Arms in the order the gate runs them. "blocking" arms are what `./run.sh all`
-# and CI execute; the two strict arms are known red and reported separately.
+# and CI execute.
 ARMS = (
+    ("lint", "blocking", "ESLint over DE/"),
+    ("types", "blocking", "tsc -b over DE/"),
     ("fast", "blocking", "credential-free harness subsets (unit, integration, validation)"),
     ("build", "blocking", "DE production build + knowledge-base assertion"),
     ("website", "blocking", "Next.js production build"),
     ("python", "blocking", "path/ analysis run + website Flask API check"),
     ("docs", "blocking", "relative Markdown link/anchor check"),
     ("gnn", "blocking", "pinned GNN parser conformance"),
-    ("lint", "strict", "ESLint over DE/"),
-    ("types", "strict", "tsc -b over DE/"),
 )
 
 FAILED_COUNT = re.compile(r"Failed:\s*(\d+)")
@@ -93,10 +93,12 @@ def run_arm(arm: str, root: Path, log_dir: Path) -> dict[str, object]:
             record["problems"] = int(match.group(1))
             record["errors"] = int(match.group(2))
             record["warnings"] = int(match.group(3))
-        else:
-            record["problems"] = None
+        elif result.returncode == 0:
+            record.update(problems=0, errors=0, warnings=0)
     if arm == "types":
-        record["errors"] = len(TSC_ERROR.findall(log))
+        error_count = len(TSC_ERROR.findall(log))
+        if result.returncode == 0 or error_count:
+            record["errors"] = error_count
     if arm == "python":
         record["summary"] = "; ".join(
             line.strip() for line in log.splitlines() if PYTHON_SUMMARY.match(line.strip())
@@ -139,8 +141,7 @@ def render(records: list[dict[str, object]], root: Path) -> str:
         "",
         "Measured by running each arm once on this host. Timings are wall clock for",
         "the whole arm, including the runner's own overhead; they are observations,",
-        "not targets. Arms marked **known red** are reported, not enforced — see",
-        "[`RUN_GUIDE.md`](RUN_GUIDE.md#known-red-checks).",
+        "not targets. Every arm is blocking in [`./run.sh all`](RUN_GUIDE.md#arms).",
         "",
         f"- source revision: `{head or 'unknown'}` ({tree_state})",
         f"- host: {platform.platform()} ({platform.machine()})",
@@ -189,8 +190,8 @@ def render(records: list[dict[str, object]], root: Path) -> str:
             "| `python` | `./run.sh python` | `path/research_paths.py` runs over `DE/KG` and the website's Flask API answers in-process, each from a fresh `requirements.txt` environment |",
             "| `docs` | `./run.sh docs` | every relative Markdown link and anchor resolves, with exact case |",
             "| `gnn` | `./run.sh gnn` | the pinned parser version parses and type-checks the conformance target |",
-            "| `lint` | `./run.sh lint` | ESLint findings in DE/ (**known red**) |",
-            "| `types` | `./run.sh types` | `tsc -b` findings in DE/ (**known red**) |",
+            "| `lint` | `./run.sh lint` | ESLint findings in DE/ |",
+            "| `types` | `./run.sh types` | `tsc -b` findings in DE/ |",
             "",
         ]
     )

@@ -4,7 +4,7 @@ import { ConceptDesignState } from '../../types';
 import { Layers, Check,  Atom, GitMerge, FlaskConical, Loader } from 'lucide-react';
 
 // Helper to render CSS fields recursively
-const renderCssFields = (data: any, darkMode: boolean, path = '', level = 0): JSX.Element | null => {
+const renderCssFields = (data: any, darkMode: boolean, path = '', level = 0): React.JSX.Element | null => {
   if (!data || typeof data !== 'object' || Array.isArray(data)) {
     if (Array.isArray(data) && data.length === 0) return <span className={`italic text-xs ${darkMode ? 'text-slate-500' : 'text-slate-400'}`}>(empty list)</span>;
     if (Array.isArray(data)) {

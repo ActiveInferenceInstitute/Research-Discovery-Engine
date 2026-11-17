@@ -35,6 +35,12 @@ jobs:
         working-directory: DE
         run: npm ci
 
+      - name: ESLint (zero warnings)
+        run: ./run.sh lint
+
+      - name: TypeScript project references
+        run: ./run.sh types
+
       # The llm subset needs a provider key; `fast` runs unit, integration and
       # validation only, and asserts each report says `Failed: 0`.
       - name: Test harness subsets

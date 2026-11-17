@@ -281,29 +281,6 @@ export class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundarySt
 }
 
 /**
- * Higher-order component that wraps a component with error boundary
- * @param WrappedComponent - Component to wrap
- * @param options - Error boundary options
- * @returns Component wrapped with error boundary
- */
-export function withErrorBoundary<T extends object>(
-  WrappedComponent: React.ComponentType<T>,
-  options: Partial<ErrorBoundaryProps> = {}
-): React.ComponentType<T> {
-  
-  const WithErrorBoundaryComponent = (props: T) => (
-    <ErrorBoundary {...options}>
-      <WrappedComponent {...props} />
-    </ErrorBoundary>
-  );
-  
-  WithErrorBoundaryComponent.displayName = 
-    `withErrorBoundary(${WrappedComponent.displayName || WrappedComponent.name})`;
-  
-  return WithErrorBoundaryComponent;
-}
-
-/**
  * Lightweight error fallback component for simple error displays
  */
 export const SimpleErrorFallback: React.FC<{ error?: Error; onRetry?: () => void }> = ({ 

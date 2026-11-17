@@ -6,7 +6,7 @@
  */
 
 import { useCallback, useState } from 'react';
-import { AlertCircle, Loader, Search, Lightbulb, Compass, Layers, Upload, Menu, X as CloseIcon, Brain, FlaskConical, Zap, Activity, Target, HelpCircle, BookOpen } from 'lucide-react';
+import { AlertCircle, Loader, Search, Lightbulb, Compass, Upload, Menu, X as CloseIcon } from 'lucide-react';
 
 // Components
 import Navbar from './components/Navbar';
@@ -24,20 +24,6 @@ import LLMResultModal from './components/Modals/LLMResultModal';
 // Hooks and utilities
 import { useAppState } from './hooks/useAppState';
 import { slugify } from './utils/markdownParser';
-
-/**
- * Configuration for the knowledge browser sidebar
- */
-export const WIKI_BROWSER_CONFIG = [
-  { key: 'mechanisms', label: 'Mechanisms', icon: Brain, file: 'KG/mechanisms.md', indexSectionTitleSlug: "index-of-mechanisms"},
-  { key: 'materials', label: 'Materials', icon: FlaskConical, file: 'KG/materials.md', indexSectionTitleSlug: "index-of-material-classes-specific-materials"},
-  { key: 'methods', label: 'Methods', icon: Zap, file: 'KG/methods.md', indexSectionTitleSlug: "index-of-methods"},
-  { key: 'phenomena', label: 'Phenomena', icon: Activity, file: 'KG/phenomena.md', indexSectionTitleSlug: "index-of-phenomena"},
-  { key: 'applications', label: 'Applications', icon: Target, file: 'KG/applications.md', indexSectionTitleSlug: "index-of-applications"},
-  { key: 'theoretical', label: 'Theory', icon: HelpCircle, file: 'KG/theoretical.md', indexSectionTitleSlug: "index-of-theoretical-concepts"},
-  { key: 'css', label: 'Schema (CSS)', icon: BookOpen, file: 'KG/css.md', indexSectionTitleSlug: "conceptual-nexus-model-cnm-core-schema-specification-css"},
-  { key: 'process', label: 'Discovery Process', icon: Layers, file: 'process.md', indexSectionTitleSlug: "discovery-engine-process-for-creating-new-knowledge-system-protocol"},
-];
 
 /**
  * Main App Component using centralized state management
@@ -261,9 +247,9 @@ function App() {
                       onTogglePhysics={actions.togglePhysics}
                       onToggleParticles={actions.toggleParticles}
                       colorBy={graphColorBy}
-                      onChangeColorBy={(value) => setGraphColorBy(value as any)}
+                      onChangeColorBy={setGraphColorBy}
                       groupBy={graphGroupBy}
-                      onChangeGroupBy={(value) => setGraphGroupBy(value as any)}
+                      onChangeGroupBy={setGraphGroupBy}
                     />
                   </div>
                 ) : (

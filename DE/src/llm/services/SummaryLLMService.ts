@@ -320,7 +320,7 @@ Structure your response as:
     };
 
     let currentSection = 'abstract';
-    let abstractLines: string[] = [];
+    const abstractLines: string[] = [];
 
     for (const line of lines) {
       const trimmed = line.trim();

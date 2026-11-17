@@ -11,10 +11,10 @@
 #   ./run.sh python    path/ analysis run + website Flask API check, each in a fresh uv env
 #   ./run.sh docs      relative Markdown links, anchors and Publishing artifact digests
 #   ./run.sh gnn       pinned GNN parser conformance (see .github/GNN.md)
-#   ./run.sh lint      ESLint over DE/ (known red: pre-existing findings, see docs)
-#   ./run.sh types     tsc -b over DE/ (known red: pre-existing errors, see docs)
-#   ./run.sh all       fast + build + website + python + docs + gnn (the CI blocking set)
-#   ./run.sh strict    all + lint + types
+#   ./run.sh lint      ESLint over DE/
+#   ./run.sh types     tsc -b over DE/
+#   ./run.sh all       lint + types + fast + build + website + python + docs + gnn
+#   ./run.sh strict    alias for all
 #   ./run.sh metrics   re-measure every arm and regenerate Docs/GATE_METRICS.md
 #
 set -euo pipefail
@@ -178,23 +178,15 @@ main() {
     lint) arm_lint "$@" ;;
     types) arm_types "$@" ;;
     metrics) arm_metrics "$@" ;;
-    all)
-      arm_fast
-      arm_build
-      arm_website
-      arm_python
-      arm_docs
-      arm_gnn
-      ;;
-    strict)
-      arm_fast
-      arm_build
-      arm_website
-      arm_python
-      arm_docs
-      arm_gnn
+    all|strict)
       arm_lint
       arm_types
+      arm_fast
+      arm_build
+      arm_website
+      arm_python
+      arm_docs
+      arm_gnn
       ;;
     help|-h|--help)
       usage

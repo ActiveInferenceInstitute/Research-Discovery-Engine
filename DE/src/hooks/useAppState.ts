@@ -63,6 +63,10 @@ interface AppActions {
   togglePDFUploader: () => void;
   toggleBrowserSidebar: () => void;
 
+  showLLMResult: (title: string, content: string) => void;
+  startLLMLoading: (title: string) => void;
+  closeLLMResultModal: () => void;
+
   // Agent Actions
   addAgentMessage: (message: Omit<AgentMessage, 'id' | 'timestamp'>) => void;
   triggerAgent: (action: string, payload?: any) => void;
@@ -164,7 +168,7 @@ export const useAppState = () => {
   const triggerAgent = useCallback((action: string, payload?: any) => {
     // Handle special actions that require direct state updates
     switch (action) {
-      case 'initiate-new-concept-from-selection':
+      case 'initiate-new-concept-from-selection': {
         setState(prev => ({
           ...prev,
           activeMode: 'create',
@@ -175,6 +179,7 @@ export const useAppState = () => {
         initializeConcept(seedNode);
         agentService.triggerAgent(action, payload, conceptDesignState, { nodes: graphData.nodes });
         break;
+      }
 
       case 'initiate-new-concept-from-goal':
         setState(prev => ({
@@ -188,7 +193,7 @@ export const useAppState = () => {
         agentService.triggerAgent(action, payload, conceptDesignState, { nodes: graphData.nodes });
         break;
 
-      case 'package-knowledge-artifact':
+      case 'package-knowledge-artifact': {
         // Create artifact and update graph
         const newArtifactNode: NodeObject = {
           id: `ka_${conceptDesignState.id}`,
@@ -196,7 +201,7 @@ export const useAppState = () => {
           label: `Artifact: ${conceptDesignState.objective || conceptDesignState.id}`,
           description: `This artifact details the proposed system '${conceptDesignState.objective}'.\nObjective: ${conceptDesignState.objective}\nMaterials: ${conceptDesignState.components.materials.join(', ')}\nMechanisms: ${conceptDesignState.components.mechanisms.join(', ')}\nProtocol Outline:\n${conceptDesignState.protocolOutline || 'Not generated.'}`,
           sourceFileKey: 'generated_artifacts',
-          size: 1,
+          value: 1,
           color: '#10B981'
         };
 
@@ -206,8 +211,7 @@ export const useAppState = () => {
             newLinks.push({
               source: newArtifactNode.id,
               target: materialId,
-              type: 'ComponentsEdge',
-              sourceFileKey: 'generated_artifacts'
+              type: 'concept-uses-component'
             });
           }
         });
@@ -222,11 +226,12 @@ export const useAppState = () => {
           sourceAgent: 'ConceptAgent',
           type: 'success',
           content: `Knowledge Artifact '${newArtifactNode.label}' created and added to the graph.`,
-          action: { type: 'select-node', payload: newArtifactNode.id, label: "View Artifact" }
+          relatedNodeIds: [newArtifactNode.id]
         });
         break;
+      }
 
-      case 'integrate-data':
+      case 'integrate-data': {
         const newData = payload;
         if (newData && newData.nodes && newData.links) {
           // Check if there's a view-llm-result action in the payload
@@ -252,6 +257,7 @@ export const useAppState = () => {
           });
         }
         break;
+      }
 
       case 'add-field-suggestion':
         if (payload && payload.field && payload.suggestion) {
@@ -283,7 +289,7 @@ export const useAppState = () => {
         setTimeout(() => {
           const isConsistent = Math.random() > 0.3;
           if (isConsistent) {
-            setConceptDesignState(prev => ({ ...prev, status: 'Proposed' }));
+            setConceptDesignState({ status: 'Proposed' });
           }
         }, 1500);
         break;

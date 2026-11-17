@@ -1,12 +1,12 @@
 // src/components/KnowledgeBrowserSidebar.tsx
 import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import { Loader, AlertCircle, ChevronDown, ChevronUp, BookOpen, ExternalLink, ChevronRight as ChevronRightIcon } from 'lucide-react';
-import { GraphData, NodeObject, ParsedSection } from '../../types';
+import { GraphData, NodeObject, ParsedSection } from '../types';
 import { parseMarkdownToStructuredDocument, ParserOutput, slugify } from '../utils/markdownParser';
-import ReactMarkdown from 'react-markdown';
+import ReactMarkdown, { type Components } from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import rehypeRaw from 'rehype-raw';
-import { WIKI_BROWSER_CONFIG } from '../App';
+import { WIKI_BROWSER_CONFIG } from '../constants';
 import { humanizeSlugForDisplay, findSectionById_local } from './WikiView/wikiViewUtils'; // Ensure path is correct
 
 interface KnowledgeBrowserSidebarProps {
@@ -89,7 +89,7 @@ const KnowledgeBrowserSidebar: React.FC<KnowledgeBrowserSidebarProps> = ({
   }, [graphData.nodes, onSelectNode]);
 
 
-  const renderIndexSections = useCallback((sections: ParsedSection[], fileKey: string, level = 0): JSX.Element[] => {
+  const renderIndexSections = useCallback((sections: ParsedSection[], fileKey: string, level = 0): React.JSX.Element[] => {
     return sections.map((section) => {
       if (section.title.toLowerCase().startsWith("index of")) {
         return section.subsections && section.subsections.length > 0 ?
@@ -118,19 +118,20 @@ const KnowledgeBrowserSidebar: React.FC<KnowledgeBrowserSidebarProps> = ({
           )}
         </React.Fragment>
       )
-    }).filter(Boolean) as JSX.Element[];
+    }).filter(Boolean) as React.JSX.Element[];
   }, [darkMode, handleSectionSelect]);
 
 
-  const indexMarkdownComponents = useMemo(() => ({
-    a: ({node: _n, href, children, ...props}: any) => {
+  const indexMarkdownComponents = useMemo<Components>(() => ({
+    a: ({ href, children, ...props}) => {
+          delete props.node;
         const linkText = React.Children.toArray(children).join('');
         const displayTitle = humanizeSlugForDisplay(linkText);
         if (href && href.startsWith('#')) {
             const targetId = href.substring(1);
             const currentFileKeyForIndex = filesContent.find(f => f.isOpen)?.key || WIKI_BROWSER_CONFIG[0]?.key || "";
             return (
-                <button {...props} onClick={() => handleSectionSelect(targetId, currentFileKeyForIndex)}
+                <button  onClick={() => handleSectionSelect(targetId, currentFileKeyForIndex)}
                     className={`wiki-index-link text-left w-full block py-1 px-1.5 focus:outline-none rounded-sm
                                 ${darkMode ? 'text-slate-300 hover:text-blue-300 hover:bg-slate-700' : 'text-slate-700 hover:text-blue-600 hover:bg-slate-100'}
                                 font-normal text-sm leading-snug`} >
@@ -140,13 +141,28 @@ const KnowledgeBrowserSidebar: React.FC<KnowledgeBrowserSidebarProps> = ({
         }
         return ( <a href={href} {...props} target="_blank" rel="noopener noreferrer" className={`inline-flex items-center ${darkMode ? 'text-pink-400 hover:text-pink-300' : 'text-pink-600 hover:text-pink-700'} hover:underline text-sm`}> {displayTitle} <ExternalLink size={12} className="ml-1 opacity-70"/></a> );
     },
-    ul: ({node: _n,ordered, className, children, ...props}: any) => <ul className={`wiki-index-ul ${ordered ? 'list-decimal' : ''} ${className || ''} pl-3 space-y-0.5`} {...props}>{children}</ul>,
-    li: ({node: _n,children, className, ...props}: any) => <li className={`wiki-index-li ${className|| ''}`} {...props}>{children}</li>,
+    ul: ({className, children, ...props}) => {
+          delete props.node;
+          return <ul className={`wiki-index-ul ${className || ''} pl-3 space-y-0.5`} {...props}>{children}</ul>;
+        },
+    li: ({children, className, ...props}) => {
+          delete props.node;
+          return <li className={`wiki-index-li ${className|| ''}`} {...props}>{children}</li>;
+        },
    // Use span instead of p to avoid nesting issues
-   p: ({node: _n, children, className}:any) => <span className={`block ${className || ''}`}>{children}</span>,
-    h1: ({node: _n, ...props}: any) => <h2 className="text-xs font-semibold mt-1 mb-0.5" {...props} />,
-    h2: ({node: _n, ...props}: any) => <h3 className="text-xs font-medium mt-1 mb-0.5" {...props} />,
-    h3: ({node: _n, ...props}: any) => <h4 className="text-xs font-medium mt-1 mb-0.5" {...props} />,
+   p: ({ children, className}) => <span className={`block ${className || ''}`}>{children}</span>,
+    h1: ({ ...props}) => {
+          delete props.node;
+          return <h2 className="text-xs font-semibold mt-1 mb-0.5" {...props} />;
+        },
+    h2: ({ ...props}) => {
+          delete props.node;
+          return <h3 className="text-xs font-medium mt-1 mb-0.5" {...props} />;
+        },
+    h3: ({ ...props}) => {
+          delete props.node;
+          return <h4 className="text-xs font-medium mt-1 mb-0.5" {...props} />;
+        },
 }), [darkMode, filesContent, handleSectionSelect]);
 
   return (

@@ -41,18 +41,20 @@ function parseArgs(): CliOptions {
       case '--domain':
         options.domain = args[++i];
         break;
-      case '--type':
+      case '--type': {
         const type = args[++i];
         if (['extract_concepts', 'find_relationships', 'generate_questions', 'summarize', 'classify'].includes(type)) {
           options.type = type as any;
         }
         break;
-      case '--format':
+      }
+      case '--format': {
         const format = args[++i];
         if (['structured', 'narrative', 'bullets', 'json'].includes(format)) {
           options.format = format as any;
         }
         break;
+      }
       case '--headless':
         options.headless = true;
         break;

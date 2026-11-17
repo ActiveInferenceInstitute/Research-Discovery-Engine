@@ -2,7 +2,7 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { NodeObject, LinkObject as CNMLinkObject } from '../../types';
 import { FileText, ExternalLink, Brain, Zap, FlaskConical, Lightbulb, Network, Link2, BookOpen, Activity, Target, HelpCircle, Layers, Hash, ArrowDownCircle, ArrowUpCircle, Tag } from 'lucide-react';
-import ReactMarkdown from 'react-markdown';
+import ReactMarkdown, { type Components } from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import rehypeRaw from 'rehype-raw';
 import { slugify } from '../../utils/markdownParser';
@@ -81,7 +81,7 @@ const NodeViewHeader: React.FC<{
   );
 };
 
-const NodeViewDescription: React.FC<{ description: string; darkMode: boolean; markdownComponents: any; }> =
+const NodeViewDescription: React.FC<{ description: string; darkMode: boolean; markdownComponents: Components; }> =
  ({ description, darkMode, markdownComponents }) => {
   if (!description || description.trim() === '' || description.startsWith('*No detailed description')) {
     return <p className="italic text-sm text-slate-500 dark:text-slate-400 my-4">No primary description content provided for this node. Select a different node to view its details.</p>;
@@ -103,30 +103,15 @@ const NodeViewDescription: React.FC<{ description: string; darkMode: boolean; ma
 
 const NodeViewAttributes: React.FC<{
     attributes: ParsedNodeDetails['attributes'];
-    inputs: ParsedNodeDetails['inputs'];
-    outputs: ParsedNodeDetails['outputs'];
-    darkMode: boolean; markdownComponents: any;
+    inputs: ParsedNodeDetails['input'];
+    outputs: ParsedNodeDetails['output'];
+    darkMode: boolean; markdownComponents: Components;
 }> = ({ attributes, inputs, outputs, darkMode, markdownComponents }) => {
   const hasInputs = inputs && inputs.length > 0;
   const hasOutputs = outputs && outputs.length > 0;
   const hasAttributes = attributes && attributes.length > 0;
 
   if (!hasInputs && !hasOutputs && !hasAttributes) return null;
-
-  const renderLinkableItem = (item: { text: string; link?: string; originalMatch?: string }, index: number) => (
-    <li key={index} className="text-xs sm:text-sm text-slate-600 dark:text-slate-300 leading-snug">
-        {item.link ? (
-            <ReactMarkdown components={markdownComponents}>
-                {`[${item.text}](${item.link})`}
-            </ReactMarkdown>
-        ) : (
-            <ReactMarkdown components={markdownComponents}>
-                {item.originalMatch || item.text}
-            </ReactMarkdown>
-        )
-        }
-    </li>
-  );
 
   return (
     <section className={`grid grid-cols-1 ${(hasInputs || hasOutputs) && hasAttributes ? 'md:grid-cols-2' : 'md:grid-cols-1'} gap-3 mb-5`}>
@@ -138,7 +123,7 @@ const NodeViewAttributes: React.FC<{
                 <ArrowDownCircle className="text-blue-500 dark:text-blue-400 mr-1.5 h-4 w-4" />
                 <h3 className="text-[11px] sm:text-xs font-semibold uppercase tracking-wider text-slate-600 dark:text-slate-300">Key Inputs / Properties</h3>
             </div>
-            <ul className="list-none pl-1 space-y-0.5">{inputs.map(renderLinkableItem)}</ul>
+            <ReactMarkdown components={markdownComponents}>{inputs}</ReactMarkdown>
             </div>
         )}
         {hasOutputs && (
@@ -147,7 +132,7 @@ const NodeViewAttributes: React.FC<{
                 <ArrowUpCircle className="text-teal-500 dark:text-teal-400 mr-1.5 h-4 w-4" />
                 <h3 className="text-[11px] sm:text-xs font-semibold uppercase tracking-wider text-slate-600 dark:text-slate-300">Key Outputs / Behaviors</h3>
             </div>
-            <ul className="list-none pl-1 space-y-0.5">{outputs.map(renderLinkableItem)}</ul>
+            <ReactMarkdown components={markdownComponents}>{outputs}</ReactMarkdown>
             </div>
         )}
         </div>
@@ -174,26 +159,27 @@ const NodeViewAttributes: React.FC<{
 
 const NodeViewConnections: React.FC<{
   connectionsText?: string | null;
-  relatedConcepts: ParsedNodeDetails['relatedConcepts'];
+  relatedConcepts: ParsedNodeDetails['relatedToTextItems'];
   exampleCitations: ParsedNodeDetails['exampleCitations'];
   graphLinks: { [key: string]: { link: CNMLinkObject, targetNode: NodeObject }[] };
   darkMode: boolean;
-  markdownComponents: any;
+  markdownComponents: Components;
   onSelectNode: NodeViewProps['onSelectNode'];
-}> = ({ connectionsText, relatedConcepts, exampleCitations, graphLinks, darkMode, markdownComponents, onSelectNode }) => {
+  onPaperClick: NodeViewProps['onPaperClick'];
+}> = ({ connectionsText, relatedConcepts, exampleCitations, graphLinks, darkMode, markdownComponents, onSelectNode, onPaperClick }) => {
 
-  const getInitialActiveTab = () => {
+  const getInitialActiveTab = React.useCallback(() => {
     if (relatedConcepts && relatedConcepts.length > 0) return 'related';
     if (Object.keys(graphLinks).length > 0) return 'graph';
     if (connectionsText && connectionsText.trim && connectionsText.trim() !== "") return 'text';
     if (exampleCitations && exampleCitations.length > 0) return 'citations';
-    return 'related';
-  };
+    return 'related' as const;
+  }, [relatedConcepts, graphLinks, connectionsText, exampleCitations]);
   const [activeTab, setActiveTab] = useState<'related' | 'graph' | 'text' | 'citations'>(getInitialActiveTab());
 
   useEffect(() => {
     setActiveTab(getInitialActiveTab());
-  }, [relatedConcepts, graphLinks, connectionsText, exampleCitations]);
+  }, [getInitialActiveTab]);
 
   const hasRelated = relatedConcepts && relatedConcepts.length > 0;
   const hasGraphLinks = Object.keys(graphLinks).length > 0;
@@ -231,11 +217,7 @@ const NodeViewConnections: React.FC<{
             <div className="flex flex-wrap gap-1">
               {relatedConcepts.map((item, index) => (
                 <div key={index} className={`inline-block px-1.5 py-0.5 rounded-full text-[11px] font-medium transition-colors ${darkMode ? 'bg-slate-700 text-slate-200' : 'bg-slate-100 text-slate-700'}`}>
-                   {item.link ? (
-                        <ReactMarkdown components={markdownComponents}>
-                            {`[${item.text}](${item.link})`}
-                        </ReactMarkdown>
-                    ) : item.text}
+                   <ReactMarkdown components={markdownComponents}>{item}</ReactMarkdown>
                 </div>
               ))}
             </div>
@@ -326,7 +308,11 @@ const NodeView: React.FC<NodeViewProps> = ({
     allNodes,
     onSelectNode,
     onPaperClick,
-    onNavigateToWikiSection,
+    onNavigateToWikiSection: (targetNav) => {
+      const [file, section] = targetNav.split('::');
+      if (section !== undefined) onNavigateToWikiSection(file, section);
+      else if (node.sourceFileKey) onNavigateToWikiSection(node.sourceFileKey, file);
+    },
     onNavigateToNodeViewSection: (sectionSlug) => {
         const element = scrollRef.current?.querySelector(`#${sectionSlug}`);
         element?.scrollIntoView({ behavior: 'smooth', block: 'start' });
@@ -334,24 +320,52 @@ const NodeView: React.FC<NodeViewProps> = ({
     currentFileKey: node.sourceFileKey
   }), [darkMode, allNodes, onSelectNode, onPaperClick, onNavigateToWikiSection, node.sourceFileKey]);
 
-  const nodeViewMarkdownComponents = useMemo(() => ({
-    h1: ({node: _n, ...props}: any) => <h1 id={props.id || slugify(React.Children.toArray(props.children).join(''))} className="text-xl font-bold mt-4 mb-2 border-b pb-1 dark:border-slate-600" {...props}></h1>,
-    h2: ({node: _n, ...props}: any) => <h2 id={props.id || slugify(React.Children.toArray(props.children).join(''))} className="text-lg font-semibold mt-3 mb-1.5 border-b pb-0.5 dark:border-slate-700" {...props}></h2>,
-    h3: ({node: _n, ...props}: any) => <h3 id={props.id || slugify(React.Children.toArray(props.children).join(''))} className="text-base font-semibold mt-2 mb-1" {...props}></h3>,
-    h4: ({node: _n, ...props}: any) => <h4 id={props.id || slugify(React.Children.toArray(props.children).join(''))} className="text-sm font-semibold mt-1.5 mb-0.5 flex items-center" {...props}><Hash size={13} className="mr-1 text-slate-500 dark:text-slate-400 opacity-70"/>{props.children}</h4>,
+  const nodeViewMarkdownComponents = useMemo<Components>(() => ({
+    h1: ({ ...props}) => {
+          delete props.node;
+          return <h1 id={props.id || slugify(React.Children.toArray(props.children).join(''))} className="text-xl font-bold mt-4 mb-2 border-b pb-1 dark:border-slate-600" {...props}></h1>;
+        },
+    h2: ({ ...props}) => {
+          delete props.node;
+          return <h2 id={props.id || slugify(React.Children.toArray(props.children).join(''))} className="text-lg font-semibold mt-3 mb-1.5 border-b pb-0.5 dark:border-slate-700" {...props}></h2>;
+        },
+    h3: ({ ...props}) => {
+          delete props.node;
+          return <h3 id={props.id || slugify(React.Children.toArray(props.children).join(''))} className="text-base font-semibold mt-2 mb-1" {...props}></h3>;
+        },
+    h4: ({ ...props}) => {
+          delete props.node;
+          return <h4 id={props.id || slugify(React.Children.toArray(props.children).join(''))} className="text-sm font-semibold mt-1.5 mb-0.5 flex items-center" {...props}><Hash size={13} className="mr-1 text-slate-500 dark:text-slate-400 opacity-70"/>{props.children}</h4>;
+        },
    // Use div instead of p to avoid nesting issues with pre/code elements
-   p: ({node: _n, ...props}: any) => <div className="my-1.5 leading-relaxed text-sm" {...props}></div>,
-    ul: ({node: _n, ...props}: any) => <ul className="list-disc pl-5 my-1.5 space-y-0.5 text-sm" {...props}></ul>,
+   p: ({ ...props}) => {
+          delete props.node;
+          return <div className="my-1.5 leading-relaxed text-sm" {...props}></div>;
+        },
+    ul: ({ ...props}) => {
+          delete props.node;
+          return <ul className="list-disc pl-5 my-1.5 space-y-0.5 text-sm" {...props}></ul>;
+        },
     // CORRECTED THE ol COMPONENT HERE
-    ol: ({node: _n, ...props}: any) => <ol className="list-decimal pl-5 my-1.5 space-y-0.5 text-sm" {...props}></ol>,
-    li: ({node: _n, ...props}: any) => <li className="my-0.5 text-sm leading-relaxed" {...props}></li>,
-    code: ({ node: _n, inline, className, children, ...props }: any) => {
+    ol: ({ ...props}) => {
+          delete props.node;
+          return <ol className="list-decimal pl-5 my-1.5 space-y-0.5 text-sm" {...props}></ol>;
+        },
+    li: ({ ...props}) => {
+          delete props.node;
+          return <li className="my-0.5 text-sm leading-relaxed" {...props}></li>;
+        },
+    code: ({ className, children, ...props }) => {
+          delete props.node;
         const childText = React.Children.toArray(children).join('');
-        return inline
+        return !className
             ? <code {...props} className={`px-1 py-0.5 rounded text-xs font-mono ${darkMode ? 'bg-slate-700 text-amber-300' : 'bg-slate-200 text-amber-700'}`}>{childText.trim()}</code>
-            : <pre {...props} className={`p-2 my-1.5 rounded-md overflow-x-auto text-xs border ${darkMode ? 'bg-slate-900/70 border-slate-700' : 'bg-slate-50 border-slate-300'}`}><code className={`font-mono ${className}`}>{childText.trim()}</code></pre>;
+            : <pre className={`p-2 my-1.5 rounded-md overflow-x-auto text-xs border ${darkMode ? 'bg-slate-900/70 border-slate-700' : 'bg-slate-50 border-slate-300'}`}><code className={`font-mono ${className}`}>{childText.trim()}</code></pre>;
     },
-    blockquote: ({node: _n, ...props}: any) => <blockquote className={`border-l-4 pl-3 italic my-1.5 py-0.5 text-sm ${darkMode ? 'border-slate-600 text-slate-400 bg-slate-700/30' : 'border-slate-300 text-slate-600 bg-slate-100/50'}`} {...props}></blockquote>,
+    blockquote: ({ ...props}) => {
+          delete props.node;
+          return <blockquote className={`border-l-4 pl-3 italic my-1.5 py-0.5 text-sm ${darkMode ? 'border-slate-600 text-slate-400 bg-slate-700/30' : 'border-slate-300 text-slate-600 bg-slate-100/50'}`} {...props}></blockquote>;
+        },
     a: nodeViewMarkdownLinkRenderer,
   }), [darkMode, nodeViewMarkdownLinkRenderer]);
 
@@ -379,8 +393,8 @@ const NodeView: React.FC<NodeViewProps> = ({
 
       <NodeViewAttributes
         attributes={parsedDetails.attributes}
-        inputs={parsedDetails.inputs}
-        outputs={parsedDetails.outputs}
+        inputs={parsedDetails.input}
+        outputs={parsedDetails.output}
         darkMode={darkMode}
         markdownComponents={nodeViewMarkdownComponents}
       />
@@ -392,8 +406,8 @@ const NodeView: React.FC<NodeViewProps> = ({
       />
 
       <NodeViewConnections
-        connectionsText={parsedDetails.connectionsText}
-        relatedConcepts={parsedDetails.relatedConcepts}
+        connectionsText={parsedDetails.linksConnectionsContent}
+        relatedConcepts={parsedDetails.relatedToTextItems}
         exampleCitations={parsedDetails.exampleCitations}
         graphLinks={useMemo(() => {
             const groups: { [key: string]: { link: CNMLinkObject, targetNode: NodeObject }[] } = {};
@@ -415,6 +429,7 @@ const NodeView: React.FC<NodeViewProps> = ({
         darkMode={darkMode}
         markdownComponents={nodeViewMarkdownComponents}
         onSelectNode={onSelectNode}
+        onPaperClick={onPaperClick}
       />
 
       {isDesignable && onStartDesign && onTriggerAgent && (

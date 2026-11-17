@@ -13,6 +13,7 @@ interface CSSFieldProps {
   onUpdate: (fieldPath: string, value: any) => void;
   onAcceptSuggestion: (fieldPath: string, suggestionValue: any) => void;
   onTriggerAgent: (action: string, payload?: any) => void; // For triggering field-specific agent actions
+  onSelectNode?: (node: NodeObject) => void;
   cnmNodes: NodeObject[]; // All CNM nodes to find nodes by ID from suggestions
 }
 
@@ -25,6 +26,7 @@ const CSSField: React.FC<CSSFieldProps> = ({
   onUpdate,
   onAcceptSuggestion,
   onTriggerAgent,
+  onSelectNode,
   cnmNodes
 }) => {
   const [isEditing, setIsEditing] = useState(false); // To show dropdown/input
@@ -167,7 +169,7 @@ const CSSField: React.FC<CSSFieldProps> = ({
                               <div className="flex flex-wrap gap-1 mt-1">
                                    {suggestionMsg.relatedNodeIds.map(nodeId => {
                                         const relatedNode = getNodeById(nodeId);
-                                        return relatedNode ? (
+                                        return relatedNode && onSelectNode ? (
                                              <button
                                                   key={nodeId}
                                                   className={`px-2 py-0.5 text-xs rounded-full ${darkMode ? 'bg-gray-700 hover:bg-gray-600' : 'bg-gray-200 hover:bg-gray-300'} flex items-center space-x-1`}
@@ -189,7 +191,7 @@ const CSSField: React.FC<CSSFieldProps> = ({
                            className={`px-3 py-1 rounded-md text-xs ${darkMode ? 'bg-blue-600 hover:bg-blue-700' : 'bg-blue-500 hover:bg-blue-600'} text-white transition-colors`}
                             onClick={() => {
                                 // Assume payload has the value to use
-                                onAcceptSuggestion(fieldPath, suggestionMsg.action.payload.value);
+                                onAcceptSuggestion(fieldPath, suggestionMsg.action?.payload?.value);
                                 setIsEditing(false); // Close suggestions/editing after accepting
                             }}
                         >
@@ -198,7 +200,7 @@ const CSSField: React.FC<CSSFieldProps> = ({
                     </div>
                 )}
                  {/* Handle other action types */}
-                  {suggestionMsg.action?.type === 'trigger-agent' && (
+                  {suggestionMsg.action?.type === 'trigger-agent-action' && (
                        <div className="mt-2 text-right">
                              <button
                                 className={`px-3 py-1 rounded-md text-xs ${darkMode ? 'bg-yellow-600 hover:bg-yellow-700' : 'bg-yellow-500 hover:bg-yellow-600'} text-white transition-colors`}

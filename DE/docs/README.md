@@ -236,8 +236,8 @@ no `test` script. What exists:
   of the gate.
 - **Testing utilities** in `src/utils/testUtils.ts`: mock graph data, mock agent
   messages, mock concept state and graph assertions, as plain functions.
-- **Red checks**: `./run.sh lint` and `./run.sh types` are runnable and report
-  pre-existing findings; see [`../../Docs/RUN_GUIDE.md`](../../Docs/RUN_GUIDE.md#known-red-checks).
+- **Frontend checks**: `./run.sh lint` and `./run.sh types` both block `all` and CI;
+  see the [run guide](../../Docs/RUN_GUIDE.md#strict-frontend-checks).
 
 ## 🔒 Security
 

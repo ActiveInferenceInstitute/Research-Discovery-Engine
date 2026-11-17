@@ -578,7 +578,9 @@ export const graphTestUtils = {
 
     // Check that all links reference existing nodes
     return graphData.links.every(link => {
-      return nodeIds.has(link.source) && nodeIds.has(link.target);
+      const source = typeof link.source === 'string' ? link.source : link.source.id;
+      const target = typeof link.target === 'string' ? link.target : link.target.id;
+      return nodeIds.has(source) && nodeIds.has(target);
     });
   }
 };

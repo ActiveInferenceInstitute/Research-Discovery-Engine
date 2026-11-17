@@ -64,12 +64,13 @@ function parseArgs(): CliOptions {
       case '--methods':
         options.methods = args[++i]?.split(',').map(s => s.trim()) || [];
         break;
-      case '--detail-level':
+      case '--detail-level': {
         const level = args[++i];
         if (['basic', 'intermediate', 'advanced'].includes(level)) {
           options.detailLevel = level as 'basic' | 'intermediate' | 'advanced';
         }
         break;
+      }
       case '--output-file':
         options.outputFile = args[++i];
         break;

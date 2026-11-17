@@ -87,19 +87,21 @@ function parseArgs(): CliOptions {
       case '--validate':
         options.validate = true;
         break;
-      case '--find-path':
+      case '--find-path': {
         const source = args[++i];
         const target = args[++i];
         if (source && target) {
           options.findPath = [source, target];
         }
         break;
-      case '--output-format':
+      }
+      case '--output-format': {
         const format = args[++i];
         if (['json', 'readable'].includes(format)) {
           options.outputFormat = format as 'json' | 'readable';
         }
         break;
+      }
       case '--headless':
         options.headless = true;
         break;

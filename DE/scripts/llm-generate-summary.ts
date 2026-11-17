@@ -37,12 +37,13 @@ function parseArgs(): CliOptions {
       case '--domain':
         options.domain = args[++i];
         break;
-      case '--format':
+      case '--format': {
         const format = args[++i];
         if (['markdown', 'json'].includes(format)) {
           options.format = format as 'markdown' | 'json';
         }
         break;
+      }
       case '--headless':
         options.headless = true;
         break;

@@ -318,7 +318,7 @@ export class AgentService {
     const contentSummary = this.createContentSummary(llmContent, action);
 
     // Create appropriate action payload for viewing in new window
-    let messageAction = {
+    let messageAction: NonNullable<AgentMessage['action']> = {
       type: 'view-llm-result',
       label: 'View Full Analysis',
       payload: {}

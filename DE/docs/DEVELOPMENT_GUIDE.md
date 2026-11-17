@@ -57,12 +57,12 @@ The repository gate wraps these commands; from the repository root:
 ```bash
 ./run.sh fast      # credential-free harness subsets
 ./run.sh build     # this directory's production build
-./run.sh lint      # ESLint findings (currently red, see below)
-./run.sh types     # npx tsc -b (currently red, see below)
+./run.sh lint      # ESLint findings
+./run.sh types     # npx tsc -b
 ./run.sh all       # what CI runs
 ```
 
-`lint` and `types` are runnable but not green: after the ESLint 10 flat-config migration `npm run lint` reports pre-existing findings, and `npx tsc -b` reports the pre-existing error surface. Neither is enforced by CI yet; see [`../../Docs/RUN_GUIDE.md`](../../Docs/RUN_GUIDE.md#known-red-checks) and the measured counts in [`../../Docs/GATE_METRICS.md`](../../Docs/GATE_METRICS.md).
+`lint` and `types` are blocking in `all` and CI. See the [run guide](../../Docs/RUN_GUIDE.md#strict-frontend-checks) and [gate metrics](../../Docs/GATE_METRICS.md).
 
 ### Styling and lint toolchain
 
@@ -603,8 +603,8 @@ For development questions and support:
 - **[Component Architecture](COMPONENTS.md)**: Detailed component documentation
 - **Current Status**: `FINAL_STATUS.md` records what the tree verifiably does and what remains incomplete
 - **Development History**: See the repository commit history and `REVIEW_LOG_2026-08-02.md`
-- **Coding Standards**: Project conventions documented in this guide. `npm run lint` runs under the ESLint 10 flat config and reports pre-existing findings; `npx tsc -b` reports the pre-existing type surface. Neither is enforced by CI — see [`../../Docs/RUN_GUIDE.md`](../../Docs/RUN_GUIDE.md#known-red-checks).
+- **Coding Standards**: `./run.sh lint` and `./run.sh types` run in `all` and CI; see the [run guide](../../Docs/RUN_GUIDE.md#strict-frontend-checks).
 - **TypeScript Documentation**: [Official TypeScript docs](https://www.typescriptlang.org/docs/)
 - **React Documentation**: [Official React docs](https://react.dev/)
 
-**Happy Coding! 🎉** The Research Discovery Engine is now a professional, maintainable platform ready for continued development and innovation. 
+**Happy Coding! 🎉** The Research Discovery Engine is now a professional, maintainable platform ready for continued development and innovation.

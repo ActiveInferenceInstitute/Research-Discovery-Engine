@@ -446,7 +446,7 @@ export const formatTimestamp = (
   const now = new Date();
 
   switch (format) {
-    case 'relative':
+    case 'relative': {
       const diffMs = now.getTime() - timestamp;
       const diffSecs = Math.floor(diffMs / 1000);
       const diffMins = Math.floor(diffSecs / 60);
@@ -458,6 +458,7 @@ export const formatTimestamp = (
       if (diffHours < 24) return `${diffHours}h ago`;
       if (diffDays < 7) return `${diffDays}d ago`;
       return date.toLocaleDateString();
+    }
 
     case 'time-only':
       return date.toLocaleTimeString(undefined, {

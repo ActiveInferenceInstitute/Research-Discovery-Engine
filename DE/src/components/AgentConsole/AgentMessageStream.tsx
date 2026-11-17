@@ -44,7 +44,7 @@ const AgentMessageStream: React.FC<AgentMessageStreamProps> = ({
       case 'suggestion': return <Lightbulb size={16} className="text-green-500" />;
       case 'warning': return <AlertTriangle size={16} className="text-orange-500" />;
       case 'error': return <AlertTriangle size={16} className="text-red-500" />;
-      case 'command': return <Brain size={16} className="text-purple-500" />;
+      case 'command_confirmation': return <Brain size={16} className="text-purple-500" />;
       default: return <MessageSquare size={16} className={darkMode ? 'text-gray-400' : 'text-gray-600'} />;
     }
   };

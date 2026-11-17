@@ -7,13 +7,14 @@ import { CSSVector, AgentMessage, NodeObject } from '../../types';
 
 interface CSSSectionProps {
   darkMode: boolean;
-  sectionId: keyof CSSVector; // e.g., 'context'
+  sectionId: keyof Omit<CSSVector, 'validation_score' | 'cognition_score' | 'criticality_score'>; // e.g., 'context'
   sectionLabel: string; // e.g., 'Context & Environment'
-  sectionData: Partial<CSSVector[keyof CSSVector]>; // Data for this section
+  sectionData: Partial<CSSVector[CSSSectionProps['sectionId']]>; // Data for this section
   fieldSuggestions: { [fieldPath: string]: AgentMessage[] }; // Suggestions for fields within this section
   onUpdateField: (fieldPath: string, value: any) => void;
   onAcceptSuggestion: (fieldPath: string, suggestionValue: any) => void;
   onTriggerAgent: (action: string, payload?: any) => void;
+  onSelectNode?: (node: NodeObject) => void;
   cnmNodes: NodeObject[]; // All CNM nodes for lookup
 }
 
@@ -26,6 +27,7 @@ const CSSSection: React.FC<CSSSectionProps> = ({
   onUpdateField,
   onAcceptSuggestion,
   onTriggerAgent,
+  onSelectNode,
   cnmNodes
 }) => {
   const [isExpanded, setIsExpanded] = useState(true); // Start expanded
@@ -69,6 +71,7 @@ const CSSSection: React.FC<CSSSectionProps> = ({
                    onUpdate={onUpdateField}
                    onAcceptSuggestion={onAcceptSuggestion}
                    onTriggerAgent={onTriggerAgent}
+                   onSelectNode={onSelectNode}
                    cnmNodes={cnmNodes}
                  />
              );

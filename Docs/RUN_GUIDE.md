@@ -33,10 +33,10 @@ fresh environments under `.gate/` (CPython `GATE_PYTHON_VERSION`, default 3.12).
 | `python` | `./run.sh python` | `path/requirements.txt` resolves and `path/research_paths.py` runs end to end over `DE/KG` into a scratch directory, writing only non-empty outputs; the website's `requirements.txt` resolves, every module under `api/` compiles, the routes import, and both `api/index.py` and `api/index_bp.py` answer `GET /api/flask_check` (200) and refuse a malformed `POST /api/subscribe` (400) with placeholder Supabase settings and no Mistral key | `python` |
 | `docs` | `./run.sh docs` | relative Markdown links and anchors resolve; Publishing artifact digests match and the canonical drift selftest passes | `gate` |
 | `gnn` | `./run.sh gnn` | the pinned GNN parser installs at the pinned revision, then parses and type-checks the conformance target | `gnn-conformance` |
-| `lint` | `./run.sh lint` | ESLint findings in `DE/` (currently red — see below) | none |
-| `types` | `./run.sh types` | `tsc -b` findings in `DE/` (currently red — see below) | none |
-| `all` | `./run.sh all` | `fast` + `build` + `website` + `python` + `docs` + `gnn` | all four |
-| `strict` | `./run.sh strict` | `all` + `lint` + `types` | none |
+| `lint` | `./run.sh lint` | ESLint reports zero errors and warnings in `DE/` | `gate` |
+| `types` | `./run.sh types` | `tsc -b` checks the `DE/` app and Node projects | `gate` |
+| `all` | `./run.sh all` | `lint` + `types` + `fast` + `build` + `website` + `python` + `docs` + `gnn` | all four |
+| `strict` | `./run.sh strict` | alias for `all` | all four |
 | `metrics` | `./run.sh metrics` | re-measures every arm and rewrites [`GATE_METRICS.md`](GATE_METRICS.md) | none |
 
 The frontend build is deliberately **not** part of `fast`: `fast` has to stay
@@ -76,28 +76,16 @@ heading anchor.
 ./run.sh docs --verbose   # counts the links and files it walked
 ```
 
-## Known red checks
+## Strict frontend checks
 
-Two checks are runnable and non-zero today. They are reported by `./run.sh
-strict` and by the generated [gate metrics](GATE_METRICS.md); they are **not**
-enforced by `./run.sh all` or by CI.
+`lint` enforces the existing ESLint rules and treats warnings as failures.
+`types` runs `tsc -b`, so it checks both project references rather than invoking
+bare `tsc` against the solution file. Both arms block `all` and run in CI.
 
-**This is a blocking debt, not an exemption.** [Issue
-#79](https://github.com/ActiveInferenceInstitute/Research-Discovery-Engine/issues/79)
-is the acceptance line: `./run.sh strict` must exit 0, and adding `lint` and
-`types` to `./run.sh all` (and therefore to CI) is the closure action for that
-issue — not a separate decision. The gate landed with both arms red; that is
-recorded here and in the issue so the deviation stays visible.
+### Known red checks
 
-| Check | Command | State |
-| --- | --- | --- |
-| `lint` | `./run.sh lint` | `npm run lint` runs after the ESLint 10 flat-config migration, but reports pre-existing findings: mainly `@typescript-eslint/no-explicit-any` and `@typescript-eslint/no-unused-vars`, and `--max-warnings 0` turns them into a failure. |
-| `types` | `./run.sh types` | `tsc -b` runs to completion after the 2026-11-06 parse repair and reports the real, pre-existing error surface — most of them missing exports, a stale `LinkObject` shape, and a handful of identifiers that no longer exist. |
-
-Neither check is a formality: the counts are recorded by `./run.sh metrics`, so a
-change that makes either worse shows up in the diff of `Docs/GATE_METRICS.md`.
-The DE build still runs a bare `tsc` that checks nothing (`tsconfig.json` is a
-solution file), so `build` does not prove the type surface.
+This was the previous section title; see [Strict frontend checks](#strict-frontend-checks)
+for current policy.
 
 ## Measuring
 

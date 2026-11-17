@@ -26,13 +26,13 @@ export const generateId = (prefix?: string): string => {
  * @example
  * const debouncedSearch = debounce(handleSearch, 300);
  */
-export const debounce = <T extends (...args: any[]) => any>(
-  func: T,
+export const debounce = <Args extends unknown[]>(
+  func: (...args: Args) => void,
   delay: number
-): ((...args: Parameters<T>) => void) => {
+): ((...args: Args) => void) => {
   let timeoutId: NodeJS.Timeout;
   
-  return (...args: Parameters<T>) => {
+  return (...args: Args) => {
     clearTimeout(timeoutId);
     timeoutId = setTimeout(() => func(...args), delay);
   };
@@ -46,13 +46,13 @@ export const debounce = <T extends (...args: any[]) => any>(
  * @example
  * const throttledScroll = throttle(handleScroll, 100);
  */
-export const throttle = <T extends (...args: any[]) => any>(
-  func: T,
+export const throttle = <Args extends unknown[]>(
+  func: (...args: Args) => void,
   interval: number
-): ((...args: Parameters<T>) => void) => {
+): ((...args: Args) => void) => {
   let lastCall = 0;
   
-  return (...args: Parameters<T>) => {
+  return (...args: Args) => {
     const now = Date.now();
     if (now - lastCall >= interval) {
       lastCall = now;
@@ -84,7 +84,7 @@ export const deepClone = <T>(obj: T): T => {
   if (typeof obj === 'object') {
     const cloned = {} as T;
     for (const key in obj) {
-      if (obj.hasOwnProperty(key)) {
+      if (Object.prototype.hasOwnProperty.call(obj, key)) {
         cloned[key] = deepClone(obj[key]);
       }
     }
@@ -237,7 +237,7 @@ export const toTitleCase = (str: string): string => {
  * const empty = isEmpty(''); // true
  * const notEmpty = isEmpty('hello'); // false
  */
-export const isEmpty = (value: any): boolean => {
+export const isEmpty = (value: unknown): boolean => {
   if (value === null || value === undefined) return true;
   if (typeof value === 'string') return value.trim().length === 0;
   if (Array.isArray(value)) return value.length === 0;
@@ -256,7 +256,7 @@ export const isEmpty = (value: any): boolean => {
  */
 export const removeDuplicates = <T>(
   array: T[],
-  keyFn?: (item: T) => any
+  keyFn?: (item: T) => unknown
 ): T[] => {
   if (!keyFn) {
     return [...new Set(array)];
