@@ -14,6 +14,8 @@ pip install -r requirements.txt
 python research_paths.py
 ```
 
+The repository gate runs this pipeline end to end: `./run.sh python` (from the repository root) installs `requirements.txt` into a fresh `uv` environment under `.gate/`, runs `research_paths.py` into a scratch directory and fails if it writes nothing or an empty file. The `python` job in `.github/workflows/ci.yml` runs the same command. See [`../Docs/RUN_GUIDE.md`](../Docs/RUN_GUIDE.md).
+
 `research_paths.py` currently has no command-line argument parser; its input files, output directory, and trajectory endpoints are configured in the module. It reads the six category files from the canonical knowledge base in `../DE/KG/`:
 
 - `applications.md`

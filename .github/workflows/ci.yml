@@ -69,6 +69,28 @@ jobs:
       - name: Build the Next.js site
         run: ./run.sh website
 
+  python:
+    name: python (path analysis + website Flask API)
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      # Same pinned uv/CPython setup as the gnn job; caching is off for the
+      # same reason (no uv.lock). The arm builds one fresh environment per
+      # requirements.txt under .gate/.
+      - name: Set up Python with uv
+        uses: ActiveInferenceInstitute/.github/.github/actions/setup-python-uv@7159e67315330aac8e414aebae0ad1e999a41448
+        with:
+          python-version: "3.12"
+          enable-cache: "false"
+
+      # path/research_paths.py end to end over DE/KG, then the website's Flask
+      # API (compile, route imports, two in-process requests) with placeholder
+      # Supabase settings and no Mistral key.
+      - name: Python components
+        run: ./run.sh python
+
   # GNN pin: .github/gnn-pin.json (schema gnn-importer-pin/v1, v5.0.3,
   # 8f293d9ba810e6eda5c09842d9c7ed9ffa5f92c1). What this job parses is
   # recorded in .github/GNN.md.

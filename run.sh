@@ -8,11 +8,12 @@
 #   ./run.sh fast      credential-free test harness subsets (unit, integration, validation)
 #   ./run.sh build     DE production build, including the knowledge-base assertion
 #   ./run.sh website   website_explore_the_unknown production build (Next.js)
+#   ./run.sh python    path/ analysis run + website Flask API check, each in a fresh uv env
 #   ./run.sh docs      relative Markdown links, anchors and Publishing artifact digests
 #   ./run.sh gnn       pinned GNN parser conformance (see .github/GNN.md)
 #   ./run.sh lint      ESLint over DE/ (known red: pre-existing findings, see docs)
 #   ./run.sh types     tsc -b over DE/ (known red: pre-existing errors, see docs)
-#   ./run.sh all       fast + build + website + docs + gnn (the CI blocking set)
+#   ./run.sh all       fast + build + website + python + docs + gnn (the CI blocking set)
 #   ./run.sh strict    all + lint + types
 #   ./run.sh metrics   re-measure every arm and regenerate Docs/GATE_METRICS.md
 #
@@ -22,10 +23,11 @@ ROOT="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"
 DE_DIR="$ROOT/DE"
 WEBSITE_DIR="$ROOT/website_explore_the_unknown"
 PYTHON="${PYTHON:-python3}"
+GATE_PYTHON_VERSION="${GATE_PYTHON_VERSION:-3.12}"
 LOG_DIR="$ROOT/.gate/logs"
 
 usage() {
-  sed -n '3,19p' "${BASH_SOURCE[0]}" | sed 's/^# \{0,1\}//'
+  sed -n '3,20p' "${BASH_SOURCE[0]}" | sed 's/^# \{0,1\}//'
 }
 
 require_command() {
@@ -78,6 +80,38 @@ arm_website() {
   require_command npm
   require_node_modules "$WEBSITE_DIR"
   ( cd "$WEBSITE_DIR" && npm run build )
+}
+
+# Install one component's requirements.txt into a fresh environment under
+# .gate/ and print its interpreter. Never the contributor's own environment:
+# the arm checks exactly what that manifest resolves to today.
+component_python() {
+  local venv="$ROOT/.gate/venv-$1"
+  uv venv --quiet --clear --python "$GATE_PYTHON_VERSION" "$venv" >&2
+  uv pip install --quiet --python "$venv/bin/python" -r "$2" >&2
+  printf '%s\n' "$venv/bin/python"
+}
+
+arm_python() {
+  require_command uv
+  local python scratch outputs written
+  # path/: the whole research-path analysis over DE/KG, written to a scratch
+  # directory (the script writes relative to its working directory).
+  python="$(component_python path "$ROOT/path/requirements.txt")"
+  scratch="$(mktemp -d)"
+  ( cd "$scratch" && MPLBACKEND=Agg "$python" -B "$ROOT/path/research_paths.py" )
+  outputs="$scratch/knowledge_graph_final_definitive"
+  written="$(find "$outputs" -type f -size +0 | wc -l | tr -d ' ')"
+  if [ "$written" -eq 0 ] || [ -n "$(find "$outputs" -type f -size 0 -print -quit)" ]; then
+    echo "run.sh: path/research_paths.py wrote no output or an empty file" >&2
+    rm -rf "$scratch"
+    return 1
+  fi
+  rm -rf "$scratch"
+  echo "path: research_paths.py completed over DE/KG and wrote $written non-empty files"
+  # website_explore_the_unknown/: the Flask API, without credentials or network.
+  python="$(component_python website "$WEBSITE_DIR/requirements.txt")"
+  "$python" -B "$ROOT/scripts/gate/website_api_smoke.py" "$WEBSITE_DIR"
 }
 
 arm_docs() {
@@ -138,6 +172,7 @@ main() {
     fast) arm_fast "$@" ;;
     build) arm_build "$@" ;;
     website) arm_website "$@" ;;
+    python) arm_python "$@" ;;
     docs) arm_docs "$@" ;;
     gnn) arm_gnn "$@" ;;
     lint) arm_lint "$@" ;;
@@ -147,6 +182,7 @@ main() {
       arm_fast
       arm_build
       arm_website
+      arm_python
       arm_docs
       arm_gnn
       ;;
@@ -154,6 +190,7 @@ main() {
       arm_fast
       arm_build
       arm_website
+      arm_python
       arm_docs
       arm_gnn
       arm_lint

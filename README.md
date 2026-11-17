@@ -63,6 +63,7 @@ workflows call these arms rather than restating them.
 ./run.sh fast      # credential-free test harness subsets
 ./run.sh build     # DE production build + knowledge-base assertion
 ./run.sh website   # Next.js 16 production build
+./run.sh python    # path/ analysis run + website Flask API check (needs uv)
 ./run.sh docs      # relative Markdown links and anchors
 ./run.sh gnn       # pinned GNN parser conformance
 ./run.sh all       # everything CI runs

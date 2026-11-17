@@ -53,6 +53,7 @@
 | `fast` | `./run.sh fast` | `.` | Run the credential-free unit, integration and validation harness subsets. |
 | `build` | `./run.sh build` | `.` | Build the Discovery Engine frontend and assert the knowledge base in dist. |
 | `website` | `./run.sh website` | `.` | Build the Next.js website. |
+| `python` | `./run.sh python` | `.` | Run the path/ analysis and the website Flask API check in fresh uv environments. |
 | `docs` | `./run.sh docs` | `.` | Check relative links and pinned Publishing artifacts; index is Docs/documentation-index.md. |
 | `gnn` | `./run.sh gnn` | `.` | Run parser conformance using .github/gnn-pin.json. |
 | `lint` | `./run.sh lint` | `.` | Run DE ESLint; admitted red and excluded from all. |
