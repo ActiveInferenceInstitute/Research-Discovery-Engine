@@ -77,6 +77,9 @@ tasks:
   website:
     cmd: ./run.sh website
     description: Build the Next.js website.
+  python:
+    cmd: ./run.sh python
+    description: Run the path/ analysis and the website Flask API check in fresh uv environments.
   docs:
     cmd: ./run.sh docs
     description: Check relative links and pinned Publishing artifacts; index is Docs/documentation-index.md.

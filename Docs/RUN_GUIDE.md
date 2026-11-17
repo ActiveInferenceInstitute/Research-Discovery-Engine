@@ -19,6 +19,9 @@ cd website_explore_the_unknown && npm ci && cd ..
 ```
 
 The Python arms need only `python3`; `./run.sh gnn` creates its own environment.
+`./run.sh python` needs [`uv`](https://docs.astral.sh/uv/): it installs
+`path/requirements.txt` and `website_explore_the_unknown/requirements.txt` into
+fresh environments under `.gate/` (CPython `GATE_PYTHON_VERSION`, default 3.12).
 
 ## Arms
 
@@ -27,11 +30,12 @@ The Python arms need only `python3`; `./run.sh gnn` creates its own environment.
 | `fast` | `./run.sh fast` | the credential-free harness subsets (`unit`, `integration`, `validation`) pass and each report says `Failed: 0` | `gate` |
 | `build` | `./run.sh build` | `DE/` builds, the knowledge-base mirror is regenerated, and `dist/KG` carries every document and publication record | `gate` |
 | `website` | `./run.sh website` | the Next.js site builds, including its own TypeScript step | `website` |
+| `python` | `./run.sh python` | `path/requirements.txt` resolves and `path/research_paths.py` runs end to end over `DE/KG` into a scratch directory, writing only non-empty outputs; the website's `requirements.txt` resolves, every module under `api/` compiles, the routes import, and both `api/index.py` and `api/index_bp.py` answer `GET /api/flask_check` (200) and refuse a malformed `POST /api/subscribe` (400) with placeholder Supabase settings and no Mistral key | `python` |
 | `docs` | `./run.sh docs` | relative Markdown links and anchors resolve; Publishing artifact digests match and the canonical drift selftest passes | `gate` |
 | `gnn` | `./run.sh gnn` | the pinned GNN parser installs at the pinned revision, then parses and type-checks the conformance target | `gnn-conformance` |
 | `lint` | `./run.sh lint` | ESLint findings in `DE/` (currently red — see below) | none |
 | `types` | `./run.sh types` | `tsc -b` findings in `DE/` (currently red — see below) | none |
-| `all` | `./run.sh all` | `fast` + `build` + `website` + `docs` + `gnn` | all three |
+| `all` | `./run.sh all` | `fast` + `build` + `website` + `python` + `docs` + `gnn` | all four |
 | `strict` | `./run.sh strict` | `all` + `lint` + `types` | none |
 | `metrics` | `./run.sh metrics` | re-measures every arm and rewrites [`GATE_METRICS.md`](GATE_METRICS.md) | none |
 

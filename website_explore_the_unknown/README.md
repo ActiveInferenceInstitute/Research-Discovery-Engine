@@ -18,9 +18,10 @@ Verify a change with the repository gate (from the repository root):
 
 ```bash
 ./run.sh website     # npm ci once in this directory first
+./run.sh python      # the Flask API under api/ (and path/), in a fresh uv environment
 ```
 
-This is the same command the `website` job in `.github/workflows/ci.yml` runs. See [`../Docs/RUN_GUIDE.md`](../Docs/RUN_GUIDE.md).
+These are the same commands the `website` and `python` jobs in `.github/workflows/ci.yml` run. See [`../Docs/RUN_GUIDE.md`](../Docs/RUN_GUIDE.md).
 
 
 ## Pages

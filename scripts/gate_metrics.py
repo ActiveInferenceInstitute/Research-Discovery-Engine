@@ -25,6 +25,7 @@ ARMS = (
     ("fast", "blocking", "credential-free harness subsets (unit, integration, validation)"),
     ("build", "blocking", "DE production build + knowledge-base assertion"),
     ("website", "blocking", "Next.js production build"),
+    ("python", "blocking", "path/ analysis run + website Flask API check"),
     ("docs", "blocking", "relative Markdown link/anchor check"),
     ("gnn", "blocking", "pinned GNN parser conformance"),
     ("lint", "strict", "ESLint over DE/"),
@@ -34,6 +35,7 @@ ARMS = (
 FAILED_COUNT = re.compile(r"Failed:\s*(\d+)")
 LINT_SUMMARY = re.compile(r"(\d+) problems \((\d+) errors?, (\d+) warnings?\)")
 TSC_ERROR = re.compile(r"error TS\d+")
+PYTHON_SUMMARY = re.compile(r"^(path: .* wrote \d+ non-empty files|website-api: \d+ modules under api/ compile)$")
 FINAL_SUMMARY = re.compile(r"(checked \d+ relative links|docs links:|gnn-version|\"result\")")
 
 
@@ -95,6 +97,10 @@ def run_arm(arm: str, root: Path, log_dir: Path) -> dict[str, object]:
             record["problems"] = None
     if arm == "types":
         record["errors"] = len(TSC_ERROR.findall(log))
+    if arm == "python":
+        record["summary"] = "; ".join(
+            line.strip() for line in log.splitlines() if PYTHON_SUMMARY.match(line.strip())
+        )
     if arm in {"docs", "gnn"}:
         summary = [line for line in log.splitlines() if FINAL_SUMMARY.search(line)]
         record["summary"] = summary[-1].strip() if summary else ""
@@ -180,6 +186,7 @@ def render(records: list[dict[str, object]], root: Path) -> str:
             "| `fast` | `./run.sh fast` | the three credential-free harness subsets pass and report `Failed: 0` |",
             "| `build` | `./run.sh build` | the DE bundle builds and `dist/KG` carries every document and publication record |",
             "| `website` | `./run.sh website` | the Next.js site builds, including its own TypeScript step |",
+            "| `python` | `./run.sh python` | `path/research_paths.py` runs over `DE/KG` and the website's Flask API answers in-process, each from a fresh `requirements.txt` environment |",
             "| `docs` | `./run.sh docs` | every relative Markdown link and anchor resolves, with exact case |",
             "| `gnn` | `./run.sh gnn` | the pinned parser version parses and type-checks the conformance target |",
             "| `lint` | `./run.sh lint` | ESLint findings in DE/ (**known red**) |",
