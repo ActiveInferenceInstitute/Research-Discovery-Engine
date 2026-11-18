@@ -4,31 +4,30 @@
 
 Measured by running each arm once on this host. Timings are wall clock for
 the whole arm, including the runner's own overhead; they are observations,
-not targets. Arms marked **known red** are reported, not enforced — see
-[`RUN_GUIDE.md`](RUN_GUIDE.md#known-red-checks).
+not targets. Every arm is blocking in [`./run.sh all`](RUN_GUIDE.md#arms).
 
-- source revision: `87104e3cda11` (clean)
-- host: macOS-27.2.1-arm64-arm-64bit-Mach-O (arm64)
-- node v26.13.1 · npm 11.20.0 · Python 3.15.2
-- measured: 2026-11-17 11:51:49 PST
+- source revision: `9129a3378b54` (clean)
+- host: macOS-27.2.1-arm64-arm-64bit (arm64)
+- node v24.22.3 · npm 11.20.0 · Python 3.12.16
+- measured: 2026-11-17 16:16:24 PST
 
 | Arm | Kind | Wall time (s) | Exit | Result |
 | --- | --- | --- | --- | --- |
-| `fast` | blocking | 1.67 | 0 | pass (failures: 0) |
-| `build` | blocking | 4.33 | 0 | pass |
-| `website` | blocking | 5.71 | 0 | pass |
-| `python` | blocking | 134.09 | 0 | pass (path: research_paths.py completed over DE/KG and wrote 12 non-empty files; website-api: 7 modules under api/ compile) |
-| `docs` | blocking | 0.92 | 0 | pass (docs links: 196 relative links in 58 files resolve) |
-| `gnn` | blocking | 7.55 | 0 | pass ({"gnn-version": "5.0.3", "models": 1, "pin-revision": "8f293d9ba810e6eda5c09842d9c7ed9ffa5f92c1", "result": "verified", "source": "pinned-exemplar"}) |
-| `lint` | strict | 3.5 | 1 | **fail** (400 problems (387 errors, 13 warnings)) |
-| `types` | strict | 5.53 | 2 | **fail** (97 type errors) |
+| `lint` | blocking | 1.84 | 0 | pass (0 problems (0 errors, 0 warnings)) |
+| `types` | blocking | 2.33 | 0 | pass (0 type errors) |
+| `fast` | blocking | 1.49 | 0 | pass (failures: 0) |
+| `build` | blocking | 1.81 | 0 | pass |
+| `website` | blocking | 4.73 | 0 | pass |
+| `python` | blocking | 39.95 | 0 | pass (path: research_paths.py completed over DE/KG and wrote 12 non-empty files; website-api: 7 modules under api/ compile) |
+| `docs` | blocking | 0.84 | 0 | pass (docs links: 196 relative links in 58 files resolve) |
+| `gnn` | blocking | 1.67 | 0 | pass ({"gnn-version": "5.0.3", "models": 1, "pin-revision": "8f293d9ba810e6eda5c09842d9c7ed9ffa5f92c1", "result": "verified", "source": "pinned-exemplar"}) |
 
 ## Test counts
 
 | Subset | Tests |
 | --- | --- |
 | integration | 3 |
-| unit | 5 |
+| unit | 6 |
 | validation | 3 |
 
 ## Arms
@@ -41,6 +40,6 @@ not targets. Arms marked **known red** are reported, not enforced — see
 | `python` | `./run.sh python` | `path/research_paths.py` runs over `DE/KG` and the website's Flask API answers in-process, each from a fresh `requirements.txt` environment |
 | `docs` | `./run.sh docs` | every relative Markdown link and anchor resolves, with exact case |
 | `gnn` | `./run.sh gnn` | the pinned parser version parses and type-checks the conformance target |
-| `lint` | `./run.sh lint` | ESLint findings in DE/ (**known red**) |
-| `types` | `./run.sh types` | `tsc -b` findings in DE/ (**known red**) |
+| `lint` | `./run.sh lint` | ESLint findings in DE/ |
+| `types` | `./run.sh types` | `tsc -b` findings in DE/ |
 
