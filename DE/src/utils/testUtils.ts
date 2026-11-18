@@ -5,9 +5,14 @@
  * in the Discovery Engine application, including comprehensive LLM testing support.
  */
 
-import { GraphData, NodeObject, LinkObject, ConceptDesignState, AgentMessage } from '../types';
-
-// Import real LLM services
+import type { GraphData, NodeObject, LinkObject, ConceptDesignState, AgentMessage } from '../types';
+import type {
+  KnowledgeProcessingLLMRequest,
+  LLMRequest,
+  LLMUsage,
+  ResearchLLMContext,
+  SummaryLLMRequest
+} from '../llm/types';
 
 /**
  * Creates mock graph data for testing
@@ -25,16 +30,16 @@ export const createMockGraphData = (
 
   // Create nodes
   for (let i = 0; i < nodeCount; i++) {
-    const nodeTypes = ['Material', 'Mechanism', 'Application', 'TheoreticalConcept'];
-    const statuses = ['Validated', 'Proposed', 'Experimental'];
+    const nodeTypes: NodeObject['type'][] = ['Material', 'Mechanism', 'Application', 'TheoreticalConcept'];
+    const statuses: NodeObject['status'][] = ['Validated', 'Proposed', 'Hypothetical'];
 
     nodes.push({
       id: `node-${i}`,
-      type: nodeTypes[Math.floor(Math.random() * nodeTypes.length)] as any,
+      type: nodeTypes[Math.floor(Math.random() * nodeTypes.length)],
       label: `Test Node ${i}`,
       description: `This is a test node with ID ${i} created for testing purposes.`,
       origin: 'user_upload',
-      status: statuses[Math.floor(Math.random() * statuses.length)] as any,
+      status: statuses[Math.floor(Math.random() * statuses.length)],
       references: [`ref-${i}`],
       sourceFileKey: 'test',
 
@@ -44,7 +49,7 @@ export const createMockGraphData = (
   // Create links based on density
   const maxPossibleLinks = (nodeCount * (nodeCount - 1)) / 2;
   const targetLinkCount = Math.floor(maxPossibleLinks * linkDensity);
-  const linkTypes = ['related-to', 'EnablesMechanismEdge', 'ComposedOfMaterialEdge', 'UtilizesMethodEdge'];
+  const linkTypes: LinkObject['type'][] = ['related-to', 'EnablesMechanismEdge', 'ComposedOfMaterialEdge', 'UtilizesMethodEdge'];
 
   for (let i = 0; i < targetLinkCount; i++) {
     const sourceIndex = Math.floor(Math.random() * nodeCount);
@@ -65,7 +70,7 @@ export const createMockGraphData = (
       links.push({
         source: nodes[sourceIndex].id,
         target: nodes[targetIndex].id,
-        type: linkTypes[Math.floor(Math.random() * linkTypes.length)] as any
+        type: linkTypes[Math.floor(Math.random() * linkTypes.length)]
       });
     }
   }
@@ -118,7 +123,7 @@ export const createMockAgentMessages = (count: number = 5): AgentMessage[] => {
   const agents = ['Discovery Engine', 'Research Assistant', 'Exploration Agent', 'Consistency Agent'];
   const types: AgentMessage['type'][] = ['info', 'warning', 'suggestion', 'opportunity'];
 
-  return Array.from({ length: count }, (_, i) => ({
+  return Array.from({ length: count }, (_, i): AgentMessage => ({
     id: `test-msg-${i}`,
     sourceAgent: agents[Math.floor(Math.random() * agents.length)],
     type: types[Math.floor(Math.random() * types.length)],
@@ -127,7 +132,7 @@ export const createMockAgentMessages = (count: number = 5): AgentMessage[] => {
     action: Math.random() > 0.7 ? {
       type: 'explore-node',
       label: `Test Action ${i}`,
-      payload: { test: true }
+      payload: { value: { test: true } }
     } : undefined,
     relatedNodeIds: Math.random() > 0.8 ? [`node-${i}`] : undefined
   }));
@@ -155,7 +160,7 @@ export const llmTestUtils = {
   /**
    * Create mock LLM request
    */
-  createMockLLMRequest: (overrides: any = {}) => ({
+  createMockLLMRequest: (overrides: Record<string, unknown> = {}) => ({
     messages: [
       { role: 'system' as const, content: 'You are a research assistant.' },
       { role: 'user' as const, content: 'Test query for mock LLM.' }
@@ -168,7 +173,7 @@ export const llmTestUtils = {
   /**
    * Create mock LLM response
    */
-  createMockLLMResponse: (overrides: any = {}) => ({
+  createMockLLMResponse: (overrides: Record<string, unknown> = {}) => ({
     success: true,
     content: 'This is a mock LLM response for testing purposes.',
     usage: {
@@ -335,6 +340,8 @@ export const llmTestUtils = {
   })
 };
 
+type Relationship = ReturnType<typeof llmTestUtils.createMockKnowledgeResult>['extractedData']['relationships'][number];
+
 /**
  * Mock LLM service implementations for testing
  */
@@ -343,10 +350,10 @@ export const mockLLMServices = {
    * Mock LLM service that returns predefined responses
    */
   createMockLLMService: () => ({
-    generateCompletion: mockFn((_request: any) =>
+    generateCompletion: mockFn<[request: LLMRequest], Promise<ReturnType<typeof llmTestUtils.createMockLLMResponse>>>(() =>
       Promise.resolve(llmTestUtils.createMockLLMResponse())
     ),
-    processBatch: mockFn((requests: any[]) =>
+    processBatch: mockFn((requests: readonly LLMRequest[]) =>
       Promise.resolve({
         results: requests.map(() => llmTestUtils.createMockLLMResponse()),
         batchId: 'test-batch-123',
@@ -360,13 +367,13 @@ export const mockLLMServices = {
    * Mock summary LLM service
    */
   createMockSummaryService: () => ({
-    generateSummary: mockFn((request: any) =>
+    generateSummary: mockFn((request: Partial<Pick<SummaryLLMRequest, 'context'>>) =>
       Promise.resolve(llmTestUtils.createMockSummaryResult(request.context?.concept))
     ),
-    generateExecutiveSummary: mockFn((context: any) =>
+    generateExecutiveSummary: mockFn((context: Pick<ResearchLLMContext, 'concept'>) =>
       Promise.resolve(`Executive summary for ${context.concept}`)
     ),
-    generateTechnicalSummary: mockFn((context: any) =>
+    generateTechnicalSummary: mockFn((context: Pick<ResearchLLMContext, 'concept'>) =>
       Promise.resolve(`Technical summary for ${context.concept}`)
     )
   }),
@@ -375,22 +382,22 @@ export const mockLLMServices = {
    * Mock knowledge LLM service
    */
   createMockKnowledgeService: () => ({
-    extractConcepts: mockFn((_text: string, _domain: string) =>
+    extractConcepts: mockFn<[text: string, domain: string], Promise<string[]>>(() =>
       Promise.resolve(['Concept 1', 'Concept 2', 'Concept 3'])
     ),
-    findRelationships: mockFn((_text: string, _domain: string) =>
+    findRelationships: mockFn<[text: string, domain: string], Promise<Relationship[]>>(() =>
       Promise.resolve([
         { source: 'Concept 1', relationship: 'relates to', target: 'Concept 2' }
       ])
     ),
-    generateQuestions: mockFn((_text: string, _domain: string) =>
+    generateQuestions: mockFn<[text: string, domain: string], Promise<string[]>>(() =>
       Promise.resolve([
         'What are the key challenges?',
         'How can this be improved?',
         'What are the applications?'
       ])
     ),
-    processKnowledge: mockFn((request: any) =>
+    processKnowledge: mockFn((request: Partial<Pick<KnowledgeProcessingLLMRequest, 'domain'>>) =>
       Promise.resolve(llmTestUtils.createMockKnowledgeResult(request.domain))
     )
   }),
@@ -399,10 +406,10 @@ export const mockLLMServices = {
    * Mock protocol LLM service
    */
   createMockProtocolService: () => ({
-    generateProtocol: mockFn((request: any) =>
+    generateProtocol: mockFn((request: { objective?: string }) =>
       Promise.resolve(llmTestUtils.createMockProtocolResult(request.objective))
     ),
-    generateSafetyGuidelines: mockFn((_materials: string[]) =>
+    generateSafetyGuidelines: mockFn<[materials: string[]], Promise<string[]>>(() =>
       Promise.resolve([
         'Handle materials with care',
         'Use appropriate PPE',
@@ -419,7 +426,7 @@ export const llmPerformanceTestUtils = {
   /**
    * Measure LLM response time
    */
-  measureResponseTime: async (operation: () => Promise<any>) => {
+  measureResponseTime: async <T>(operation: () => Promise<T>) => {
     const startTime = Date.now();
     const result = await operation();
     const endTime = Date.now();
@@ -433,7 +440,7 @@ export const llmPerformanceTestUtils = {
   /**
    * Test token usage efficiency
    */
-  calculateTokenEfficiency: (result: any) => {
+  calculateTokenEfficiency: (result: { usage?: LLMUsage }) => {
     const { usage } = result;
     if (!usage) return { efficiency: 0, details: 'No usage data' };
 
@@ -447,7 +454,10 @@ export const llmPerformanceTestUtils = {
   /**
    * Simulate load testing for LLM services
    */
-  simulateLoad: async (service: any, requestCount: number = 10) => {
+  simulateLoad: async (
+    service: { generateText(request: LLMRequest): Promise<{ success?: boolean } | undefined> },
+    requestCount: number = 10
+  ) => {
     const startTime = Date.now();
     const promises = [];
 
@@ -462,10 +472,10 @@ export const llmPerformanceTestUtils = {
     const endTime = Date.now();
 
     const successful = results.filter(r =>
-      r.status === 'fulfilled' && (r.value as any)?.success
+      r.status === 'fulfilled' && r.value?.success
     ).length;
     const failed = results.filter(r =>
-      r.status === 'rejected' || (r.status === 'fulfilled' && !(r.value as any)?.success)
+      r.status === 'rejected' || (r.status === 'fulfilled' && !r.value?.success)
     ).length;
 
     return {
@@ -594,7 +604,7 @@ export const mockImplementations = {
    */
   localStorage: {
     store: {} as Record<string, string>,
-    getItem: mockFn((key: string) => mockImplementations.localStorage.store[key] || null),
+    getItem: mockFn((key: string): string | null => mockImplementations.localStorage.store[key] || null),
     setItem: mockFn((key: string, value: string) => {
       mockImplementations.localStorage.store[key] = value;
     }),
@@ -610,11 +620,9 @@ export const mockImplementations = {
    * Mock fetch for API testing
    */
   fetch: mockFn(() =>
-    Promise.resolve({
-      ok: true,
-      json: () => Promise.resolve({}),
-      text: () => Promise.resolve('')
-    })
+    Promise.resolve(Object.assign(new Response(null), {
+      json: async () => ({})
+    }))
   ),
 
   /**
@@ -634,7 +642,7 @@ export const mockImplementations = {
   openai: {
     chat: {
       completions: {
-        create: mockFn((params: any) =>
+        create: mockFn((params: { model?: string }) =>
           Promise.resolve({
             id: 'test-completion-123',
             object: 'chat.completion',
@@ -790,15 +798,17 @@ export const customMatchers = {
   /**
    * Checks if LLM result has expected structure
    */
-  toHaveValidLLMResult: (result: any): boolean =>
-    result && typeof result.success === 'boolean' &&
-    result.content && result.usage && result.metadata,
+  toHaveValidLLMResult: (result: unknown): boolean =>
+    typeof result === 'object' && result !== null &&
+    'success' in result && typeof result.success === 'boolean' &&
+    'content' in result && 'usage' in result && 'metadata' in result &&
+    Boolean(result.content && result.usage && result.metadata),
 
   /**
    * Checks if LLM usage is within expected bounds
    */
-  toHaveReasonableTokenUsage: (result: any, maxTokens: number = 5000): boolean =>
-    result.usage && result.usage.totalTokens <= maxTokens && result.usage.totalTokens > 0
+  toHaveReasonableTokenUsage: (result: { usage?: Pick<LLMUsage, 'totalTokens'> }, maxTokens: number = 5000): boolean =>
+    Boolean(result.usage && result.usage.totalTokens <= maxTokens && result.usage.totalTokens > 0)
 };
 
 /**
@@ -818,7 +828,7 @@ export const testSetup = {
     Object.assign(console, mockImplementations.console);
 
     // Mock fetch
-    global.fetch = mockImplementations.fetch as any;
+    globalThis.fetch = mockImplementations.fetch;
   },
 
   /**
@@ -848,14 +858,21 @@ export const testSetup = {
   }
 };
 
+type MockFunction<Args extends unknown[], Result> = ((...args: Args) => Result) & {
+  mockClear(): void;
+  mockReset(): void;
+};
+
 /**
  * Simple mock function implementation
  */
-function mockFn(implementation?: (...args: any[]) => any) {
-  const fn = implementation || (() => {});
-  (fn as any).mockClear = () => {};
-  (fn as any).mockReset = () => {};
-  return fn;
+function mockFn(): MockFunction<unknown[], void>;
+function mockFn<Args extends unknown[], Result>(implementation: (...args: Args) => Result): MockFunction<Args, Result>;
+function mockFn<Args extends unknown[], Result>(implementation?: (...args: Args) => Result) {
+  return Object.assign(implementation ?? (() => {}), {
+    mockClear: () => {},
+    mockReset: () => {}
+  });
 }
 
 /**
@@ -866,8 +883,11 @@ function clearAllMocks() {
 }
 
 // Export a mock jest object for non-test environments
-if (typeof (globalThis as any).jest === 'undefined') {
-  (globalThis as any).jest = {
+const testGlobal = globalThis as typeof globalThis & {
+  jest?: { fn: typeof mockFn; clearAllMocks: typeof clearAllMocks };
+};
+if (testGlobal.jest === undefined) {
+  testGlobal.jest = {
     fn: mockFn,
     clearAllMocks: clearAllMocks
   };

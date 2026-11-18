@@ -76,7 +76,7 @@ export function loadEnvironment(): { success: boolean; message: string; apiKeyPr
     
   } else if (existsSync(envExamplePath)) {
     // Load from .env.example as fallback
-    const result = config({ path: envExamplePath });
+    config({ path: envExamplePath });
     
     return {
       success: false,

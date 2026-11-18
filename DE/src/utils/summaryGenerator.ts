@@ -70,10 +70,10 @@ export const generateSummary = (
   const { objective } = conceptState;
 
   // Generate abstract first
-  const abstract = generateAbstract(conceptState, config);
+  const abstract = generateAbstract(conceptState);
 
   // Extract keywords
-  const keywords = extractSummaryKeywords(conceptState, graphData);
+  const keywords = extractSummaryKeywords(conceptState);
 
   // Find related concepts
   const relatedConcepts = findRelatedConcepts(conceptState, graphData);
@@ -87,7 +87,7 @@ export const generateSummary = (
     metadata: {
       wordCount: 0,
       readingTime: '',
-      complexity: determineComplexity(conceptState, config),
+      complexity: determineComplexity(conceptState),
       completeness: calculateCompleteness(conceptState),
       keywords,
       relatedConcepts
@@ -108,8 +108,7 @@ export const generateSummary = (
  * Generate abstract for the concept
  */
 const generateAbstract = (
-  conceptState: ConceptDesignState,
-  _config: SummaryConfig
+  conceptState: ConceptDesignState
 ): string => {
   const { objective, components, cssVectorDraft } = conceptState;
   const css = cssVectorDraft || {};
@@ -151,16 +150,16 @@ const generateSummarySections = (
   const sections: SummarySection[] = [];
 
   // 1. Concept Overview (always included)
-  sections.push(generateOverviewSection(conceptState, config));
+  sections.push(generateOverviewSection(conceptState));
 
   // 2. Components Section
   if (config.includeComponents) {
-    sections.push(generateComponentsSection(conceptState, config));
+    sections.push(generateComponentsSection(conceptState));
   }
 
   // 3. Technical Details Section
   if (config.technicalLevel !== 'general') {
-    sections.push(generateTechnicalSection(conceptState, config));
+    sections.push(generateTechnicalSection(conceptState));
   }
 
   // 4. Related Work Section
@@ -170,7 +169,7 @@ const generateSummarySections = (
 
   // 5. Recommendations Section
   if (config.includeRecommendations) {
-    sections.push(generateRecommendationsSection(conceptState, config));
+    sections.push(generateRecommendationsSection(conceptState));
   }
 
   return sections;
@@ -180,8 +179,7 @@ const generateSummarySections = (
  * Generate concept overview section
  */
 const generateOverviewSection = (
-  conceptState: ConceptDesignState,
-  _config: SummaryConfig
+  conceptState: ConceptDesignState
 ): SummarySection => {
   const { objective, components, cssVectorDraft } = conceptState;
   const css = cssVectorDraft || {};
@@ -233,8 +231,7 @@ const generateOverviewSection = (
  * Generate components section
  */
 const generateComponentsSection = (
-  conceptState: ConceptDesignState,
-  _config: SummaryConfig
+  conceptState: ConceptDesignState
 ): SummarySection => {
   const { components } = conceptState;
 
@@ -291,8 +288,7 @@ const generateComponentsSection = (
  * Generate technical details section
  */
 const generateTechnicalSection = (
-  conceptState: ConceptDesignState,
-  _config: SummaryConfig
+  conceptState: ConceptDesignState
 ): SummarySection => {
   const { cssVectorDraft } = conceptState;
   const css = cssVectorDraft || {};
@@ -411,8 +407,7 @@ const generateRelatedWorkSection = (
  * Generate recommendations section
  */
 const generateRecommendationsSection = (
-  conceptState: ConceptDesignState,
-  _config: SummaryConfig
+  conceptState: ConceptDesignState
 ): SummarySection => {
   const content: string[] = [];
   const { components, cssVectorDraft } = conceptState;
@@ -457,8 +452,7 @@ const generateRecommendationsSection = (
  * Extract keywords from concept state
  */
 const extractSummaryKeywords = (
-  conceptState: ConceptDesignState,
-  _graphData?: GraphData
+  conceptState: ConceptDesignState
 ): string[] => {
   const keywords = new Set<string>();
 
@@ -552,8 +546,7 @@ const isCommonWord = (word: string): boolean => {
 };
 
 const determineComplexity = (
-  conceptState: ConceptDesignState,
-  _config: SummaryConfig
+  conceptState: ConceptDesignState
 ): 'low' | 'medium' | 'high' => {
   let complexity = 0;
 

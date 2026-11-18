@@ -297,7 +297,7 @@ function App() {
             <PDFUploader
               darkMode={state.darkMode}
               onClose={actions.togglePDFUploader}
-              onFileProcessed={(parsedData) => actions.triggerAgent('integrate-data', parsedData)}
+              onFileProcessed={(parsedData) => actions.triggerAgent('integrate-data', { ...parsedData })}
               onTriggerAgent={actions.triggerAgent}
             />
           </ErrorBoundary>

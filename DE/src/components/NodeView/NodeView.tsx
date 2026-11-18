@@ -1,3 +1,4 @@
+import type { TriggerAgent } from '../../types';
 // src/components/NodeView/NodeView.tsx
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { NodeObject, LinkObject as CNMLinkObject } from '../../types';
@@ -16,7 +17,7 @@ interface NodeViewProps {
   relatedLinks?: CNMLinkObject[];
   onSelectNode: (node: NodeObject, sectionSlug?: string) => void;
   onStartDesign?: (seedNodeId: string) => void;
-  onTriggerAgent?: (action: string, payload?: any) => void;
+  onTriggerAgent?: TriggerAgent;
   onNavigateToWikiSection: (fileKey: string, sectionSlug: string) => void;
   onPaperClick: (citationKey: string) => void;
 }
@@ -291,13 +292,13 @@ const NodeView: React.FC<NodeViewProps> = ({
   // Ensure we're using the correct description field
   const mainDescription = parsedDetails.mainDescription || parsedDetails.description;
   useEffect(() => {
-    const targetSlug = (window as any).__targetSectionSlugForNodeView;
+    const targetSlug = window.__targetSectionSlugForNodeView;
     if (targetSlug && scrollRef.current) {
       const element = scrollRef.current.querySelector(`#${targetSlug}`);
       if (element) {
         setTimeout(() => element.scrollIntoView({ behavior: 'smooth', block: 'start' }), 150);
       }
-      delete (window as any).__targetSectionSlugForNodeView;
+      delete window.__targetSectionSlugForNodeView;
     } else if (scrollRef.current) {
       scrollRef.current.scrollTop = 0;
     }

@@ -20,7 +20,7 @@
  *   --headless-output ./path              Custom output directory for headless mode
  */
 
-import { generateProtocol, formatProtocolAsMarkdown, createStandaloneProtocol } from '../src/utils/protocolGenerator';
+import { createStandaloneProtocol } from '../src/utils/protocolGenerator';
 import { ConceptDesignState } from '../src/types';
 import fs from 'fs';
 import path from 'path';

@@ -1,3 +1,4 @@
+import type { TriggerAgent } from '../../types';
 // src/components/ConceptDesigner/ConceptDesigner.tsx
 import React, { useEffect, useState } from 'react';
 import { Brain, FlaskConical,  Loader, Lightbulb, FileText, Layers, Target, AlertTriangle, Sparkles } from 'lucide-react';
@@ -11,9 +12,9 @@ interface ConceptDesignerProps {
   graphData: GraphData;
   onUpdateObjective: (objective: string) => void;
   onUpdateComponentSelection: (componentType: keyof ConceptDesignState['components'], selectedIds: string[]) => void;
-  onUpdateCssField: (fieldPath: string, value: any) => void;
-  onAcceptSuggestion: (fieldPath: string, suggestionValue: any) => void;
-  onTriggerAgent: (action: string, payload?: any) => void;
+  onUpdateCssField: (fieldPath: string, value: unknown) => void;
+  onAcceptSuggestion: (fieldPath: string, suggestionValue: unknown) => void;
+  onTriggerAgent: TriggerAgent;
   agentMessages: AgentMessage[];
 }
 

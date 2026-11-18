@@ -1,10 +1,11 @@
+import type { TriggerAgent } from '../../types';
 // src/components/ContextPanel/ConceptDetails.tsx
 import React from 'react';
 import { ConceptDesignState } from '../../types';
 import { Layers, Check,  Atom, GitMerge, FlaskConical, Loader } from 'lucide-react';
 
 // Helper to render CSS fields recursively
-const renderCssFields = (data: any, darkMode: boolean, path = '', level = 0): React.JSX.Element | null => {
+const renderCssFields = (data: unknown, darkMode: boolean, path = '', level = 0): React.JSX.Element | null => {
   if (!data || typeof data !== 'object' || Array.isArray(data)) {
     if (Array.isArray(data) && data.length === 0) return <span className={`italic text-xs ${darkMode ? 'text-slate-500' : 'text-slate-400'}`}>(empty list)</span>;
     if (Array.isArray(data)) {
@@ -26,12 +27,12 @@ const renderCssFields = (data: any, darkMode: boolean, path = '', level = 0): Re
     return <span className={`text-xs ${darkMode ? 'text-slate-200' : 'text-slate-800'}`}>{String(data)}</span>;
   }
 
-  const keysToRender = path === '' ? Object.keys(data).filter(k => k !== 'meta') : Object.keys(data);
+  const entries = Object.entries(data) as [string, unknown][];
+  const fields = path === '' ? entries.filter(([key]) => key !== 'meta') : entries;
 
   return (
     <div className={`space-y-1 ${level > 0 ? 'pl-2 border-l border-dashed ' + (darkMode ? 'border-slate-600/70' : 'border-slate-300') : ''}`}>
-      {keysToRender.map((key) => {
-        const value = (data as any)[key];
+      {fields.map(([key, value]) => {
         const currentPath = path ? `${path}.${key}` : key;
         const label = key.split('_').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ');
 
@@ -59,7 +60,7 @@ const renderCssFields = (data: any, darkMode: boolean, path = '', level = 0): Re
 interface ConceptDetailsProps {
   darkMode: boolean;
   designState: ConceptDesignState;
-  onTriggerAgent: (action: string, payload?: any) => void;
+  onTriggerAgent: TriggerAgent;
 }
 
 const ConceptDetails: React.FC<ConceptDetailsProps> = ({ darkMode, designState, onTriggerAgent }) => {

@@ -1,3 +1,4 @@
+import type { TriggerAgent } from '../../types';
 // Renders a single CSS field with input/selector and suggestions.
 
 import React, { useState, useEffect } from 'react';
@@ -8,11 +9,11 @@ interface CSSFieldProps {
   darkMode: boolean;
   label: string;
   fieldPath: string; // e.g., 'context.material_primary'
-  value: any; // Current value of the field
+  value: unknown; // Current value of the field
   suggestions: AgentMessage[]; // Suggestions for this field
-  onUpdate: (fieldPath: string, value: any) => void;
-  onAcceptSuggestion: (fieldPath: string, suggestionValue: any) => void;
-  onTriggerAgent: (action: string, payload?: any) => void; // For triggering field-specific agent actions
+  onUpdate: (fieldPath: string, value: unknown) => void;
+  onAcceptSuggestion: (fieldPath: string, suggestionValue: unknown) => void;
+  onTriggerAgent: TriggerAgent; // For triggering field-specific agent actions
   onSelectNode?: (node: NodeObject) => void;
   cnmNodes: NodeObject[]; // All CNM nodes to find nodes by ID from suggestions
 }
@@ -48,7 +49,7 @@ const CSSField: React.FC<CSSFieldProps> = ({
           if (value.length === 0) return <span className="italic text-gray-500">Empty</span>;
            return (
                <div className="flex flex-wrap gap-1">
-                   {value.map((item: any, index: number) => (
+                   {value.map((item: unknown, index: number) => (
                        <span key={index} className={`px-2 py-0.5 rounded-full ${darkMode ? 'bg-gray-600' : 'bg-gray-200'} flex items-center space-x-1`}>
                           {String(item)}
                            {/* Optional: Add remove button for array items */}
@@ -78,7 +79,7 @@ const CSSField: React.FC<CSSFieldProps> = ({
 
    const handleManualInputBlur = () => {
        // Update the concept state when user finishes typing/selecting manually
-        let finalValue: any = manualInput;
+        let finalValue: string | boolean = manualInput;
         if (isBoolField) finalValue = manualInput === 'Yes'; // Convert string Yes/No to boolean
          if (isArrayField) {
              // How to handle manual input for arrays? Maybe a dedicated input?
@@ -204,7 +205,10 @@ const CSSField: React.FC<CSSFieldProps> = ({
                        <div className="mt-2 text-right">
                              <button
                                 className={`px-3 py-1 rounded-md text-xs ${darkMode ? 'bg-yellow-600 hover:bg-yellow-700' : 'bg-yellow-500 hover:bg-yellow-600'} text-white transition-colors`}
-                                onClick={() => onTriggerAgent(suggestionMsg.action!.payload.task, suggestionMsg.action!.payload)}
+                                onClick={() => {
+                                    const payload = suggestionMsg.action?.payload;
+                                    if (payload?.task) onTriggerAgent(payload.task, { ...payload });
+                                }}
                              >
                                 {suggestionMsg.content.includes('Generate') ? 'Generate Idea' : 'Trigger Action'}
                              </button>

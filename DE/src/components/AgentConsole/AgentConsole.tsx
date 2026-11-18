@@ -1,3 +1,4 @@
+import type { TriggerAgent } from '../../types';
 // src/components/AgentConsole/AgentConsole.tsx
 
 import React, { useState } from 'react';
@@ -17,7 +18,7 @@ interface AgentConsoleProps {
   activeMode: 'explore' | 'create';
   conceptDesignState: ConceptDesignState;
   selectedNodeId: string | null;
-  onTriggerAgent: (action: string, payload?: any) => void;
+  onTriggerAgent: TriggerAgent;
   onSelectNode: (node: NodeObject) => void;
 }
 

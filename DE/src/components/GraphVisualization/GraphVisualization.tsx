@@ -1,6 +1,6 @@
 // src/components/GraphVisualization/GraphVisualization.tsx
 import React, { useRef, useEffect, useState, useMemo } from 'react';
-import ForceGraph3D from '3d-force-graph';
+import ForceGraph3D, { type ConfigOptions, type ForceGraph3DInstance } from '3d-force-graph';
 import SpriteText from 'three-spritetext';
 import * as THREE from 'three';
 import * as d3 from 'd3';
@@ -21,6 +21,13 @@ interface GraphLink extends CNMLinkObject {
   source: string | GraphNode;
   target: string | GraphNode;
 }
+
+// The installed constructor accepts these graph types at runtime but only
+// declares default types. Keep the specialization at this library boundary.
+const TypedForceGraph3D = ForceGraph3D as unknown as new (
+  element: HTMLElement,
+  config?: ConfigOptions,
+) => ForceGraph3DInstance<GraphNode, GraphLink>;
 
 const NODE_TYPE_COLORS: Partial<Record<NodeType, string>> & { Default: string } = {
   'Mechanism': '#8A2BE2', 
@@ -98,7 +105,7 @@ const GraphVisualization: React.FC<GraphVisualizationProps> = ({
   onFilterComplete, colorBy, groupBy
 }) => {
   const containerRef = useRef<HTMLDivElement>(null);
-  const graphRef = useRef<any>(null);
+  const graphRef = useRef<ForceGraph3DInstance<GraphNode, GraphLink> | null>(null);
 
   const [hoveredNodeId, setHoveredNodeId] = useState<string | null>(null);
   const [neighborNodes, setNeighborNodes] = useState(new Set<string>());
@@ -182,8 +189,8 @@ const GraphVisualization: React.FC<GraphVisualizationProps> = ({
             const numClusters = Math.min(8, Math.max(3, Math.ceil(currentNodes.length / 10)));
             const clusteredNodes = assignNodesToClusters(currentNodes, numClusters);
             const clusteredNode = clusteredNodes.find(n => n.id === node.id);
-            if (clusteredNode && 'cluster' in clusteredNode) {
-              groupValue = (clusteredNode as any).cluster + 1;
+            if (clusteredNode) {
+              groupValue = clusteredNode.cluster + 1;
             }
             break;
           }
@@ -269,39 +276,61 @@ const GraphVisualization: React.FC<GraphVisualizationProps> = ({
     }
   }, [filteredData, onFilterComplete]); // Call ONLY when filteredData or onFilterComplete changes
 
-  useEffect(() => { 
-    if (!containerRef.current || graphRef.current) return;
+  useEffect(() => {
+    const container = containerRef.current;
+    if (!container) return;
+
     try {
-      const graph = new ForceGraph3D(containerRef.current)
-        .width(containerRef.current.clientWidth)
-        .height(containerRef.current.clientHeight)
+      const graph = new TypedForceGraph3D(container);
+      graph
+        .width(container.clientWidth)
+        .height(container.clientHeight)
         .enableNodeDrag(true)
-        .showNavInfo(false)
-        .onNodeClick((node: any | null) => {
+        .showNavInfo(false);
+      graphRef.current = graph;
+
+      const handleResize = () => {
+        graph.width(container.clientWidth).height(container.clientHeight);
+      };
+      window.addEventListener('resize', handleResize);
+      return () => {
+        window.removeEventListener('resize', handleResize);
+        graph._destructor();
+        graphRef.current = null;
+      };
+    } catch (error) {
+      console.error("Error initializing 3D Force Graph:", error);
+    }
+  }, []);
+
+  useEffect(() => {
+    const graph = graphRef.current;
+    if (!graph) return;
+
+    graph
+        .onNodeClick((node) => {
             if (!node) {
                 onNodeSelect(null);
                 setNeighborNodes(new Set());
                 setNeighborLinks(new Set());
                 return;
             }
-            const appNode = node as GraphNode;
             const distance = 150;
-            const nodePos = { x: appNode.x || 0, y: appNode.y || 0, z: appNode.z || 0 };
+            const nodePos = { x: node.x || 0, y: node.y || 0, z: node.z || 0 };
             const cameraLookAt = {x: nodePos.x, y: nodePos.y, z: nodePos.z};
             const cameraPosition = {
                 x: nodePos.x + distance * (Math.random() * 0.6 + 0.4) * (Math.random() > 0.5 ? 1: -1),
                 y: nodePos.y + distance * (Math.random() * 0.2 + 0.1),
                 z: nodePos.z + distance * (Math.random() * 0.6 + 0.4) * (Math.random() > 0.5 ? 1: -1)
             };
-            graphRef.current.cameraPosition(cameraPosition, cameraLookAt, 1000);
-            onNodeSelect(appNode);
+            graph.cameraPosition(cameraPosition, cameraLookAt, 1000);
+            onNodeSelect(node);
         })
-        .onNodeHover((node: any | null) => {
-            const appNode = node as GraphNode | null;
-            setHoveredNodeId(appNode ? String(appNode.id) : null);
+        .onNodeHover((node) => {
+            setHoveredNodeId(node ? String(node.id) : null);
 
-            if (appNode && combinedGraphData.nodes.length > 0) {
-                const { nodes: neighbors, links: connectingLinks } = getNeighbors(combinedGraphData, String(appNode.id), 1);
+            if (node && combinedGraphData.nodes.length > 0) {
+                const { nodes: neighbors, links: connectingLinks } = getNeighbors(combinedGraphData, String(node.id), 1);
                 setNeighborNodes(new Set(Array.from(neighbors).map(n => String(n.id))));
                 setNeighborLinks(new Set(Array.from(connectingLinks) as GraphLink[]));
             } else {
@@ -318,38 +347,27 @@ const GraphVisualization: React.FC<GraphVisualizationProps> = ({
             setNeighborNodes(new Set());
             setNeighborLinks(new Set());
         });
-
-      graphRef.current = graph;
-      const handleResize = () => { 
-        if (containerRef.current && graphRef.current) { 
-          graphRef.current.width(containerRef.current.clientWidth).height(containerRef.current.clientHeight); 
-        }
-      };
-      window.addEventListener('resize', handleResize);
-      return () => window.removeEventListener('resize', handleResize);
-    } catch (error) { 
-      console.error("Error initializing 3D Force Graph:", error); 
-    }
-  }, []);
+  }, [combinedGraphData, onNodeSelect]);
 
   useEffect(() => { 
     if (!graphRef.current || !filteredData.nodes) return;
+
+    const getNodeSize = (node: GraphNode) => {
+      let baseSize = node.type?.includes('_Category') ? 6 : 10;
+      if (node.type === 'Concept' || node.origin === 'concept_design') baseSize = 14;
+      if (node.status === 'Hypothetical' || node.status === 'Proposed') baseSize *= 1.1;
+      if (String(node.id) === selectedNodeId) return baseSize * 1.5;
+      if (hoveredNodeId === String(node.id)) return baseSize * 1.3;
+      if (neighborNodes.has(String(node.id))) return baseSize * 1.1;
+      return baseSize;
+    };
 
     graphRef.current.graphData(filteredData);
 
     graphRef.current
         .backgroundColor(darkMode ? '#1A202C' : '#F7FAFC')
-        .nodeVal((node: GraphNode) => {
-            let baseSize = node.type?.includes('_Category') ? 6 : 10;
-            if (node.type === 'Concept' || node.origin === 'concept_design') baseSize = 14;
-            if (node.status === 'Hypothetical' || node.status === 'Proposed') baseSize *= 1.1;
-            if (String(node.id) === selectedNodeId) return baseSize * 1.5;
-            if (hoveredNodeId === String(node.id)) return baseSize * 1.3;
-            if (neighborNodes.has(String(node.id))) return baseSize * 1.1;
-            return baseSize;
-         })
-        .nodeThreeObject((objNode: any) => {
-            const node = objNode as GraphNode;
+        .nodeVal(getNodeSize)
+        .nodeThreeObject((node) => {
             const isSelected = selectedNodeId === String(node.id);
             const isHovered = hoveredNodeId === String(node.id);
             const isDirectNeighbor = neighborNodes.has(String(node.id)) && (hoveredNodeId !== null || selectedNodeId !== null);
@@ -433,7 +451,7 @@ const GraphVisualization: React.FC<GraphVisualizationProps> = ({
                 sprite.material.transparent = true;
                 return sprite;
             } else {
-                const geometrySize = Math.max(0.5, (graphRef.current.nodeVal()(node) as number) * 0.45); 
+                const geometrySize = Math.max(0.5, getNodeSize(node) * 0.45);
                 const geometry = new THREE.SphereGeometry(geometrySize, 16, 8);
                 const sphereMaterial = new THREE.MeshLambertMaterial({
                     color: finalColor, 
@@ -450,10 +468,7 @@ const GraphVisualization: React.FC<GraphVisualizationProps> = ({
             const defaultColor = darkMode ? '#4A5568' : '#A0AEC0'; 
             
             // Determine link color based on type or connected nodes
-            let typeColor;
-            
-            // Use type-based coloring for links
-            typeColor = LINK_TYPE_COLORS[link.type || 'Default'] || defaultColor;
+            const typeColor = LINK_TYPE_COLORS[link.type || 'Default'] || defaultColor;
             
             return neighborLinks.has(link) ? (darkMode ? '#FACC15' : '#D97706') : typeColor; 
         })
@@ -480,7 +495,10 @@ const GraphVisualization: React.FC<GraphVisualizationProps> = ({
     if (enablePhysics) {
         graphRef.current.resumeAnimation();
         if (d3 && graphRef.current.d3Force) { 
-            graphRef.current.d3Force('link', d3.forceLink().id((d:any) => d.id).distance((link: any) => link.type === 'categorizes' ? 80 : 150).strength(0.02));
+            graphRef.current.d3Force('link', d3.forceLink<GraphNode, GraphLink>()
+                .id(node => node.id)
+                .distance(link => link.type === 'categorizes' ? 80 : 150)
+                .strength(0.02));
             graphRef.current.d3Force('charge', d3.forceManyBody().strength(-120).distanceMax(350));
             graphRef.current.d3Force('center', d3.forceCenter(0, 0).strength(0.003));
         }
@@ -496,7 +514,9 @@ const GraphVisualization: React.FC<GraphVisualizationProps> = ({
     if (selectedNodeId) {
         const node = filteredData.nodes.find(n => String(n.id) === selectedNodeId);
         if (node) {
-            const currentLookAt = graphRef.current.cameraPosition().lookAt;
+            // three-render-objects returns its orbit target along with camera coordinates.
+            const camera = graphRef.current.cameraPosition() as { lookAt?: { x: number; y: number; z: number } };
+            const currentLookAt = camera.lookAt;
             if (!currentLookAt || Math.abs(currentLookAt.x - (node.x||0)) > 1 || Math.abs(currentLookAt.y - (node.y||0)) > 1) { // only refocus if significantly different
                 const distance = 150;
                 const nodePos = { x: node.x || 0, y: node.y || 0, z: node.z || 0 };
@@ -509,9 +529,7 @@ const GraphVisualization: React.FC<GraphVisualizationProps> = ({
                 graphRef.current.cameraPosition(cameraPosition, cameraLookAt, 700);
             }
         }
-    } else if (!hoveredNodeId && graphRef.current.cameraPosition().lookAt && (graphRef.current.cameraPosition().lookAt.x !==0 || graphRef.current.cameraPosition().lookAt.y !==0 || graphRef.current.cameraPosition().lookAt.z !==0 )) { 
-        // Optional: Reset camera to a default overview if nothing is selected or hovered
-        // graphRef.current.cameraPosition({ x: 0, y: 0, z: 300 }, {x:0,y:0,z:0}, 700); 
+
     }
 
   }, [

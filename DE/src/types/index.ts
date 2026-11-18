@@ -51,8 +51,49 @@ export interface AgentMessage { /* ... (as before) ... */
   id: string; sourceAgent: string;
   type: 'info' | 'success' | 'opportunity' | 'suggestion' | 'warning' | 'error' | 'command_confirmation' | 'user_query';
   content: string; timestamp: number; relatedNodeIds?: string[]; relatedFieldId?: string;
-  action?: { type: 'accept-suggestion' | 'view-details' | 'view-llm-result' | 'trigger-agent-action' | 'integrate-data' | 'explore-node'; label?: string; payload?: any; };
+  action?: { type: 'accept-suggestion' | 'view-details' | 'view-llm-result' | 'trigger-agent-action' | 'integrate-data' | 'explore-node'; label?: string; payload?: AgentMessageActionPayload; };
 }
+
+/**
+ * Agent action payload interface for type safety
+ */
+export interface AgentActionPayload {
+  query?: string;
+  nodeId?: string;
+  targetId?: string;
+  componentId?: string;
+  goalText?: string;
+  targetNodeType?: string;
+  targetNodeLabel?: string;
+  targetNodeDescription?: string;
+  [key: string]: unknown;
+}
+
+interface AgentMessageActionPayload {
+  title?: string;
+  content?: string;
+  protocolGenerated?: boolean;
+  protocol?: string;
+  summaryGenerated?: boolean;
+  fullSummary?: string;
+  conceptId?: string;
+  task?: string;
+  value?: unknown;
+  nodes?: GraphData['nodes'];
+  links?: GraphData['links'];
+  [key: string]: unknown;
+}
+
+export interface AgentTriggerPayload extends AgentActionPayload, AgentMessageActionPayload {
+  field?: string;
+  suggestion?: AgentMessage;
+  sourceAgent?: string;
+  type?: AgentMessage['type'];
+  action?: AgentMessage['action'];
+  key?: string;
+}
+
+export type TriggerAgent = (action: string, payload?: AgentTriggerPayload) => void;
 
 export interface ConceptDesignState {
   id: string;

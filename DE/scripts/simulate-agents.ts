@@ -20,7 +20,7 @@
 
 import { AgentService } from '../src/services/AgentService';
 import { createMockConceptDesignState, createMockGraphData } from '../src/utils/testUtils';
-import { ConceptDesignState, AgentMessage, NodeObject } from '../src/types';
+import { AgentMessage } from '../src/types';
 
 interface CliOptions {
   scenario?: 'research' | 'exploration' | 'validation';
@@ -44,7 +44,6 @@ interface SimulationAgent {
 interface AgentInteraction {
   timestamp: number;
   action: string;
-  payload?: any;
   result: string;
   duration: number;
 }
@@ -175,9 +174,6 @@ async function simulateScenario(
   
   console.log(`🤖 Starting ${scenario} simulation with ${agents.length} agents for ${duration} seconds...\n`);
   
-  const startTime = Date.now();
-  const endTime = startTime + (duration * 1000);
-  
   // Simplified simulation - just generate a few messages
   for (let i = 0; i < 5; i++) {
     const agent = agents[i % agents.length];
@@ -198,7 +194,7 @@ async function simulateScenario(
         console.log(`🤖 ${agent.name}: generated summary`);
       }
       
-    } catch (error) {
+    } catch {
       if (verbose) {
         console.log(`❌ ${agent.name}: simulation step failed`);
       }

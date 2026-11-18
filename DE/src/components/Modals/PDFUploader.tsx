@@ -1,3 +1,4 @@
+import type { TriggerAgent } from '../../types';
 // Modal to upload a file and trigger backend processing.
 
 import React, { useState, useRef } from 'react';
@@ -13,7 +14,7 @@ interface PDFUploaderProps {
   darkMode: boolean;
   onClose: () => void;
   onFileProcessed: (parsedData: GraphData) => void; // Callback when backend returns data
-  onTriggerAgent: (action: string, payload?: any) => void; // To communicate with AgentConsole
+  onTriggerAgent: TriggerAgent; // To communicate with AgentConsole
 }
 
 const PDFUploader: React.FC<PDFUploaderProps> = ({ darkMode, onClose, onFileProcessed, onTriggerAgent }) => {
@@ -380,7 +381,7 @@ Format your response as a well-structured markdown document with clear headings 
         timestamp: Date.now(),
         action: {
           type: 'integrate-data',
-          payload: mockParsedData
+          payload: { ...mockParsedData }
         }
     });
 

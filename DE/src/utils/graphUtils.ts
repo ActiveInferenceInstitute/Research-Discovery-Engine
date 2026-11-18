@@ -10,7 +10,7 @@ import { GraphData, NodeObject, LinkObject, CSSVector } from '../types';
  * @param numClusters - Number of clusters to create
  * @returns Nodes with cluster assignments
  */
-export function assignNodesToClusters(nodes: NodeObject[], numClusters: number): NodeObject[] {
+export function assignNodesToClusters(nodes: NodeObject[], numClusters: number): (NodeObject & { cluster: number })[] {
   // Simple implementation of force-directed clustering
   // Kept as an expression statement: the construction draws from
   // Math.random(), so removing it would change the RNG sequence that the
@@ -165,14 +165,27 @@ export function filterGraphData(graphData: GraphData, searchQuery: string): Grap
   return { nodes: filteredNodes, links: filteredLinks };
 }
 
+interface MockSuggestionGroup {
+  fieldPath: string;
+  suggestions: {
+    value: string;
+    node?: NodeObject;
+    explanation: string;
+    action?: {
+      type: 'trigger-agent';
+      payload: { task: 'generate-idea'; field: string };
+    };
+  }[];
+}
+
 // Simulate generating suggestions based on a partial CSS vector
-export function generateMockSuggestions(conceptState: Partial<CSSVector>, cnmData: GraphData): { fieldPath: string, suggestions: { value: string; node?: NodeObject; explanation: string; action?: any }[] }[] {
+export function generateMockSuggestions(conceptState: Partial<CSSVector>, cnmData: GraphData): MockSuggestionGroup[] {
   if (!cnmData || !cnmData.nodes || cnmData.nodes.length === 0) {
     console.warn("generateMockSuggestions: Missing or empty graph data");
     return [];
   }
 
-  const suggestions: { fieldPath: string, suggestions: { value: string; node?: NodeObject; explanation: string; action?: any }[] }[] = [];
+  const suggestions: MockSuggestionGroup[] = [];
   const currentCSS = conceptState || {};
   const nodes = cnmData.nodes;
 

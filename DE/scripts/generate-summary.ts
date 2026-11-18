@@ -16,7 +16,7 @@
  *   --help, -h                          Show help message
  */
 
-import { generateSummary, formatSummaryAsMarkdown, createStandaloneSummary } from '../src/utils/summaryGenerator';
+import { createStandaloneSummary } from '../src/utils/summaryGenerator';
 import { ConceptDesignState } from '../src/types';
 
 /**
@@ -55,7 +55,7 @@ interface CliOptions {
  * Parse command line arguments
  */
 function parseArgs(): CliOptions {
-  const args = (globalThis as any).process?.argv?.slice(2) || [];
+  const args = process.argv.slice(2);
   const options: CliOptions = {};
 
   for (let i = 0; i < args.length; i++) {
@@ -121,6 +121,13 @@ Examples:
 `);
 }
 
+type SummaryResults = (ReturnType<typeof createStandaloneSummary> & {
+  concept: Partial<ConceptDesignState>;
+  options: CliOptions;
+}) | { error: string; summary?: never; markdown?: never };
+
+type HeadlessOutput = NonNullable<Awaited<ReturnType<typeof setupHeadlessOutput>>>;
+
 /**
  * Initialize headless output (simplified implementation)
  */
@@ -133,7 +140,6 @@ async function setupHeadlessOutput(options: CliOptions) {
   // Create output structure
   const headlessOutput = {
     outputDir,
-    results: {} as any,
     report: {
       scriptName: 'generate-summary.ts',
       timestamp: new Date().toISOString(),
@@ -144,7 +150,8 @@ async function setupHeadlessOutput(options: CliOptions) {
       errors: [] as string[],
       warnings: [] as string[],
       summary: '',
-      duration: 0
+      duration: 0,
+      results: undefined as SummaryResults | undefined
     }
   };
 
@@ -155,7 +162,7 @@ async function setupHeadlessOutput(options: CliOptions) {
 /**
  * Save headless results (simplified implementation)
  */
-async function saveHeadlessResults(headlessOutput: any, results: any) {
+async function saveHeadlessResults(headlessOutput: HeadlessOutput, results: SummaryResults) {
   if (!headlessOutput) return;
 
   try {

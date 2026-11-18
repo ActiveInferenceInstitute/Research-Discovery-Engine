@@ -1,3 +1,4 @@
+import type { TriggerAgent } from '../../types';
 // Renders a single CSS section (e.g., Context, Dynamics) containing multiple fields.
 
 import React, { useState } from 'react';
@@ -11,9 +12,9 @@ interface CSSSectionProps {
   sectionLabel: string; // e.g., 'Context & Environment'
   sectionData: Partial<CSSVector[CSSSectionProps['sectionId']]>; // Data for this section
   fieldSuggestions: { [fieldPath: string]: AgentMessage[] }; // Suggestions for fields within this section
-  onUpdateField: (fieldPath: string, value: any) => void;
-  onAcceptSuggestion: (fieldPath: string, suggestionValue: any) => void;
-  onTriggerAgent: (action: string, payload?: any) => void;
+  onUpdateField: (fieldPath: string, value: unknown) => void;
+  onAcceptSuggestion: (fieldPath: string, suggestionValue: unknown) => void;
+  onTriggerAgent: TriggerAgent;
   onSelectNode?: (node: NodeObject) => void;
   cnmNodes: NodeObject[]; // All CNM nodes for lookup
 }

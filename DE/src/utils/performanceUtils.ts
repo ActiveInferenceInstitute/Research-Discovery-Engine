@@ -5,7 +5,7 @@
  * including memoization helpers, lazy loading utilities, and optimization functions.
  */
 
-import React, { useCallback, useMemo, useRef, useEffect, useState } from 'react';
+import React, { useCallback, useMemo, useRef, useEffect, useEffectEvent, useState } from 'react';
 
 /**
  * Creates a stable callback that won't change between renders unless dependencies change
@@ -17,12 +17,7 @@ import React, { useCallback, useMemo, useRef, useEffect, useState } from 'react'
  * @example
  * const stableCallback = useStableCallback(handleClick, [data]);
  */
-export const useStableCallback = <T extends (...args: any[]) => any>(
-  callback: T,
-  deps: React.DependencyList
-): T => {
-  return useCallback(callback, deps);
-};
+export const useStableCallback = useCallback;
 
 /**
  * Memoizes a complex computation and only recalculates when dependencies change
@@ -33,12 +28,7 @@ export const useStableCallback = <T extends (...args: any[]) => any>(
  * @example
  * const expensiveValue = useStableMemo(() => processLargeData(data), [data]);
  */
-export const useStableMemo = <T>(
-  factory: () => T,
-  deps: React.DependencyList
-): T => {
-  return useMemo(factory, deps);
-};
+export const useStableMemo = useMemo;
 
 /**
  * Debounced state hook that delays state updates until a specified delay has passed
@@ -96,6 +86,7 @@ export const useIsMounted = (): (() => boolean) => {
   const isMountedRef = useRef(true);
   
   useEffect(() => {
+    isMountedRef.current = true;
     return () => {
       isMountedRef.current = false;
     };
@@ -114,19 +105,19 @@ export const useIsMounted = (): (() => boolean) => {
  * @example
  * const throttledOnScroll = useThrottle(handleScroll, 100);
  */
-export const useThrottle = <T extends (...args: any[]) => any>(
-  callback: T,
+export const useThrottle = <Args extends unknown[]>(
+  callback: (...args: Args) => unknown,
   delay: number
-): T => {
+): ((...args: Args) => void) => {
   const lastRan = useRef(Date.now());
   
   return useCallback(
-    ((...args) => {
+    (...args: Args) => {
       if (Date.now() - lastRan.current >= delay) {
         callback(...args);
         lastRan.current = Date.now();
       }
-    }) as T,
+    },
     [callback, delay]
   );
 };
@@ -141,21 +132,21 @@ export const useThrottle = <T extends (...args: any[]) => any>(
  * @example
  * const debouncedSearch = useDebounce(handleSearch, 300);
  */
-export const useDebounce = <T extends (...args: any[]) => any>(
-  callback: T,
+export const useDebounce = <Args extends unknown[]>(
+  callback: (...args: Args) => unknown,
   delay: number
-): T => {
+): ((...args: Args) => void) => {
   const timeoutRef = useRef<NodeJS.Timeout>(undefined);
   
   return useCallback(
-    ((...args) => {
+    (...args: Args) => {
       if (timeoutRef.current) {
         clearTimeout(timeoutRef.current);
       }
       timeoutRef.current = setTimeout(() => {
         callback(...args);
       }, delay);
-    }) as T,
+    },
     [callback, delay]
   );
 };
@@ -200,9 +191,21 @@ export const useLazyLoad = <T>(
     }
   }, [loader, isMounted]);
 
+  const lastDeps = useRef<React.DependencyList | undefined>(undefined);
+  const loadFromEffect = useEffectEvent(load);
+
   useEffect(() => {
-    load();
-  }, deps);
+    const previous = lastDeps.current;
+    if (!previous || previous.length !== deps.length ||
+        previous.some((value, index) => !Object.is(value, deps[index]))) {
+      lastDeps.current = [...deps];
+      void loadFromEffect();
+    }
+  });
+
+  useEffect(() => () => {
+    lastDeps.current = undefined;
+  }, []);
 
   const retry = useCallback(() => {
     load();

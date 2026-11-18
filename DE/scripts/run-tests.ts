@@ -497,7 +497,7 @@ async function runPerformanceTests(): Promise<TestSuite> {
     const conceptState = createMockConceptDesignState();
     
     const perfStart = Date.now();
-    const summary = generateSummary(conceptState, undefined, {
+    generateSummary(conceptState, undefined, {
       summaryLength: 'comprehensive',
       technicalLevel: 'technical',
       includeComponents: true,
