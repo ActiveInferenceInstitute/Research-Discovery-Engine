@@ -26,8 +26,7 @@ import {
   findShortestPath,
   validateGraphData,
   groupNodesByProperty,
-  extractKeywords,
-  mergeGraphData
+  extractKeywords
 } from '../src/utils/dataTransformUtils';
 import { GraphData, NodeObject } from '../src/types';
 
@@ -43,6 +42,20 @@ interface CliOptions {
   help?: boolean;
 }
 
+interface AnalysisResults {
+  graphData?: { nodeCount: number; linkCount: number };
+  statistics?: ReturnType<typeof calculateGraphStats>;
+  searchResults?: GraphData;
+  pathResults?: {
+    source: string;
+    target: string;
+    path: ReturnType<typeof findShortestPath>;
+    found: boolean;
+  };
+  validation?: ReturnType<typeof validateGraphData>;
+  error?: string;
+}
+
 interface HeadlessOutput {
   outputDir: string;
   report: {
@@ -56,7 +69,7 @@ interface HeadlessOutput {
     errors: string[];
     warnings: string[];
     summary: string;
-    results: any;
+    results: AnalysisResults;
   };
 }
 
@@ -64,7 +77,7 @@ interface HeadlessOutput {
  * Parse command line arguments
  */
 function parseArgs(): CliOptions {
-  const args = (globalThis as any).process?.argv?.slice(2) || [];
+  const args = process.argv.slice(2);
   const options: CliOptions = {};
 
   for (let i = 0; i < args.length; i++) {
@@ -87,19 +100,21 @@ function parseArgs(): CliOptions {
       case '--validate':
         options.validate = true;
         break;
-      case '--find-path':
+      case '--find-path': {
         const source = args[++i];
         const target = args[++i];
         if (source && target) {
           options.findPath = [source, target];
         }
         break;
-      case '--output-format':
+      }
+      case '--output-format': {
         const format = args[++i];
         if (['json', 'readable'].includes(format)) {
           options.outputFormat = format as 'json' | 'readable';
         }
         break;
+      }
       case '--headless':
         options.headless = true;
         break;
@@ -376,7 +391,7 @@ async function initializeHeadlessOutput(options: CliOptions): Promise<HeadlessOu
 /**
  * Save headless output results
  */
-async function saveHeadlessOutput(headlessOutput: HeadlessOutput, results: any) {
+async function saveHeadlessOutput(headlessOutput: HeadlessOutput, results: AnalysisResults) {
   try {
     const fs = await import('fs');
     const path = await import('path');
@@ -415,7 +430,7 @@ async function saveHeadlessOutput(headlessOutput: HeadlessOutput, results: any) 
 /**
  * Generate summary from results
  */
-function generateSummary(results: any): string {
+function generateSummary(results: AnalysisResults): string {
   const parts: string[] = [];
   
   if (results.statistics) {
@@ -441,7 +456,7 @@ function generateSummary(results: any): string {
 /**
  * Generate human-readable summary report
  */
-function generateHumanReadableSummary(report: any): string {
+function generateHumanReadableSummary(report: HeadlessOutput['report']): string {
   const duration = report.duration ? `${(report.duration / 1000).toFixed(2)}s` : 'N/A';
   
   return `# Data Analysis - Processing Report
@@ -504,7 +519,7 @@ async function main() {
     }
 
     // Store results for headless output
-    const results: any = {
+    const results: AnalysisResults = {
       graphData: {
         nodeCount: graphData.nodes.length,
         linkCount: graphData.links.length
@@ -583,8 +598,7 @@ async function main() {
       await saveHeadlessOutput(headlessOutput, { error: String(error) });
     }
     console.error('❌ Error during analysis:', error);
-    // Use globalThis to avoid TypeScript issues
-    (globalThis as any).process?.exit?.(1);
+    process.exit(1);
   }
 }
 

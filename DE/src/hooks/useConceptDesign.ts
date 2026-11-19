@@ -15,7 +15,7 @@ const getInitialConceptDesignState = (seedNode?: NodeObject | null): ConceptDesi
     applications: [],
     theoretical_concepts: [],
   };
-  let cssVectorDraft: Partial<CSSVector> = {
+  const cssVectorDraft: Partial<CSSVector> = {
     meta: { id: newId, analysis_date: new Date().toISOString(), source_keys: [] },
     context: {}, state: {}, interface: {}, dynamics: {}, memory: {},
     adaptation: {}, constraints: {}, interactions: {}, hierarchy: {}
@@ -60,12 +60,8 @@ export const useConceptDesign = () => {
   const updateComponentSelection = useCallback((componentType: keyof ConceptDesignState['components'], selectedIds: string[]) => {
     setConceptDesignState(prevState => {
       const newState = cloneDeep(prevState);
-      // Ensure the componentType array exists
-      if (!newState.components[componentType]) {
-        (newState.components as any)[componentType] = []; // Initialize if not present
-      }
-      (newState.components[componentType] as string[]) = selectedIds;
-      
+      newState.components[componentType] = selectedIds;
+
       if (prevState.status === 'Hypothetical' && (newState.components.materials.length > 0 || newState.components.mechanisms.length > 0)) {
         newState.status = 'Proposed';
       }
@@ -73,7 +69,7 @@ export const useConceptDesign = () => {
     });
   }, []);
 
-  const updateCssField = useCallback((fieldPath: string, value: any) => { /* ... as before ... */ 
+  const updateCssField = useCallback((fieldPath: string, value: unknown) => {
     setConceptDesignState(prevState => {
       const newState = cloneDeep(prevState);
       lodashSet(newState.cssVectorDraft, fieldPath, value);

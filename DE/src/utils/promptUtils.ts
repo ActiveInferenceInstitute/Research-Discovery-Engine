@@ -30,7 +30,7 @@ export const loadPrompt = async (promptName: string): Promise<string> => {
  * @param variables - Object with variable values
  * @returns Formatted prompt
  */
-export const formatPrompt = (promptTemplate: string, variables: Record<string, any>): string => {
+export const formatPrompt = (promptTemplate: string, variables: Record<string, unknown>): string => {
   let formattedPrompt = promptTemplate;
 
   // Replace each variable in the template
@@ -72,7 +72,7 @@ export const listAvailablePrompts = async (): Promise<string[]> => {
  * @param promptContent - Content of the prompt
  * @returns Promise resolving to success status
  */
-export const createPrompt = async (promptName: string, _promptContent: string): Promise<boolean> => {
+export const createPrompt: (promptName: string, promptContent: string) => Promise<boolean> = async (promptName) => {
   try {
     // This would require a server endpoint in a real application
     // For now, we'll just simulate success
@@ -91,7 +91,7 @@ export const createPrompt = async (promptName: string, _promptContent: string): 
  * @param promptContent - New content of the prompt
  * @returns Promise resolving to success status
  */
-export const updatePrompt = async (promptName: string, _promptContent: string): Promise<boolean> => {
+export const updatePrompt: (promptName: string, promptContent: string) => Promise<boolean> = async (promptName) => {
   try {
     // This would require a server endpoint in a real application
     // For now, we'll just simulate success

@@ -75,30 +75,3 @@ export interface CSSVector {
   cognition_score?: number;
   criticality_score?: number;
 }
-
-export interface NodeObject {
-  id: string;
-  type: NodeType;
-  origin?: 'wiki_section' | 'wiki_entity_file' | 'user_upload' | 'concept_design' | 'paper_analysis';
-  status?: 'canonical' | 'proposed' | 'hypothetical' | 'validated' | 'deprecated'; // Added status
-  group?: number;
-  value?: number;
-  label?: string;
-  description?: string;
-  cssVector?: Partial<CSSVector>;
-  sourceWikiSectionId?: string;
-  references?: string[];
-  validationScore?: number;
-  cognitionScore?: number;
-  criticalityScore?: number;
-  x?: number; y?: number; z?: number; fx?: number; fy?: number; fz?: number;
-  color?: string;
-}
-
-export interface LinkObject {
-  source: string;
-  target: string;
-  type: 'categorizes' | 'cites-paper' | 'concept-uses' | 'related-to' | 'interplay' | 'addresses-gap' | 'defines-artifact'; // Added more types based on process.md
-  value?: number;
-  justification?: string;
-}

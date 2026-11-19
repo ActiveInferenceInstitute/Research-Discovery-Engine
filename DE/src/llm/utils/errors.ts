@@ -4,6 +4,41 @@
  * Custom error classes for better error handling in LLM operations
  */
 
+function isRecord(value: unknown): value is Record<string, unknown> {
+  return (typeof value === 'object' && value !== null) || typeof value === 'function';
+}
+
+function errorMessage(error: unknown): string | undefined {
+  return isRecord(error) && typeof error.message === 'string' ? error.message : undefined;
+}
+
+function errorName(error: unknown): unknown {
+  return isRecord(error) ? error.name : undefined;
+}
+
+export function readProviderError(error: unknown) {
+  const properties = isRecord(error) ? error : undefined;
+  const body = isRecord(properties?.error) ? properties.error : undefined;
+  const headers = properties?.headers;
+  const retryAfterHeader = (typeof Headers !== 'undefined' && headers instanceof Headers)
+    ? headers.get('retry-after')
+    : isRecord(headers) ? headers['retry-after'] : undefined;
+  const retryAfter = typeof retryAfterHeader === 'string'
+    ? Number.parseInt(retryAfterHeader, 10)
+    : retryAfterHeader;
+
+  return {
+    message: errorMessage(error),
+    code: typeof properties?.code === 'string' ? properties.code : undefined,
+    status: typeof properties?.status === 'number' ? properties.status : undefined,
+    statusCode: typeof properties?.statusCode === 'number' ? properties.statusCode : undefined,
+    bodyMessage: errorMessage(body),
+    bodyCode: typeof body?.code === 'string' ? body.code : undefined,
+    bodyType: typeof body?.type === 'string' ? body.type : undefined,
+    retryAfter: typeof retryAfter === 'number' && Number.isFinite(retryAfter) ? retryAfter : undefined
+  };
+}
+
 /**
  * Base LLM Error class
  */
@@ -12,14 +47,14 @@ export class LLMError extends Error {
   public readonly code?: string;
   public readonly statusCode?: number;
   public retryAfter?: number;
-  public readonly details?: any;
+  public readonly details?: unknown;
 
   constructor(
     message: string,
     type: string = 'llm_error',
     code?: string,
     statusCode?: number,
-    details?: any
+    details?: unknown
   ) {
     super(message);
     this.name = 'LLMError';
@@ -37,25 +72,24 @@ export class LLMError extends Error {
   /**
    * Create error from OpenAI API error
    */
-  static fromOpenAIError(error: any): LLMError {
-    const message = error?.error?.message || error?.message || 'Unknown OpenAI error';
-    const code = error?.error?.code || error?.code;
-    const statusCode = error?.status || error?.statusCode;
+  static fromOpenAIError(error: unknown): LLMError {
+    const providerError = readProviderError(error);
+    const message = providerError.bodyMessage || providerError.message || 'Unknown OpenAI error';
+    const code = providerError.bodyCode || providerError.code;
+    const statusCode = providerError.status || providerError.statusCode;
 
     let type = 'api_error';
     if (statusCode === 429) {
       type = 'rate_limit_error';
-    } else if (statusCode >= 500) {
-      type = 'api_error';
-    } else if (statusCode >= 400) {
+    } else if (statusCode !== undefined && statusCode >= 400 && statusCode < 500) {
       type = 'validation_error';
     }
 
     const llmError = new LLMError(message, type, code, statusCode, error);
     
     // Extract retry-after header for rate limits
-    if (type === 'rate_limit_error' && error?.headers?.['retry-after']) {
-      llmError.retryAfter = parseInt(error.headers['retry-after']);
+    if (type === 'rate_limit_error') {
+      llmError.retryAfter = providerError.retryAfter;
     }
 
     return llmError;
@@ -64,28 +98,28 @@ export class LLMError extends Error {
   /**
    * Create network error
    */
-  static networkError(message: string, details?: any): LLMError {
+  static networkError(message: string, details?: unknown): LLMError {
     return new LLMError(message, 'network_error', undefined, undefined, details);
   }
 
   /**
    * Create timeout error
    */
-  static timeoutError(message: string, details?: any): LLMError {
+  static timeoutError(message: string, details?: unknown): LLMError {
     return new LLMError(message, 'timeout_error', undefined, undefined, details);
   }
 
   /**
    * Create validation error
    */
-  static validationError(message: string, details?: any): LLMError {
+  static validationError(message: string, details?: unknown): LLMError {
     return new LLMError(message, 'validation_error', undefined, 400, details);
   }
 
   /**
    * Create rate limit error
    */
-  static rateLimitError(message: string, retryAfter?: number, details?: any): LLMError {
+  static rateLimitError(message: string, retryAfter?: number, details?: unknown): LLMError {
     const error = new LLMError(message, 'rate_limit_error', 'rate_limit_exceeded', 429, details);
     error.retryAfter = retryAfter;
     return error;
@@ -97,9 +131,9 @@ export class LLMError extends Error {
  */
 export class LLMConfigError extends Error {
   public readonly field?: string;
-  public readonly value?: any;
+  public readonly value?: unknown;
 
-  constructor(message: string, field?: string, value?: any) {
+  constructor(message: string, field?: string, value?: unknown) {
     super(message);
     this.name = 'LLMConfigError';
     this.field = field;
@@ -184,28 +218,28 @@ export class LLMServiceError extends Error {
 /**
  * Type guard for LLM errors
  */
-export function isLLMError(error: any): error is LLMError {
-  return error instanceof LLMError || (error && error.name === 'LLMError');
+export function isLLMError(error: unknown): error is LLMError {
+  return error instanceof LLMError || errorName(error) === 'LLMError';
 }
 
 /**
  * Type guard for config errors
  */
-export function isLLMConfigError(error: any): error is LLMConfigError {
-  return error instanceof LLMConfigError || (error && error.name === 'LLMConfigError');
+export function isLLMConfigError(error: unknown): error is LLMConfigError {
+  return error instanceof LLMConfigError || errorName(error) === 'LLMConfigError';
 }
 
 /**
  * Type guard for service errors
  */
-export function isLLMServiceError(error: any): error is LLMServiceError {
-  return error instanceof LLMServiceError || (error && error.name === 'LLMServiceError');
+export function isLLMServiceError(error: unknown): error is LLMServiceError {
+  return error instanceof LLMServiceError || errorName(error) === 'LLMServiceError';
 }
 
 /**
  * Format error for logging
  */
-export function formatLLMError(error: any): string {
+export function formatLLMError(error: unknown): string {
   if (isLLMError(error)) {
     return `LLMError [${error.type}]: ${error.message} (Code: ${error.code || 'N/A'}, Status: ${error.statusCode || 'N/A'})`;
   } else if (isLLMConfigError(error)) {
@@ -213,6 +247,6 @@ export function formatLLMError(error: any): string {
   } else if (isLLMServiceError(error)) {
     return `LLMServiceError [${error.service}.${error.operation}]: ${error.message}`;
   } else {
-    return `Unknown Error: ${error?.message || String(error)}`;
+    return `Unknown Error: ${errorMessage(error) || String(error)}`;
   }
 } 

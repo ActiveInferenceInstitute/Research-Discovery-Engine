@@ -70,9 +70,9 @@ workflows call these arms rather than restating them.
 ```
 
 Install each component from its lockfile first (`npm ci` in `DE/` and in
-`website_explore_the_unknown/`). `./run.sh lint` and `./run.sh types` exist and
-are runnable but currently report pre-existing findings: see
-[`Docs/RUN_GUIDE.md`](Docs/RUN_GUIDE.md#known-red-checks). Measured wall times,
+`website_explore_the_unknown/`). `./run.sh lint` and `./run.sh types` are
+required by `all` and CI: see
+[`Docs/RUN_GUIDE.md`](Docs/RUN_GUIDE.md#strict-frontend-checks). Measured wall times,
 test counts and finding counts are generated in
 [`Docs/GATE_METRICS.md`](Docs/GATE_METRICS.md) by `./run.sh metrics`.
 

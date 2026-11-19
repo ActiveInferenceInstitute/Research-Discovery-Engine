@@ -26,13 +26,13 @@ export const generateId = (prefix?: string): string => {
  * @example
  * const debouncedSearch = debounce(handleSearch, 300);
  */
-export const debounce = <T extends (...args: any[]) => any>(
-  func: T,
+export const debounce = <Args extends unknown[]>(
+  func: (...args: Args) => void,
   delay: number
-): ((...args: Parameters<T>) => void) => {
+): ((...args: Args) => void) => {
   let timeoutId: NodeJS.Timeout;
   
-  return (...args: Parameters<T>) => {
+  return (...args: Args) => {
     clearTimeout(timeoutId);
     timeoutId = setTimeout(() => func(...args), delay);
   };
@@ -46,13 +46,13 @@ export const debounce = <T extends (...args: any[]) => any>(
  * @example
  * const throttledScroll = throttle(handleScroll, 100);
  */
-export const throttle = <T extends (...args: any[]) => any>(
-  func: T,
+export const throttle = <Args extends unknown[]>(
+  func: (...args: Args) => void,
   interval: number
-): ((...args: Parameters<T>) => void) => {
+): ((...args: Args) => void) => {
   let lastCall = 0;
   
-  return (...args: Parameters<T>) => {
+  return (...args: Args) => {
     const now = Date.now();
     if (now - lastCall >= interval) {
       lastCall = now;
@@ -84,7 +84,7 @@ export const deepClone = <T>(obj: T): T => {
   if (typeof obj === 'object') {
     const cloned = {} as T;
     for (const key in obj) {
-      if (obj.hasOwnProperty(key)) {
+      if (Object.prototype.hasOwnProperty.call(obj, key)) {
         cloned[key] = deepClone(obj[key]);
       }
     }
@@ -103,8 +103,8 @@ export const deepClone = <T>(obj: T): T => {
  * @example
  * const name = getNestedProperty(user, 'profile.name', 'Unknown');
  */
-export const getNestedProperty = <T = any>(
-  obj: any,
+export const getNestedProperty = <T = unknown>(
+  obj: unknown,
   path: string,
   defaultValue?: T
 ): T => {
@@ -112,10 +112,10 @@ export const getNestedProperty = <T = any>(
   let current = obj;
   
   for (const key of keys) {
-    if (current === null || current === undefined || !(key in current)) {
+    if (current === null || (typeof current !== 'object' && typeof current !== 'function') || !(key in current)) {
       return defaultValue as T;
     }
-    current = current[key];
+    current = (current as Record<string, unknown>)[key];
   }
   
   return current as T;
@@ -129,18 +129,22 @@ export const getNestedProperty = <T = any>(
  * @example
  * setNestedProperty(user, 'profile.name', 'John Doe');
  */
-export const setNestedProperty = (obj: any, path: string, value: any): void => {
+export const setNestedProperty = (obj: object, path: string, value: unknown): void => {
   const keys = path.split('.');
   const lastKey = keys.pop();
   
   if (!lastKey) return;
   
-  let current = obj;
+  let current = obj as Record<string, unknown>;
   for (const key of keys) {
-    if (!(key in current) || typeof current[key] !== 'object') {
-      current[key] = {};
+    const child = current[key];
+    if (child === null || typeof child !== 'object') {
+      const nested: Record<string, unknown> = {};
+      current[key] = nested;
+      current = nested;
+    } else {
+      current = child as Record<string, unknown>;
     }
-    current = current[key];
   }
   
   current[lastKey] = value;
@@ -237,7 +241,7 @@ export const toTitleCase = (str: string): string => {
  * const empty = isEmpty(''); // true
  * const notEmpty = isEmpty('hello'); // false
  */
-export const isEmpty = (value: any): boolean => {
+export const isEmpty = (value: unknown): boolean => {
   if (value === null || value === undefined) return true;
   if (typeof value === 'string') return value.trim().length === 0;
   if (Array.isArray(value)) return value.length === 0;
@@ -256,7 +260,7 @@ export const isEmpty = (value: any): boolean => {
  */
 export const removeDuplicates = <T>(
   array: T[],
-  keyFn?: (item: T) => any
+  keyFn?: (item: T) => unknown
 ): T[] => {
   if (!keyFn) {
     return [...new Set(array)];
@@ -304,10 +308,10 @@ export const groupBy = <T, K extends string | number | symbol>(
  *   { key: 'firstName', direction: 'asc' }
  * ]);
  */
-export const sortBy = <T>(
+export const sortBy = <T, Value = unknown>(
   array: T[],
   sortCriteria: Array<{
-    key: keyof T | ((item: T) => any);
+    key: keyof T | ((item: T) => Value);
     direction: 'asc' | 'desc';
   }>
 ): T[] => {

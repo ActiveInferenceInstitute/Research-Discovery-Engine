@@ -5,7 +5,8 @@
  * retry logic, streaming support, and analytics.
  */
 
-import OpenAI from 'openai';
+import OpenAI, { type ClientOptions } from 'openai';
+import { readProviderError } from './utils/errors';
 import {
   LLMConfig,
   LLMRequest,
@@ -35,7 +36,7 @@ export class LLMService {
     this.config = config;
 
     // Initialize OpenAI client with appropriate configuration
-    const openaiConfig: any = {
+    const openaiConfig: ClientOptions = {
       apiKey: config.apiKey
     };
 
@@ -123,7 +124,7 @@ export class LLMService {
       // Make the API call with retry logic
       const response = await this.makeRequestWithRetry(async () => {
         // Create request parameters based on provider
-        const requestParams: any = {
+        const requestParams = {
           model: finalConfig.model || this.config.model,
           messages,
           max_tokens: finalConfig.maxTokens || this.config.maxTokens,
@@ -132,7 +133,6 @@ export class LLMService {
           frequency_penalty: finalConfig.frequencyPenalty,
           presence_penalty: finalConfig.presencePenalty,
           stop: finalConfig.stop,
-          stream: false,
           seed: finalConfig.seed,
           logit_bias: finalConfig.logitBias,
         };
@@ -144,7 +144,7 @@ export class LLMService {
           headers['X-Title'] = 'Research Discovery Engine';
         }
 
-        return await this.openai.chat.completions.create(requestParams, { headers });
+        return await this.openai.chat.completions.create({ ...requestParams, stream: false }, { headers });
       });
 
       const endTime = Date.now();
@@ -222,12 +222,11 @@ export class LLMService {
       const finalConfig = this.mergeConfig(request.config);
 
       // Create request parameters based on provider
-      const requestParams: any = {
+      const requestParams = {
         model: finalConfig.model || this.config.model,
         messages,
         max_tokens: finalConfig.maxTokens || this.config.maxTokens,
         temperature: finalConfig.temperature ?? this.config.temperature,
-        stream: true
       };
 
       // Add OpenRouter-specific headers if needed
@@ -236,7 +235,7 @@ export class LLMService {
         headers['HTTP-Referer'] = 'https://research-discovery-engine.example.com';
         headers['X-Title'] = 'Research Discovery Engine';
       }
-      const stream = await this.openai.chat.completions.create(requestParams, { headers });
+      const stream = await this.openai.chat.completions.create({ ...requestParams, stream: true }, { headers });
 
       for await (const chunk of stream) {
         const content = chunk.choices[0]?.delta?.content;
@@ -260,7 +259,7 @@ export class LLMService {
 
     let successfulRequests = 0;
     let failedRequests = 0;
-    let totalUsage = { promptTokens: 0, completionTokens: 0, totalTokens: 0 };
+    const totalUsage = { promptTokens: 0, completionTokens: 0, totalTokens: 0 };
 
     // Process requests in batches
     for (let i = 0; i < batchRequest.requests.length; i += concurrency) {
@@ -347,7 +346,7 @@ export class LLMService {
     this.config = { ...this.config, ...newConfig };
 
     // Reinitialize OpenAI client with updated configuration
-    const openaiConfig: any = {
+    const openaiConfig: ClientOptions = {
       apiKey: this.config.apiKey
     };
 
@@ -409,7 +408,7 @@ export class LLMService {
     requestFn: () => Promise<T>,
     retryPolicy: RetryPolicy = this.defaultRetryPolicy
   ): Promise<T> {
-    let lastError: any;
+    let lastError: unknown;
 
     for (let attempt = 0; attempt <= retryPolicy.maxRetries; attempt++) {
       try {
@@ -435,71 +434,57 @@ export class LLMService {
     throw lastError;
   }
 
-  private handleError(error: any): LLMError {
-    // Handle OpenRouter-specific errors
-    if (this.config.apiProvider === 'openrouter') {
-      if (error?.status === 429 || (error?.error && error?.error.type === 'insufficient_quota')) {
-        return {
-          type: 'rate_limit_error',
-          message: 'OpenRouter rate limit exceeded or insufficient quota',
-          code: error.error?.code,
-          statusCode: error.status || 429,
-          retryAfter: error.headers?.['retry-after'] ? parseInt(error.headers['retry-after']) : 5
-        };
-      }
+  private handleError(error: unknown): LLMError {
+    const { status, code, bodyType, bodyCode, bodyMessage, message, retryAfter } = readProviderError(error);
+
+    if (this.config.apiProvider === 'openrouter' && (status === 429 || bodyType === 'insufficient_quota')) {
+      return {
+        type: 'rate_limit_error',
+        message: 'OpenRouter rate limit exceeded or insufficient quota',
+        code: bodyCode,
+        statusCode: status || 429,
+        retryAfter: retryAfter ?? 5
+      };
     }
 
-    // Handle OpenRouter-specific errors
-    if (this.config.apiProvider === 'openrouter') {
-      if (error?.status === 429 || (error?.error && error?.error.type === 'insufficient_quota')) {
-        return {
-          type: 'rate_limit_error',
-          message: 'OpenRouter rate limit exceeded or insufficient quota',
-          code: error.error?.code,
-          statusCode: error.status || 429,
-          retryAfter: error.headers?.['retry-after'] ? parseInt(error.headers['retry-after']) : 5
-        };
-      }
-    }
-
-    if (error?.error?.type === 'insufficient_quota') {
+    if (bodyType === 'insufficient_quota') {
       return {
         type: 'rate_limit_error',
         message: 'Insufficient quota. Please check your billing.',
-        code: error.error.code,
-        statusCode: error.status
+        code: bodyCode,
+        statusCode: status
       };
     }
 
-    if (error?.status === 429) {
+    if (status === 429) {
       return {
         type: 'rate_limit_error',
         message: 'Rate limit exceeded',
-        code: error.error?.code,
-        statusCode: error.status,
-        retryAfter: error.headers?.['retry-after']
+        code: bodyCode,
+        statusCode: status,
+        retryAfter
       };
     }
 
-    if (error?.status >= 500) {
+    if (status !== undefined && status >= 500) {
       return {
         type: 'api_error',
         message: 'Server error',
-        code: error.error?.code,
-        statusCode: error.status
+        code: bodyCode,
+        statusCode: status
       };
     }
 
-    if (error?.status >= 400) {
+    if (status !== undefined && status >= 400) {
       return {
         type: 'validation_error',
-        message: error.error?.message || 'Invalid request',
-        code: error.error?.code,
-        statusCode: error.status
+        message: bodyMessage || 'Invalid request',
+        code: bodyCode,
+        statusCode: status
       };
     }
 
-    if (error?.code === 'ENOTFOUND' || error?.code === 'ECONNREFUSED') {
+    if (code === 'ENOTFOUND' || code === 'ECONNREFUSED') {
       return {
         type: 'network_error',
         message: 'Network connection failed',
@@ -509,7 +494,7 @@ export class LLMService {
 
     return {
       type: 'api_error',
-      message: error?.message || 'Unknown error occurred',
+      message: message || 'Unknown error occurred',
       details: error
     };
   }

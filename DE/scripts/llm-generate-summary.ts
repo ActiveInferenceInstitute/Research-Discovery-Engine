@@ -9,7 +9,7 @@
 import { loadEnvironment } from './load-env';
 import { createSummaryService, createProviderService } from '../src/llm/utils/factory';
 import { createMockConceptDesignState } from '../src/utils/testUtils';
-import { SummaryLLMRequest } from '../src/llm/types';
+import { SummaryLLMRequest, SummaryLLMResult } from '../src/llm/types';
 import * as fs from 'fs';
 import * as path from 'path';
 
@@ -37,12 +37,13 @@ function parseArgs(): CliOptions {
       case '--domain':
         options.domain = args[++i];
         break;
-      case '--format':
+      case '--format': {
         const format = args[++i];
         if (['markdown', 'json'].includes(format)) {
           options.format = format as 'markdown' | 'json';
         }
         break;
+      }
       case '--headless':
         options.headless = true;
         break;
@@ -90,7 +91,7 @@ Examples:
 `);
 }
 
-async function generateLLMSummary(concept: string, options: CliOptions): Promise<any> {
+async function generateLLMSummary(concept: string, options: CliOptions) {
   if (options.verbose) {
     console.log(`🤖 Generating LLM-enhanced summary for: ${concept}`);
   }
@@ -129,7 +130,7 @@ async function generateLLMSummary(concept: string, options: CliOptions): Promise
     };
 
     // Generate summary using LLM
-    const result = await summaryService.generateSummary(request);
+    const result: SummaryLLMResult = await summaryService.generateSummary(request);
 
     if (!result.success) {
       throw new Error(`LLM summary generation failed: ${result.error}`);
@@ -186,7 +187,9 @@ function extractKeyTopics(content: string): string[] {
   return found.slice(0, 5);
 }
 
-function formatOutput(data: any, format: string): string {
+type SummaryOutput = Awaited<ReturnType<typeof generateLLMSummary>>;
+
+function formatOutput(data: SummaryOutput, format: string): string {
   if (format === 'json') {
     return JSON.stringify(data, null, 2);
   }
@@ -232,7 +235,7 @@ ${data.conceptState.components.theoretical_concepts.map((t: string) => `- ${t}`)
 `;
 }
 
-function saveHeadlessOutput(data: any, format: string, options: CliOptions): string {
+function saveHeadlessOutput(data: SummaryOutput, format: string, options: CliOptions): string {
   const baseDir = options.headlessOutput || './llm-summary-output';
   const timestamp = new Date().toISOString().replace(/[:.]/g, '-').slice(0, 19);
   const outputDir = path.join(baseDir, `llm-summary_${timestamp}`);

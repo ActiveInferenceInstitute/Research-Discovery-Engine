@@ -27,14 +27,14 @@ import {
   createMockHandlers,
   testDataGenerators,
   graphTestUtils,
-  llmTestUtils,
   llmPerformanceTestUtils
 } from '../src/utils/testUtils';
 import { createLLMService, createSummaryService, createKnowledgeService, createProtocolService } from '../src/llm/utils/factory';
 import { validateGraphData, calculateGraphStats } from '../src/utils/dataTransformUtils';
 import { generateSummary } from '../src/utils/summaryGenerator';
 import { generateProtocol } from '../src/utils/protocolGenerator';
-import { GraphData, ConceptDesignState } from '../src/types';
+import { parseNodeDetails } from '../src/utils/parseNodeData';
+import type { NodeObject } from '../src/types';
 
 interface CliOptions {
   testType?: 'unit' | 'integration' | 'validation' | 'llm' | 'all';
@@ -80,12 +80,13 @@ function parseArgs(): CliOptions {
       case '-h':
         options.help = true;
         break;
-      case '--test-type':
+      case '--test-type': {
         const testType = args[++i];
         if (['unit', 'integration', 'validation', 'llm', 'all'].includes(testType)) {
           options.testType = testType as 'unit' | 'integration' | 'validation' | 'llm' | 'all';
         }
         break;
+      }
       case '--component':
         options.component = args[++i];
         break;
@@ -101,12 +102,13 @@ function parseArgs(): CliOptions {
       case '--llm-test':
         options.llmTest = true;
         break;
-      case '--output-format':
+      case '--output-format': {
         const format = args[++i];
         if (['json', 'readable'].includes(format)) {
           options.outputFormat = format as 'json' | 'readable';
         }
         break;
+      }
       case '--verbose':
         options.verbose = true;
         break;
@@ -202,6 +204,29 @@ async function runUnitTests(component?: string): Promise<TestSuite> {
     }));
   }
 
+  if (!component || component.toLowerCase() === 'parsenodedata') {
+    results.push(await runTest('Node Details Preserve Parsed Fields', async () => {
+      const node: NodeObject = {
+        id: 'test-node',
+        type: 'Mechanism',
+        description: [
+          'Overview of the node.',
+          '* **Input / Properties:** Heat',
+          '* **Output / Behaviors:** Motion',
+          '* **Related concepts:** [[test-node]]',
+          '* **Connections:** Coupled to the source',
+          '* **Custom attribute:** Preserved',
+        ].join('\n'),
+      };
+      const parsed = parseNodeDetails(node, [node]);
+      if (parsed.input !== 'Heat' || parsed.output !== 'Motion') throw new Error('Missing inputs or outputs');
+      if (!parsed.relatedToTextItems[0]?.includes('#NODE__test-node')) throw new Error('Missing related-node link');
+      if (parsed.linksConnectionsContent !== 'Coupled to the source') throw new Error('Missing connections');
+      if (parsed.attributes[0]?.value !== 'Preserved') throw new Error('Missing custom attribute');
+      return 'Inputs, outputs, connections, related-node links and custom attributes preserved';
+    }));
+  }
+
   const totalDuration = Date.now() - startTime;
   return createTestSuite('Unit Tests', results, totalDuration);
 }
@@ -282,7 +307,6 @@ async function runValidationTests(): Promise<TestSuite> {
     const graphData = createMockGraphData(100, 0.15);
     const validation = validateGraphData(graphData);
     
-    const issues = validation.errors.length + validation.warnings.length;
     return `Validation complete. ${validation.errors.length} errors, ${validation.warnings.length} warnings`;
   }));
 
@@ -441,7 +465,7 @@ async function runPerformanceTests(): Promise<TestSuite> {
   // Test 1: Large Graph Generation Performance
   results.push(await runTest('Large Graph Generation Performance', async () => {
     const perfStart = Date.now();
-    const largeGraph = createMockGraphData(1000, 0.1);
+    createMockGraphData(1000, 0.1);
     const perfEnd = Date.now();
     
     const generationTime = perfEnd - perfStart;
@@ -473,7 +497,7 @@ async function runPerformanceTests(): Promise<TestSuite> {
     const conceptState = createMockConceptDesignState();
     
     const perfStart = Date.now();
-    const summary = generateSummary(conceptState, undefined, {
+    generateSummary(conceptState, undefined, {
       summaryLength: 'comprehensive',
       technicalLevel: 'technical',
       includeComponents: true,

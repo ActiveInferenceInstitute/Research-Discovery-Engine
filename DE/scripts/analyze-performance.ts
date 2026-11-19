@@ -18,18 +18,10 @@
  *   --help, -h                                Show help message
  */
 
-import { 
-  useStableCallback,
-  useDebouncedValue, 
-  useThrottle,
-  useBatchedState,
-  useVirtualList
-} from '../src/utils/performanceUtils';
 import { createMockGraphData } from '../src/utils/testUtils';
 import { calculateGraphStats, filterGraphBySearch } from '../src/utils/dataTransformUtils';
 import { generateSummary } from '../src/utils/summaryGenerator';
 import { generateProtocol } from '../src/utils/protocolGenerator';
-import { GraphData } from '../src/types';
 
 interface CliOptions {
   testType?: 'render' | 'compute' | 'memory' | 'network' | 'llm' | 'all';
@@ -48,7 +40,7 @@ interface PerformanceTest {
   memoryUsed: number;
   throughput?: number;
   errors: string[];
-  details: Record<string, any>;
+  details: { success: true; resultSize: number } | { success: false };
 }
 
 interface PerformanceResults {
@@ -287,7 +279,7 @@ async function runMemoryTests(benchmarkSize: string): Promise<PerformanceTest[]>
     () => {
       // Simulate creating and discarding large objects
       for (let i = 0; i < 100; i++) {
-        const temp = createMockGraphData(50, 0.1);
+        createMockGraphData(50, 0.1);
         // Object will be garbage collected
       }
       return 'cleanup-complete';

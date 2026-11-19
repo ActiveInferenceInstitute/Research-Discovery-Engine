@@ -51,7 +51,7 @@ export class SummaryLLMService extends LLMService {
 
     return {
       ...result,
-      summary: this.parseSummaryContent(result.content, request)
+      summary: this.parseSummaryContent(result.content)
     } as SummaryLLMResult;
   }
 
@@ -95,7 +95,7 @@ export class SummaryLLMService extends LLMService {
       if ('success' in result && result.success) {
         results[summaryTypes[index]] = {
           ...result,
-          summary: this.parseSummaryContent(result.content, requests[index])
+          summary: this.parseSummaryContent(result.content)
         } as SummaryLLMResult;
       }
     });
@@ -306,7 +306,7 @@ Structure your response as:
     }
   }
 
-  private parseSummaryContent(content: string, _request: SummaryLLMRequest): SummaryLLMResult['summary'] {
+  private parseSummaryContent(content: string): SummaryLLMResult['summary'] {
     // Simple parsing - in production you might want more sophisticated extraction
     const lines = content.split('\n').filter(line => line.trim());
 
@@ -320,7 +320,7 @@ Structure your response as:
     };
 
     let currentSection = 'abstract';
-    let abstractLines: string[] = [];
+    const abstractLines: string[] = [];
 
     for (const line of lines) {
       const trimmed = line.trim();

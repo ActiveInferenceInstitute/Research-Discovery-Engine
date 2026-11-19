@@ -1,3 +1,4 @@
+import type { TriggerAgent } from '../../types';
 // Modal to upload a file and trigger backend processing.
 
 import React, { useState, useRef } from 'react';
@@ -13,7 +14,7 @@ interface PDFUploaderProps {
   darkMode: boolean;
   onClose: () => void;
   onFileProcessed: (parsedData: GraphData) => void; // Callback when backend returns data
-  onTriggerAgent: (action: string, payload?: any) => void; // To communicate with AgentConsole
+  onTriggerAgent: TriggerAgent; // To communicate with AgentConsole
 }
 
 const PDFUploader: React.FC<PDFUploaderProps> = ({ darkMode, onClose, onFileProcessed, onTriggerAgent }) => {
@@ -78,7 +79,7 @@ const PDFUploader: React.FC<PDFUploaderProps> = ({ darkMode, onClose, onFileProc
         const page = await pdf.getPage(i);
         const textContent = await page.getTextContent();
         const pageText = textContent.items
-          .map((item: any) => item.str)
+          .flatMap(item => 'str' in item ? [item.str] : [])
           .join(' ');
         fullText += pageText + '\n\n';
       }
@@ -205,10 +206,9 @@ Format your response as a well-structured markdown document with clear headings 
     });
 
     // Extract text from PDF if it's a PDF file
-    let fileContent = '';
     if (file.type === 'application/pdf') {
       setStatusMessage('Extracting text from PDF...');
-      fileContent = await extractPDFText(file);
+      const fileContent = await extractPDFText(file);
       setExtractedText(fileContent);
 
       setStatusMessage('Analyzing content with LLM...');
@@ -316,7 +316,7 @@ Format your response as a well-structured markdown document with clear headings 
     // Handle text or markdown files
     if (file.type === 'text/plain' || file.name.endsWith('.md')) {
       setStatusMessage('Reading text content...');
-      fileContent = await file.text();
+      const fileContent = await file.text();
       setExtractedText(fileContent);
 
       setStatusMessage('Analyzing content with LLM...');
@@ -359,14 +359,14 @@ Format your response as a well-structured markdown document with clear headings 
         { id: 'Extracted Concept A', type: 'Concept', group: 6, value: 5, description: 'Simulated concept from upload', references: ['simulated_ref_2024'] },
         { id: 'Extracted Material B', type: 'Material', group: 1, value: 3, description: 'Simulated material from upload', references: ['simulated_ref_2024'] },
         { id: 'Extracted Mechanism C', type: 'Mechanism', group: 2, value: 4, description: 'Simulated mechanism from upload', references: ['simulated_ref_2024'] },
-         { id: 'simulated_ref_2024', type: 'Paper', group: 4, description: 'Simulated reference paper', references: []} // Add reference node
+         { id: 'simulated_ref_2024', type: 'UserUploaded', group: 4, description: 'Simulated reference paper', references: []} // Add reference node
       ],
       links: [
-        { source: 'Extracted Concept A', target: 'Extracted Material B', type: 'uses-material', value: 2 },
-        { source: 'Extracted Concept A', target: 'Extracted Mechanism C', type: 'uses-mechanism', value: 1 },
-         { source: 'Extracted Concept A', target: 'simulated_ref_2024', type: 'cites-paper', value: 1 }, // Link concept to paper
-         { source: 'Extracted Material B', target: 'simulated_ref_2024', type: 'cites-paper', value: 1 }, // Link material to paper
-         { source: 'Extracted Mechanism C', target: 'simulated_ref_2024', type: 'cites-paper', value: 1 }, // Link mechanism to paper
+        { source: 'Extracted Concept A', target: 'Extracted Material B', type: 'ComposedOfMaterialEdge', value: 2 },
+        { source: 'Extracted Concept A', target: 'Extracted Mechanism C', type: 'ImplementsMechanismEdge', value: 1 },
+         { source: 'Extracted Concept A', target: 'simulated_ref_2024', type: 'cites-source', value: 1 }, // Link concept to paper
+         { source: 'Extracted Material B', target: 'simulated_ref_2024', type: 'cites-source', value: 1 }, // Link material to paper
+         { source: 'Extracted Mechanism C', target: 'simulated_ref_2024', type: 'cites-source', value: 1 }, // Link mechanism to paper
       ]
     };
 
@@ -381,7 +381,7 @@ Format your response as a well-structured markdown document with clear headings 
         timestamp: Date.now(),
         action: {
           type: 'integrate-data',
-          payload: mockParsedData
+          payload: { ...mockParsedData }
         }
     });
 
@@ -467,7 +467,6 @@ Format your response as a well-structured markdown document with clear headings 
                   <button
                     onClick={handleSubmit}
                     className={`px-3 py-1 rounded-md ${darkMode ? 'bg-blue-600 hover:bg-blue-700' : 'bg-blue-500 hover:bg-blue-600'} text-white transition-colors`}
-                    disabled={status === 'uploading' || status === 'processing'}
                   >
                     Process
                   </button>

@@ -14,7 +14,7 @@ export const preprocessMarkdownForDisplayUtil = (content: string, _currentFileKe
     // Group 5: Optional closing backtick(s)
     const wikiLinkRegex = /(`*)(\[\[((?:[^#|\]`]*?)(?:\.md)?(?:#[^|\]`]+?)?|[^|\]`]+?)(?:\|([^\]`]+))?\]\])(`*)/g;
 
-    processed = processed.replace(wikiLinkRegex, (_match, _openTicks, _fullLinkPattern, fullTargetPath, displayTextInput, _closeTicks) => {
+    processed = processed.replace(wikiLinkRegex, (_match, _openTicks, _fullLinkPattern, fullTargetPath: string, displayTextInput?: string) => {
         const targetPath = fullTargetPath.trim();
         let displayText = displayTextInput?.trim() || targetPath;
 
@@ -29,7 +29,7 @@ export const preprocessMarkdownForDisplayUtil = (content: string, _currentFileKe
         }
 
 
-        let href = `#BROKEN_LINK__${slugify(targetPath.replace(/`/g, ''))}`; // Slugify cleaned target
+        let href: string;
 
         // Clean targetPath from backticks before further processing
         const cleanedTargetPath = targetPath.replace(/`/g, '');
@@ -87,6 +87,8 @@ export interface ParsedNodeDetails {
   attributes: Array<{ key: string; value: string }>;
 }
 
+type ParsedField = Exclude<keyof ParsedNodeDetails, 'title' | 'mainDescription' | 'idForDisplay' | 'attributes'>;
+
 export const parseNodeDetails = (node: NodeObject, allNodes: NodeObject[]): ParsedNodeDetails => {
   const details: ParsedNodeDetails = {
     title: node.label || node.id,
@@ -112,21 +114,25 @@ export const parseNodeDetails = (node: NodeObject, allNodes: NodeObject[]): Pars
   }
 
   const lines = node.description.split('\n');
-  let activeKeyTarget: keyof ParsedNodeDetails | 'generic_attribute' | null = null;
+  let activeKeyTarget: ParsedField | 'generic_attribute' | null = null;
   let activeRawKeyName: string | null = null;
   let accumulatingContent: string[] = [];
-  let generalProseAccumulator: string[] = [];
+  const generalProseAccumulator: string[] = [];
   let firstKeyEncountered = false;
 
-  const KNOWN_KEYS_MAP: { [keyLowercase: string]: keyof ParsedNodeDetails } = {
+  const KNOWN_KEYS_MAP: { [keyLowercase: string]: ParsedField } = {
     'human-readable title': 'humanReadableTitle',
     'description': 'description',
     'summary': 'description',
+    'inputs': 'input',
+    'input / properties': 'input',
     'input': 'input', // Catches "Input:", "Input / Properties:"
     'key properties': 'input',
     'physics/primitives': 'processPrimitives',
     'process/primitives': 'processPrimitives',
     'local rules': 'processPrimitives', // Example for a more specific key
+    'outputs': 'output',
+    'output / behaviors': 'output',
     'output': 'output', // Catches "Output:", "Output / Behaviors:"
     'output type': 'output',
     'role/connections': 'roleConnections',
@@ -158,13 +164,13 @@ export const parseNodeDetails = (node: NodeObject, allNodes: NodeObject[]): Pars
                 }
             });
         } else if (activeKeyTarget === 'relatedToTextItems') {
-            contentBlock.split(/\n\s*[\*-]\s*|,\s*(?![^\[]*\])/).map(item => item.trim()).filter(Boolean)
+            contentBlock.split(/\n\s*[*-]\s*|,\s*(?![^[]*\])/).map(item => item.trim()).filter(Boolean)
                 .forEach(item => details.relatedToTextItems.push(preprocessMarkdownForDisplayUtil(item, node.sourceFileKey, allNodes)));
-        } else if (activeKeyTarget !== 'humanReadableTitle' && activeKeyTarget !== 'generic_attribute') {
-            (details as any)[activeKeyTarget] = ((details as any)[activeKeyTarget] ? (details as any)[activeKeyTarget] + '\n\n' : '') + preprocessedBlock;
+        } else if (activeKeyTarget === 'generic_attribute') {
+          if (activeRawKeyName) details.attributes.push({ key: activeRawKeyName, value: preprocessedBlock });
+        } else if (activeKeyTarget !== 'humanReadableTitle') {
+          details[activeKeyTarget] = [details[activeKeyTarget], preprocessedBlock].filter(Boolean).join('\n\n');
         }
-      } else if (activeRawKeyName) {
-        details.attributes.push({ key: activeRawKeyName, value: preprocessedBlock });
       }
       accumulatingContent = [];
     }
@@ -178,7 +184,7 @@ export const parseNodeDetails = (node: NodeObject, allNodes: NodeObject[]): Pars
       finalizePreviousBlock();
       firstKeyEncountered = true;
       activeRawKeyName = keyValueMatch[1].trim();
-      let valueRaw = keyValueMatch[2].trim();
+      const valueRaw = keyValueMatch[2].trim();
       const keyLower = activeRawKeyName.toLowerCase();
 
       if (keyLower.endsWith(" id") && !['gap_id', 'artifact_id', 'publication_id', 'parameter_id', 'metric_id', 'energy_type_id'].includes(keyLower) ) {
@@ -200,7 +206,7 @@ export const parseNodeDetails = (node: NodeObject, allNodes: NodeObject[]): Pars
         } else if (!firstKeyEncountered && line.trim()) {
             generalProseAccumulator.push(line);
         } else if (firstKeyEncountered && line.trim()){
-            if (!details.description && !currentKeyFieldTarget && !activeRawKeyName) { // If no current key, it's part of general description
+            if (!details.description && !activeKeyTarget && !activeRawKeyName) { // If no current key, it's part of general description
                  generalProseAccumulator.push(line);
             } else { // Otherwise, it's continuation of the last active key
                  accumulatingContent.push(line);
@@ -228,8 +234,7 @@ export const parseNodeDetails = (node: NodeObject, allNodes: NodeObject[]): Pars
       details.mainDescription = preprocessMarkdownForDisplayUtil(`*No primary description content found for ${node.label || node.id}.*`, node.sourceFileKey, allNodes);
     }
   }
-  // Ensure mainDescription is set
-  details.mainDescription = details.description;
+  if (details.description.trim()) details.mainDescription = details.description;
 
   return details;
 };

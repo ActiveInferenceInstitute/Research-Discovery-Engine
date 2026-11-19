@@ -11,8 +11,8 @@ identity grammar. The schema below is an unmodified copy from that revision.
 - Docs index: [`Docs/documentation-index.md`](../documentation-index.md).
 - Manuscript command: none.
 - GNN pin: [`.github/gnn-pin.json`](../../.github/gnn-pin.json).
-- `lint` and `types` remain admitted red, excluded from `all`; see the
-  [run guide](../RUN_GUIDE.md#known-red-checks).
+- `lint` and `types` are blocking arms in `all` and CI; see the
+  [run guide](../RUN_GUIDE.md#strict-frontend-checks).
 
 ## Pinned canonical artifacts
 

@@ -101,12 +101,13 @@ function parseArgs(): CliOptions {
       case '--validate-links':
         options.validateLinks = true;
         break;
-      case '--output-format':
+      case '--output-format': {
         const format = args[++i];
         if (['json', 'readable'].includes(format)) {
           options.outputFormat = format as 'json' | 'readable';
         }
         break;
+      }
       case '--output-file':
         options.outputFile = args[++i];
         break;
@@ -213,53 +214,6 @@ See: [[Biomimetics]] for more information.
 }
 
 /**
- * Process markdown content and extract structured data
- */
-function processMarkdownContent(content: string, fileKey: string): ProcessedFile {
-  const startTime = Date.now();
-  
-  try {
-    const parsedDoc = parseMarkdownToStructuredDocument(content, fileKey);
-    const references = extractReferences(content);
-    const wordCount = content.split(/\s+/).length;
-    const sectionCount = countSections(parsedDoc.sections || []);
-    
-    return {
-      filePath: `${fileKey}.md`,
-      fileKey,
-      parsedDoc,
-      references,
-      sectionCount,
-      wordCount,
-      errors: []
-    };
-  } catch (error) {
-    return {
-      filePath: `${fileKey}.md`,
-      fileKey,
-      parsedDoc: { sections: [] },
-      references: [],
-      sectionCount: 0,
-      wordCount: 0,
-      errors: [String(error)]
-    };
-  }
-}
-
-/**
- * Count total sections recursively
- */
-function countSections(sections: ParsedSection[]): number {
-  let count = sections.length;
-  sections.forEach(section => {
-    if (section.subsections) {
-      count += countSections(section.subsections);
-    }
-  });
-  return count;
-}
-
-/**
  * Extract and validate wiki links
  */
 function extractWikiLinks(content: string): string[] {
@@ -302,29 +256,25 @@ function validateLinks(processedFiles: ProcessedFile[]): LinkValidationResult[] 
     const links = extractWikiLinks(content);
     
     links.forEach(link => {
-      let isValid = false;
-      let targetExists = false;
+      let targetExists: boolean;
       let linkType: 'internal' | 'external' | 'section' = 'internal';
       
       if (link.startsWith('http')) {
         linkType = 'external';
-        isValid = true; // Assume external links are valid
-        targetExists = true;
+        targetExists = true; // Assume external links are valid
       } else if (link.includes('#')) {
         linkType = 'section';
         const sectionId = slugify(link.split('#')[1]);
         targetExists = allSections.has(sectionId);
-        isValid = targetExists;
       } else {
         const targetFile = link.replace('.md', '');
         targetExists = allFiles.has(targetFile);
-        isValid = targetExists;
       }
       
       validationResults.push({
         sourceFile: file.fileKey,
         link,
-        isValid,
+        isValid: targetExists,
         targetExists,
         linkType
       });
@@ -430,7 +380,6 @@ async function main() {
 
   try {
     const startTime = Date.now();
-    let processedFiles: ProcessedFile[];
 
     // For demonstration, use mock data
     if (options.sourceFile || options.sourceDir) {
@@ -441,7 +390,7 @@ async function main() {
     }
 
     // Create mock processed files
-    processedFiles = createMockFileData();
+    const processedFiles = createMockFileData();
     
     const processingTime = Date.now() - startTime;
 

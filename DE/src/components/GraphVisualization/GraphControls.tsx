@@ -16,9 +16,9 @@ interface GraphControlsProps {
   onTogglePhysics: () => void;
   onToggleParticles: () => void;
   colorBy: 'type' | 'group' | 'status' | 'origin' | 'custom';
-  onChangeColorBy: (value: string) => void;
+  onChangeColorBy: (value: GraphControlsProps['colorBy']) => void;
   groupBy: 'none' | 'type' | 'status' | 'origin' | 'connections' | 'cluster';
-  onChangeGroupBy: (value: string) => void;
+  onChangeGroupBy: (value: GraphControlsProps['groupBy']) => void;
   // Add more controls as needed (e.g., filter, layout)
 }
 
@@ -120,7 +120,7 @@ const GraphControls: React.FC<GraphControlsProps> = ({
               </h4>
               <select
                 value={colorBy}
-                onChange={(e) => onChangeColorBy(e.target.value)}
+                onChange={(e) => onChangeColorBy(e.currentTarget.value as GraphControlsProps['colorBy'])}
                 className={`w-full p-2 rounded-md text-sm ${
                   darkMode ? 'bg-gray-700 text-white' : 'bg-gray-100 text-gray-900'
                 }`}
@@ -140,7 +140,7 @@ const GraphControls: React.FC<GraphControlsProps> = ({
               </h4>
               <select
                 value={groupBy}
-                onChange={(e) => onChangeGroupBy(e.target.value)}
+                onChange={(e) => onChangeGroupBy(e.currentTarget.value as GraphControlsProps['groupBy'])}
                 className={`w-full p-2 rounded-md text-sm ${
                   darkMode ? 'bg-gray-700 text-white' : 'bg-gray-100 text-gray-900'
                 }`}

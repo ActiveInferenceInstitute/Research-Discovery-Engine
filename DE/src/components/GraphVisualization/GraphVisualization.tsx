@@ -1,6 +1,6 @@
 // src/components/GraphVisualization/GraphVisualization.tsx
 import React, { useRef, useEffect, useState, useMemo } from 'react';
-import ForceGraph3D from '3d-force-graph';
+import ForceGraph3D, { type ConfigOptions, type ForceGraph3DInstance } from '3d-force-graph';
 import SpriteText from 'three-spritetext';
 import * as THREE from 'three';
 import * as d3 from 'd3';
@@ -22,7 +22,14 @@ interface GraphLink extends CNMLinkObject {
   target: string | GraphNode;
 }
 
-const NODE_TYPE_COLORS: Record<NodeType | 'Default', string> = {
+// The installed constructor accepts these graph types at runtime but only
+// declares default types. Keep the specialization at this library boundary.
+const TypedForceGraph3D = ForceGraph3D as unknown as new (
+  element: HTMLElement,
+  config?: ConfigOptions,
+) => ForceGraph3DInstance<GraphNode, GraphLink>;
+
+const NODE_TYPE_COLORS: Partial<Record<NodeType, string>> & { Default: string } = {
   'Mechanism': '#8A2BE2', 
   'Mechanism_Category': '#9370DB', 
   'Material': '#2E8B57', 
@@ -47,7 +54,7 @@ const NODE_TYPE_COLORS: Record<NodeType | 'Default', string> = {
   'Default': '#A9A9A9', 
 };
 
-const LINK_TYPE_COLORS: Record<EdgeType | 'Default', string> = {
+const LINK_TYPE_COLORS: Partial<Record<EdgeType, string>> & { Default: string } = {
   'categorizes': '#A9A9A9',       
   'cites-source': '#6495ED',      
   'concept-uses-component': '#32CD32',     
@@ -98,7 +105,7 @@ const GraphVisualization: React.FC<GraphVisualizationProps> = ({
   onFilterComplete, colorBy, groupBy
 }) => {
   const containerRef = useRef<HTMLDivElement>(null);
-  const graphRef = useRef<any>(null);
+  const graphRef = useRef<ForceGraph3DInstance<GraphNode, GraphLink> | null>(null);
 
   const [hoveredNodeId, setHoveredNodeId] = useState<string | null>(null);
   const [neighborNodes, setNeighborNodes] = useState(new Set<string>());
@@ -117,9 +124,6 @@ const GraphVisualization: React.FC<GraphVisualizationProps> = ({
   }, [data]);
 
   const combinedGraphData = useMemo(() => {
-    if (safeData.nodes.length === 0 && conceptDesignState.status === 'empty') {
-      return { nodes: [], links: [] } as { nodes: GraphNode[], links: GraphLink[] };
-    }
     let currentNodes = cloneDeep(safeData.nodes) as GraphNode[];
     let currentLinks = cloneDeep(safeData.links) as GraphLink[];
 
@@ -129,15 +133,16 @@ const GraphVisualization: React.FC<GraphVisualizationProps> = ({
         let groupValue = 0;
         
         switch (groupBy) {
-          case 'type':
+          case 'type': {
             // Group by node type
             const typeGroup = WIKI_SOURCES_FOR_GV_GROUPING.find(
               ws => node.type?.startsWith(ws.typePrefix)
             );
             groupValue = typeGroup?.group || 0;
             break;
+          }
             
-          case 'status':
+          case 'status': {
             // Group by status
             const statusMap: Record<string, number> = {
               'Hypothetical': 1,
@@ -148,8 +153,9 @@ const GraphVisualization: React.FC<GraphVisualizationProps> = ({
             };
             groupValue = node.status ? statusMap[node.status] || 0 : 0;
             break;
+          }
             
-          case 'origin':
+          case 'origin': {
             // Group by origin
             const originMap: Record<string, number> = {
               'wiki_section': 1,
@@ -159,8 +165,9 @@ const GraphVisualization: React.FC<GraphVisualizationProps> = ({
             };
             groupValue = node.origin ? originMap[node.origin] || 0 : 0;
             break;
+          }
             
-          case 'connections':
+          case 'connections': {
             // Count connections
             const connections = currentLinks.filter(link => {
               const sourceId = typeof link.source === 'object' ? link.source.id : link.source;
@@ -175,16 +182,18 @@ const GraphVisualization: React.FC<GraphVisualizationProps> = ({
             else if (connections <= 10) groupValue = 4;
             else groupValue = 5;
             break;
+          }
             
-          case 'cluster':
+          case 'cluster': {
             // Use force-directed clustering
             const numClusters = Math.min(8, Math.max(3, Math.ceil(currentNodes.length / 10)));
             const clusteredNodes = assignNodesToClusters(currentNodes, numClusters);
             const clusteredNode = clusteredNodes.find(n => n.id === node.id);
-            if (clusteredNode && 'cluster' in clusteredNode) {
-              groupValue = (clusteredNode as any).cluster + 1;
+            if (clusteredNode) {
+              groupValue = clusteredNode.cluster + 1;
             }
             break;
+          }
         }
         
         return {
@@ -194,7 +203,7 @@ const GraphVisualization: React.FC<GraphVisualizationProps> = ({
       });
     }
 
-    if (conceptDesignState.status !== 'empty' && conceptDesignState.id) {
+    if (conceptDesignState.id) {
       const conceptNodeId = conceptDesignState.id;
       const conceptNodeLabel = conceptDesignState.objective || conceptNodeId;
       const existingNodeIndex = currentNodes.findIndex(n => n.id === conceptNodeId);
@@ -227,7 +236,7 @@ const GraphVisualization: React.FC<GraphVisualizationProps> = ({
       currentLinks.push(...conceptLinksRaw.map(l => ({ ...l } as GraphLink)));
     }
     return { nodes: currentNodes, links: currentLinks };
-  }, [safeData, conceptDesignState]);
+  }, [safeData, conceptDesignState, groupBy]);
 
   const filteredData = useMemo(() => {
     if (!searchQuery.trim()) return combinedGraphData;
@@ -243,7 +252,7 @@ const GraphVisualization: React.FC<GraphVisualizationProps> = ({
       }
     });
 
-    let allRelevantNodeIds = new Set(matchingNodeIds);
+    const allRelevantNodeIds = new Set(matchingNodeIds);
     if (combinedGraphData.nodes.length > 0) {
         matchingNodeIds.forEach(id => {
             const { nodes: directNeighbors } = getNeighbors(combinedGraphData, id, 1);
@@ -267,39 +276,61 @@ const GraphVisualization: React.FC<GraphVisualizationProps> = ({
     }
   }, [filteredData, onFilterComplete]); // Call ONLY when filteredData or onFilterComplete changes
 
-  useEffect(() => { 
-    if (!containerRef.current || graphRef.current) return;
+  useEffect(() => {
+    const container = containerRef.current;
+    if (!container) return;
+
     try {
-      const graph = ForceGraph3D()
-        .width(containerRef.current.clientWidth)
-        .height(containerRef.current.clientHeight)
+      const graph = new TypedForceGraph3D(container);
+      graph
+        .width(container.clientWidth)
+        .height(container.clientHeight)
         .enableNodeDrag(true)
-        .showNavInfo(false)
-        .onNodeClick((node: any | null) => {
+        .showNavInfo(false);
+      graphRef.current = graph;
+
+      const handleResize = () => {
+        graph.width(container.clientWidth).height(container.clientHeight);
+      };
+      window.addEventListener('resize', handleResize);
+      return () => {
+        window.removeEventListener('resize', handleResize);
+        graph._destructor();
+        graphRef.current = null;
+      };
+    } catch (error) {
+      console.error("Error initializing 3D Force Graph:", error);
+    }
+  }, []);
+
+  useEffect(() => {
+    const graph = graphRef.current;
+    if (!graph) return;
+
+    graph
+        .onNodeClick((node) => {
             if (!node) {
                 onNodeSelect(null);
                 setNeighborNodes(new Set());
                 setNeighborLinks(new Set());
                 return;
             }
-            const appNode = node as GraphNode;
             const distance = 150;
-            const nodePos = { x: appNode.x || 0, y: appNode.y || 0, z: appNode.z || 0 };
+            const nodePos = { x: node.x || 0, y: node.y || 0, z: node.z || 0 };
             const cameraLookAt = {x: nodePos.x, y: nodePos.y, z: nodePos.z};
             const cameraPosition = {
                 x: nodePos.x + distance * (Math.random() * 0.6 + 0.4) * (Math.random() > 0.5 ? 1: -1),
                 y: nodePos.y + distance * (Math.random() * 0.2 + 0.1),
                 z: nodePos.z + distance * (Math.random() * 0.6 + 0.4) * (Math.random() > 0.5 ? 1: -1)
             };
-            graphRef.current.cameraPosition(cameraPosition, cameraLookAt, 1000);
-            onNodeSelect(appNode);
+            graph.cameraPosition(cameraPosition, cameraLookAt, 1000);
+            onNodeSelect(node);
         })
-        .onNodeHover((node: any | null) => {
-            const appNode = node as GraphNode | null;
-            setHoveredNodeId(appNode ? String(appNode.id) : null);
+        .onNodeHover((node) => {
+            setHoveredNodeId(node ? String(node.id) : null);
 
-            if (appNode && combinedGraphData.nodes.length > 0) {
-                const { nodes: neighbors, links: connectingLinks } = getNeighbors(combinedGraphData, String(appNode.id), 1);
+            if (node && combinedGraphData.nodes.length > 0) {
+                const { nodes: neighbors, links: connectingLinks } = getNeighbors(combinedGraphData, String(node.id), 1);
                 setNeighborNodes(new Set(Array.from(neighbors).map(n => String(n.id))));
                 setNeighborLinks(new Set(Array.from(connectingLinks) as GraphLink[]));
             } else {
@@ -316,39 +347,27 @@ const GraphVisualization: React.FC<GraphVisualizationProps> = ({
             setNeighborNodes(new Set());
             setNeighborLinks(new Set());
         });
-
-      graphRef.current = graph;
-      graphRef.current(containerRef.current);
-      const handleResize = () => { 
-        if (containerRef.current && graphRef.current) { 
-          graphRef.current.width(containerRef.current.clientWidth).height(containerRef.current.clientHeight); 
-        }
-      };
-      window.addEventListener('resize', handleResize);
-      return () => window.removeEventListener('resize', handleResize);
-    } catch (error) { 
-      console.error("Error initializing 3D Force Graph:", error); 
-    }
-  }, []);
+  }, [combinedGraphData, onNodeSelect]);
 
   useEffect(() => { 
     if (!graphRef.current || !filteredData.nodes) return;
+
+    const getNodeSize = (node: GraphNode) => {
+      let baseSize = node.type?.includes('_Category') ? 6 : 10;
+      if (node.type === 'Concept' || node.origin === 'concept_design') baseSize = 14;
+      if (node.status === 'Hypothetical' || node.status === 'Proposed') baseSize *= 1.1;
+      if (String(node.id) === selectedNodeId) return baseSize * 1.5;
+      if (hoveredNodeId === String(node.id)) return baseSize * 1.3;
+      if (neighborNodes.has(String(node.id))) return baseSize * 1.1;
+      return baseSize;
+    };
 
     graphRef.current.graphData(filteredData);
 
     graphRef.current
         .backgroundColor(darkMode ? '#1A202C' : '#F7FAFC')
-        .nodeVal((node: GraphNode) => {
-            let baseSize = node.type?.includes('_Category') ? 6 : 10;
-            if (node.type === 'Concept' || node.origin === 'concept_design') baseSize = 14;
-            if (node.status === 'Hypothetical' || node.status === 'Proposed') baseSize *= 1.1;
-            if (String(node.id) === selectedNodeId) return baseSize * 1.5;
-            if (hoveredNodeId === String(node.id)) return baseSize * 1.3;
-            if (neighborNodes.has(String(node.id))) return baseSize * 1.1;
-            return baseSize;
-         })
-        .nodeThreeObject((objNode: any) => {
-            const node = objNode as GraphNode;
+        .nodeVal(getNodeSize)
+        .nodeThreeObject((node) => {
             const isSelected = selectedNodeId === String(node.id);
             const isHovered = hoveredNodeId === String(node.id);
             const isDirectNeighbor = neighborNodes.has(String(node.id)) && (hoveredNodeId !== null || selectedNodeId !== null);
@@ -356,16 +375,17 @@ const GraphVisualization: React.FC<GraphVisualizationProps> = ({
             const isDimmed = isContextActive && !isSelected && !isHovered && !isDirectNeighbor;
             
             // Determine node color based on colorBy parameter
-            let baseColorHex: string = '#A9A9A9';
+            let baseColorHex: string;
             
             switch (colorBy) {
-              case 'type':
+              case 'type': {
                 // Color by node type (default)
                 const nodeTypeKey = (node.type as NodeType) || 'Default';
                 baseColorHex = NODE_TYPE_COLORS[nodeTypeKey] || NODE_TYPE_COLORS['Default'];
                 break;
+              }
                 
-              case 'group':
+              case 'group': {
                 // Color by group number
                 const groupColors = [
                   '#1f77b4', '#ff7f0e', '#2ca02c', '#d62728', '#9467bd',
@@ -375,8 +395,9 @@ const GraphVisualization: React.FC<GraphVisualizationProps> = ({
                 const groupIndex = (node.group || 0) % groupColors.length;
                 baseColorHex = groupColors[groupIndex];
                 break;
+              }
                 
-              case 'status':
+              case 'status': {
                 // Color by status
                 const statusColors: Record<string, string> = {
                   'Hypothetical': '#FFD700', // Gold
@@ -387,8 +408,9 @@ const GraphVisualization: React.FC<GraphVisualizationProps> = ({
                 };
                 baseColorHex = node.status ? statusColors[node.status] || '#A9A9A9' : '#A9A9A9';
                 break;
+              }
                 
-              case 'origin':
+              case 'origin': {
                 // Color by origin
                 const originColors: Record<string, string> = {
                   'wiki_section': '#4169E1',    // Royal Blue
@@ -398,19 +420,21 @@ const GraphVisualization: React.FC<GraphVisualizationProps> = ({
                 };
                 baseColorHex = node.origin ? originColors[node.origin] || '#A9A9A9' : '#A9A9A9';
                 break;
+              }
                 
               case 'custom':
                 // Use node's custom color if available
                 baseColorHex = node.color || '#A9A9A9';
                 break;
                 
-              default:
+              default: {
                 // Fallback to type-based coloring
                 const fallbackTypeKey = (node.type as NodeType) || 'Default';
                 baseColorHex = NODE_TYPE_COLORS[fallbackTypeKey] || NODE_TYPE_COLORS['Default'];
+              }
             }
             
-            let finalColor = new THREE.Color(baseColorHex);
+            const finalColor = new THREE.Color(baseColorHex);
 
             if (showLabels || isSelected || isHovered) {
                 const sprite = new SpriteText(node.label || String(node.id));
@@ -427,8 +451,8 @@ const GraphVisualization: React.FC<GraphVisualizationProps> = ({
                 sprite.material.transparent = true;
                 return sprite;
             } else {
-                const geometrySize = Math.max(0.5, (graphRef.current.nodeVal()(node) as number) * 0.45); 
-                let geometry = new THREE.SphereGeometry(geometrySize, 16, 8); 
+                const geometrySize = Math.max(0.5, getNodeSize(node) * 0.45);
+                const geometry = new THREE.SphereGeometry(geometrySize, 16, 8);
                 const sphereMaterial = new THREE.MeshLambertMaterial({
                     color: finalColor, 
                     transparent: true,
@@ -444,10 +468,7 @@ const GraphVisualization: React.FC<GraphVisualizationProps> = ({
             const defaultColor = darkMode ? '#4A5568' : '#A0AEC0'; 
             
             // Determine link color based on type or connected nodes
-            let typeColor;
-            
-            // Use type-based coloring for links
-            typeColor = LINK_TYPE_COLORS[link.type || 'Default'] || defaultColor;
+            const typeColor = LINK_TYPE_COLORS[link.type || 'Default'] || defaultColor;
             
             return neighborLinks.has(link) ? (darkMode ? '#FACC15' : '#D97706') : typeColor; 
         })
@@ -469,14 +490,17 @@ const GraphVisualization: React.FC<GraphVisualizationProps> = ({
         })
         .linkDirectionalParticles(showParticles ? (link: GraphLink) => neighborLinks.has(link) ? 3 : 0 : 0)
         .linkDirectionalParticleWidth(1.5)
-        .linkDirectionalParticleColor((_link: GraphLink) => (darkMode ? '#FFFFFF':'#000000'));
+        .linkDirectionalParticleColor(() => (darkMode ? '#FFFFFF':'#000000'));
 
     if (enablePhysics) {
         graphRef.current.resumeAnimation();
         if (d3 && graphRef.current.d3Force) { 
-            graphRef.current.d3Force('link', d3.forceLink().id((d:any) => d.id).distance((link: any) => link.type === 'categorizes' ? 80 : 150).strength(0.02));
+            graphRef.current.d3Force('link', d3.forceLink<GraphNode, GraphLink>()
+                .id(node => node.id)
+                .distance(link => link.type === 'categorizes' ? 80 : 150)
+                .strength(0.02));
             graphRef.current.d3Force('charge', d3.forceManyBody().strength(-120).distanceMax(350));
-            graphRef.current.d3Force('center', d3.forceCenter(0,0,0).strength(0.003));
+            graphRef.current.d3Force('center', d3.forceCenter(0, 0).strength(0.003));
         }
         graphRef.current.d3AlphaDecay(0.0228); 
         graphRef.current.cooldownTime(10000); 
@@ -490,7 +514,9 @@ const GraphVisualization: React.FC<GraphVisualizationProps> = ({
     if (selectedNodeId) {
         const node = filteredData.nodes.find(n => String(n.id) === selectedNodeId);
         if (node) {
-            const currentLookAt = graphRef.current.cameraPosition().lookAt;
+            // three-render-objects returns its orbit target along with camera coordinates.
+            const camera = graphRef.current.cameraPosition() as { lookAt?: { x: number; y: number; z: number } };
+            const currentLookAt = camera.lookAt;
             if (!currentLookAt || Math.abs(currentLookAt.x - (node.x||0)) > 1 || Math.abs(currentLookAt.y - (node.y||0)) > 1) { // only refocus if significantly different
                 const distance = 150;
                 const nodePos = { x: node.x || 0, y: node.y || 0, z: node.z || 0 };
@@ -503,9 +529,7 @@ const GraphVisualization: React.FC<GraphVisualizationProps> = ({
                 graphRef.current.cameraPosition(cameraPosition, cameraLookAt, 700);
             }
         }
-    } else if (!hoveredNodeId && graphRef.current.cameraPosition().lookAt && (graphRef.current.cameraPosition().lookAt.x !==0 || graphRef.current.cameraPosition().lookAt.y !==0 || graphRef.current.cameraPosition().lookAt.z !==0 )) { 
-        // Optional: Reset camera to a default overview if nothing is selected or hovered
-        // graphRef.current.cameraPosition({ x: 0, y: 0, z: 300 }, {x:0,y:0,z:0}, 700); 
+
     }
 
   }, [

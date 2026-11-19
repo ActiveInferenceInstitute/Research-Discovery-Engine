@@ -6,7 +6,7 @@
  */
 
 import { useState, useCallback, useMemo, useEffect } from 'react';
-import { AgentMessage,  BreadcrumbItem, NodeObject, LinkObject } from '../types';
+import { AgentMessage, AgentTriggerPayload, BreadcrumbItem, NodeObject, LinkObject, TriggerAgent } from '../types';
 import { AgentService } from '../services/AgentService';
 import { useGraphData } from './useGraphData';
 import { useConceptDesign } from './useConceptDesign';
@@ -63,9 +63,13 @@ interface AppActions {
   togglePDFUploader: () => void;
   toggleBrowserSidebar: () => void;
 
+  showLLMResult: (title: string, content: string) => void;
+  startLLMLoading: (title: string) => void;
+  closeLLMResultModal: () => void;
+
   // Agent Actions
   addAgentMessage: (message: Omit<AgentMessage, 'id' | 'timestamp'>) => void;
-  triggerAgent: (action: string, payload?: any) => void;
+  triggerAgent: TriggerAgent;
 
   // Graph Actions
   handleNodeSelect: (node: NodeObject | null, sectionSlug?: string) => void;
@@ -161,20 +165,21 @@ export const useAppState = () => {
   /**
    * Enhanced agent trigger function with state management integration
    */
-  const triggerAgent = useCallback((action: string, payload?: any) => {
+  const triggerAgent = useCallback((action: string, payload?: AgentTriggerPayload) => {
     // Handle special actions that require direct state updates
     switch (action) {
-      case 'initiate-new-concept-from-selection':
+      case 'initiate-new-concept-from-selection': {
         setState(prev => ({
           ...prev,
           activeMode: 'create',
           selectedNodeId: null,
           breadcrumbPath: []
         }));
-        const seedNode = graphData.nodes.find(n => n.id === payload.nodeId);
+        const seedNode = graphData.nodes.find(n => n.id === payload?.nodeId);
         initializeConcept(seedNode);
         agentService.triggerAgent(action, payload, conceptDesignState, { nodes: graphData.nodes });
         break;
+      }
 
       case 'initiate-new-concept-from-goal':
         setState(prev => ({
@@ -188,7 +193,7 @@ export const useAppState = () => {
         agentService.triggerAgent(action, payload, conceptDesignState, { nodes: graphData.nodes });
         break;
 
-      case 'package-knowledge-artifact':
+      case 'package-knowledge-artifact': {
         // Create artifact and update graph
         const newArtifactNode: NodeObject = {
           id: `ka_${conceptDesignState.id}`,
@@ -196,7 +201,7 @@ export const useAppState = () => {
           label: `Artifact: ${conceptDesignState.objective || conceptDesignState.id}`,
           description: `This artifact details the proposed system '${conceptDesignState.objective}'.\nObjective: ${conceptDesignState.objective}\nMaterials: ${conceptDesignState.components.materials.join(', ')}\nMechanisms: ${conceptDesignState.components.mechanisms.join(', ')}\nProtocol Outline:\n${conceptDesignState.protocolOutline || 'Not generated.'}`,
           sourceFileKey: 'generated_artifacts',
-          size: 1,
+          value: 1,
           color: '#10B981'
         };
 
@@ -206,8 +211,7 @@ export const useAppState = () => {
             newLinks.push({
               source: newArtifactNode.id,
               target: materialId,
-              type: 'ComponentsEdge',
-              sourceFileKey: 'generated_artifacts'
+              type: 'concept-uses-component'
             });
           }
         });
@@ -222,28 +226,29 @@ export const useAppState = () => {
           sourceAgent: 'ConceptAgent',
           type: 'success',
           content: `Knowledge Artifact '${newArtifactNode.label}' created and added to the graph.`,
-          action: { type: 'select-node', payload: newArtifactNode.id, label: "View Artifact" }
+          relatedNodeIds: [newArtifactNode.id]
         });
         break;
+      }
 
-      case 'integrate-data':
+      case 'integrate-data': {
         const newData = payload;
-        if (newData && newData.nodes && newData.links) {
-          // Check if there's a view-llm-result action in the payload
-          if (payload.action && payload.action.type === 'view-llm-result') {
+        if (newData?.nodes && newData.links) {
+          const { nodes, links, action: messageAction } = newData;
+          if (messageAction?.type === 'view-llm-result') {
             // Show the LLM result modal
             setState(prev => ({
               ...prev,
               showLLMResultModal: true,
-              llmResultTitle: payload.action.payload.title || 'Analysis Result',
-              llmResultContent: payload.action.payload.content || '',
+              llmResultTitle: messageAction.payload?.title || 'Analysis Result',
+              llmResultContent: messageAction.payload?.content || '',
               isLLMResultLoading: false
             }));
           }
 
           setGraphData(prevData => ({
-            nodes: [...prevData.nodes, ...newData.nodes],
-            links: [...prevData.links, ...newData.links]
+            nodes: [...prevData.nodes, ...nodes],
+            links: [...prevData.links, ...links]
           }));
           addAgentMessage({
             sourceAgent: "Nexus Weaver",
@@ -252,6 +257,7 @@ export const useAppState = () => {
           });
         }
         break;
+      }
 
       case 'add-field-suggestion':
         if (payload && payload.field && payload.suggestion) {
@@ -266,10 +272,18 @@ export const useAppState = () => {
         break;
 
       case 'add-message':
-        addAgentMessage(payload);
+        if (payload?.type && payload.sourceAgent && typeof payload.content === 'string') {
+          addAgentMessage({
+            ...payload,
+            type: payload.type,
+            sourceAgent: payload.sourceAgent,
+            content: payload.content,
+          });
+        }
         break;
 
       case 'open-publication':
+        if (!payload?.key) break;
         window.open(`/KG/publications/${payload.key}.md`, '_blank');
         addAgentMessage({
           sourceAgent: "Reference Manager",
@@ -283,7 +297,7 @@ export const useAppState = () => {
         setTimeout(() => {
           const isConsistent = Math.random() > 0.3;
           if (isConsistent) {
-            setConceptDesignState(prev => ({ ...prev, status: 'Proposed' }));
+            setConceptDesignState({ status: 'Proposed' });
           }
         }, 1500);
         break;
@@ -311,8 +325,8 @@ export const useAppState = () => {
     }));
 
     if (node) {
-      if (sectionSlug) (window as any).__targetSectionSlugForNodeView = sectionSlug;
-      else delete (window as any).__targetSectionSlugForNodeView;
+      if (sectionSlug) window.__targetSectionSlugForNodeView = sectionSlug;
+      else delete window.__targetSectionSlugForNodeView;
 
       setState(prev => ({
         ...prev,
@@ -344,7 +358,7 @@ export const useAppState = () => {
         setState(prev => ({ ...prev, activeMode: 'explore' }));
       }
     } else {
-      delete (window as any).__targetSectionSlugForNodeView;
+      delete window.__targetSectionSlugForNodeView;
       setState(prev => ({
         ...prev,
         breadcrumbPath: []
@@ -380,42 +394,33 @@ export const useAppState = () => {
     }
   }, [graphLoading, graphError, graphData.nodes.length, graphData.links.length, state.agentMessages]);
 
-  // Handle protocol and summary generation based on agent messages
+  const showLLMResult = useCallback((title: string, content: string) => {
+    setState(prev => ({
+      ...prev,
+      showLLMResultModal: true,
+      llmResultTitle: title,
+      llmResultContent: content,
+      isLLMResultLoading: false,
+    }));
+  }, []);
+
   useEffect(() => {
     const latestMessage = state.agentMessages[state.agentMessages.length - 1];
-    if (!latestMessage?.action) return;
+    const action = latestMessage?.action;
+    if (action?.type !== 'view-llm-result' || !action.payload) return;
 
-    // Handle LLM result actions
-    if (latestMessage.action.type === 'view-llm-result') {
-      const payload = latestMessage.action.payload;
-
-      // Handle protocol generation completion
-      if (payload.protocolGenerated && latestMessage.sourceAgent === 'Protocol Agent') {
-        try {
-          // Use the protocol from the LLM response
-          const protocolMarkdown = payload.protocol || '';
-
-          setConceptDesignState({
-            protocolOutline: protocolMarkdown,
-            status: 'Validated'
-          });
-        } catch (error) {
-          console.error('Error generating protocol:', error);
-          addAgentMessage({
-            sourceAgent: 'Protocol Agent',
-            type: 'error',
-            content: 'Failed to generate protocol. Please check the concept definition.'
-          });
-        }
+    const { title, content, protocolGenerated, protocol, summaryGenerated, fullSummary } = action.payload;
+    if (protocolGenerated) {
+      if (latestMessage.sourceAgent === 'Protocol Agent') {
+        setConceptDesignState({ protocolOutline: protocol || '', status: 'Validated' });
       }
-
-      // Show the LLM result in the modal
-      actions.showLLMResult(
-        payload.title || 'LLM Result',
-        payload.content || ''
-      );
+      showLLMResult(title || 'Protocol', protocol ?? '');
+    } else if (summaryGenerated) {
+      showLLMResult(title || 'Summary', fullSummary ?? '');
+    } else {
+      showLLMResult(title || (content ? 'Analysis' : 'LLM Result'), content || '');
     }
-  }, [state.agentMessages, conceptDesignState, graphData, setConceptDesignState, addAgentMessage]);
+  }, [state.agentMessages, setConceptDesignState, showLLMResult]);
 
   // Handle search filter updates
   useEffect(() => {
@@ -442,33 +447,6 @@ export const useAppState = () => {
     }
   }, [state.pendingSearchFilterCounts, state.searchQuery, state.agentMessages]);
 
-  // Handle LLM result actions from agent messages
-  useEffect(() => {
-    const latestMessage = state.agentMessages[state.agentMessages.length - 1];
-    if (!latestMessage?.action) return;
-
-    if (latestMessage.action.type === 'view-llm-result') {
-      const payload = latestMessage.action.payload;
-
-      if (payload.protocolGenerated) {
-        actions.showLLMResult(
-          payload.title || 'Protocol',
-          payload.protocol
-        );
-      } else if (payload.summaryGenerated) {
-        actions.showLLMResult(
-          payload.title || 'Summary',
-          payload.fullSummary
-        );
-      } else if (payload.content) {
-        actions.showLLMResult(
-          payload.title || 'Analysis',
-          payload.content
-        );
-      }
-    }
-  }, [state.agentMessages]);
-
   // Create actions object
   const actions: AppActions = {
     // UI Actions
@@ -487,13 +465,7 @@ export const useAppState = () => {
     toggleBrowserSidebar: () => setState(prev => ({ ...prev, isBrowserSidebarOpen: !prev.isBrowserSidebarOpen })),
 
     // LLM Result Modal Actions
-    showLLMResult: (title: string, content: string) => setState(prev => ({
-      ...prev,
-      showLLMResultModal: true,
-      llmResultTitle: title,
-      llmResultContent: content,
-      isLLMResultLoading: false
-    })),
+    showLLMResult,
     startLLMLoading: (title: string) => setState(prev => ({
       ...prev,
       showLLMResultModal: true,

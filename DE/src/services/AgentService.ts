@@ -5,21 +5,9 @@
  * for agent interactions and removing this complexity from the main App component.
  */
 
-import { AgentMessage, ConceptDesignState, NodeObject } from '../types';
+import { AgentActionPayload, AgentMessage, ConceptDesignState, NodeObject } from '../types';
 import { createLLMService } from '../llm/utils/factory';
 import { llmConfig } from '../llm/config/LLMConfig';
-
-/**
- * Agent action payload interface for type safety
- */
-interface AgentActionPayload {
-  query?: string;
-  nodeId?: string;
-  targetId?: string;
-  componentId?: string;
-  goalText?: string;
-  [key: string]: any;
-}
 
 /**
  * Agent response interface for structured responses
@@ -175,43 +163,43 @@ export class AgentService {
         return this.handleSearchGraph(payload);
 
       case 'initiate-new-concept-from-selection':
-        return this.handleInitiateConceptFromSelection(payload, graphData);
+        return this.handleInitiateConceptFromSelection(payload);
 
       case 'initiate-new-concept-from-goal':
         return this.handleInitiateConceptFromGoal(payload);
 
       case 'launch-exploratory-analysis':
-        return this.handleExploratoryAnalysis(payload, conceptState);
+        return this.handleExploratoryAnalysis();
 
       case 'add-component-to-design':
         return this.handleAddComponent(payload);
 
       case 'suggest-compatible-components':
-        return this.handleSuggestComponents(conceptState);
+        return this.handleSuggestComponents();
 
       case 'find-analogies':
-        return this.handleFindAnalogies(conceptState);
+        return this.handleFindAnalogies();
 
       case 'check-consistency':
-        return this.handleCheckConsistency(conceptState);
+        return this.handleCheckConsistency();
 
       case 'generate-protocol-outline':
-        return this.handleGenerateProtocol(conceptState);
+        return this.handleGenerateProtocol();
 
       case 'generate-concept-summary':
-        return this.handleGenerateSummary(conceptState);
+        return this.handleGenerateSummary();
 
       case 'package-knowledge-artifact':
         return this.handlePackageArtifact(conceptState);
 
       case 'deliver-protocol':
-        return this.handleDeliverProtocol(payload, conceptState);
+        return this.handleDeliverProtocol(conceptState);
 
       case 'deliver-summary':
-        return this.handleDeliverSummary(payload, conceptState);
+        return this.handleDeliverSummary(conceptState);
 
       default:
-        return this.handleGenericAction(action, payload);
+        return this.handleGenericAction(action);
     }
   }
 
@@ -241,7 +229,7 @@ export class AgentService {
     graphData?: { nodes: NodeObject[] }
   ): AgentResponse {
     // Create initial response message
-    const initialMessage = this.createInitialMessage(action, payload, conceptState);
+    const initialMessage = this.createInitialMessage(action);
 
     // Prepare to make LLM call
     this.callLLMAsync(action, payload, conceptState, graphData)
@@ -266,13 +254,9 @@ export class AgentService {
   /**
    * Create initial message for LLM-based actions
    */
-  private createInitialMessage(
-    action: string,
-    _payload?: AgentActionPayload,
-    _conceptState?: ConceptDesignState
-  ): Omit<AgentMessage, 'id' | 'timestamp'> {
+  private createInitialMessage(action: string): Omit<AgentMessage, 'id' | 'timestamp'> {
     const agentName = this.getAgentForAction(action);
-    let content = '';
+    let content: string;
 
     switch (action) {
       case 'suggest-compatible-components':
@@ -318,11 +302,7 @@ export class AgentService {
     const contentSummary = this.createContentSummary(llmContent, action);
 
     // Create appropriate action payload for viewing in new window
-    let messageAction = {
-      type: 'view-llm-result',
-      label: 'View Full Analysis',
-      payload: {}
-    };
+    let messageAction: NonNullable<AgentMessage['action']>;
 
     // Customize action based on action type
     switch (action) {
@@ -427,7 +407,7 @@ export class AgentService {
     const headingMatch = content.match(/^#\s+(.+)$/m);
     const firstHeading = headingMatch ? headingMatch[0] : '';
 
-    let summary = '';
+    let summary: string;
 
     if (firstHeading) {
       // Include the first heading
@@ -549,7 +529,7 @@ export class AgentService {
     const promptTemplate = this.getBuiltInPrompt(action);
 
     // Add knowledge base context to all prompts
-    let prompt = `KNOWLEDGE BASE CONTEXT:\n${this.getRelevantKnowledgeExcerpt(action, conceptState)}\n\n`;
+    let prompt = `KNOWLEDGE BASE CONTEXT:\n${this.getRelevantKnowledgeExcerpt()}\n\n`;
 
     // Add the prompt template with variables replaced
     prompt += this.replacePromptVariables(promptTemplate, action, payload, conceptState, graphData);
@@ -977,7 +957,7 @@ Provide scientifically grounded analysis with specific, actionable research dire
   /**
    * Get relevant knowledge excerpt for the action
    */
-  private getRelevantKnowledgeExcerpt(_action: string, _conceptState?: ConceptDesignState): string {
+  private getRelevantKnowledgeExcerpt(): string {
     // For now, return a subset of the knowledge base
     // In the future, this could be more sophisticated with semantic search
     const maxLength = 2000; // Limit knowledge context to avoid token limits
@@ -1023,7 +1003,7 @@ Provide scientifically grounded analysis with specific, actionable research dire
     };
   }
 
-  private handleInitiateConceptFromSelection(payload?: AgentActionPayload, _graphData?: { nodes: NodeObject[] }): AgentResponse {
+  private handleInitiateConceptFromSelection(payload?: AgentActionPayload): AgentResponse {
     return {
       message: {
         sourceAgent: 'Concept Initiator',
@@ -1043,7 +1023,7 @@ Provide scientifically grounded analysis with specific, actionable research dire
     };
   }
 
-  private handleExploratoryAnalysis(_payload?: AgentActionPayload, _conceptState?: ConceptDesignState): AgentResponse {
+  private handleExploratoryAnalysis(): AgentResponse {
     return {
       message: {
         sourceAgent: 'Knowledge Explorer',
@@ -1063,7 +1043,7 @@ Provide scientifically grounded analysis with specific, actionable research dire
     };
   }
 
-  private handleSuggestComponents(_conceptState?: ConceptDesignState): AgentResponse {
+  private handleSuggestComponents(): AgentResponse {
     return {
       message: {
         sourceAgent: 'Component Advisor',
@@ -1073,7 +1053,7 @@ Provide scientifically grounded analysis with specific, actionable research dire
     };
   }
 
-  private handleFindAnalogies(_conceptState?: ConceptDesignState): AgentResponse {
+  private handleFindAnalogies(): AgentResponse {
     return {
       message: {
         sourceAgent: 'Analogy Finder',
@@ -1083,7 +1063,7 @@ Provide scientifically grounded analysis with specific, actionable research dire
     };
   }
 
-  private handleCheckConsistency(_conceptState?: ConceptDesignState): AgentResponse {
+  private handleCheckConsistency(): AgentResponse {
     return {
       message: {
         sourceAgent: 'Consistency Checker',
@@ -1093,7 +1073,7 @@ Provide scientifically grounded analysis with specific, actionable research dire
     };
   }
 
-  private handleGenerateProtocol(_conceptState?: ConceptDesignState): AgentResponse {
+  private handleGenerateProtocol(): AgentResponse {
     return {
       message: {
         sourceAgent: 'Protocol Generator',
@@ -1103,7 +1083,7 @@ Provide scientifically grounded analysis with specific, actionable research dire
     };
   }
 
-  private handleGenerateSummary(_conceptState?: ConceptDesignState): AgentResponse {
+  private handleGenerateSummary(): AgentResponse {
     return {
       message: {
         sourceAgent: 'Summary Generator',
@@ -1123,7 +1103,7 @@ Provide scientifically grounded analysis with specific, actionable research dire
     };
   }
 
-  private handleDeliverProtocol(_payload?: AgentActionPayload, conceptState?: ConceptDesignState): AgentResponse {
+  private handleDeliverProtocol(conceptState?: ConceptDesignState): AgentResponse {
     return {
       message: {
         sourceAgent: 'Protocol Deliverer',
@@ -1133,7 +1113,7 @@ Provide scientifically grounded analysis with specific, actionable research dire
     };
   }
 
-  private handleDeliverSummary(_payload?: AgentActionPayload, conceptState?: ConceptDesignState): AgentResponse {
+  private handleDeliverSummary(conceptState?: ConceptDesignState): AgentResponse {
     return {
       message: {
         sourceAgent: 'Summary Deliverer',
@@ -1143,7 +1123,7 @@ Provide scientifically grounded analysis with specific, actionable research dire
     };
   }
 
-  private handleGenericAction(action: string, _payload?: AgentActionPayload): AgentResponse {
+  private handleGenericAction(action: string): AgentResponse {
     return {
       message: {
         sourceAgent: 'Generic Agent',

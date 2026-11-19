@@ -54,7 +54,7 @@ export function parseMarkdownToStructuredDocument(markdown: string, sourceFileKe
   let preambleLines: string[] = [];
   const rootSections: ParsedSection[] = [];
   
-  let currentSectionStack: Array<ParsedSection & { _internal_accumulatedPathForParent?: string }> = [];
+  const currentSectionStack: ParsedSection[] = [];
   let currentSectionContentLines: string[] = [];
   
   let firstH1Found = false;
@@ -120,11 +120,12 @@ export function parseMarkdownToStructuredDocument(markdown: string, sourceFileKe
             currentSectionStack.pop();
         }
         
-        const parentAccumulatedPath = currentSectionStack.length > 0 ? currentSectionStack[currentSectionStack.length-1]._internal_accumulatedPathForParent : '';
-        const newSection: ParsedSection & { _internal_accumulatedPathForParent?: string, parentPath?: string } = {
+        const parent = currentSectionStack[currentSectionStack.length - 1];
+        const parentAccumulatedPath = parent ? [parent.parentPath, parent.id].filter(Boolean).join('/') : '';
+        const newSection: ParsedSection = {
             title: displayTitle, content: '', level, id: sectionId, sourceFileKey,
             subsections: [], references: [], parentPath: parentAccumulatedPath,
-            _internal_accumulatedPathForParent: parentAccumulatedPath ? `${parentAccumulatedPath}/${sectionId}` : sectionId,
+
         };
         
         if (currentSectionStack.length > 0) {
@@ -155,19 +156,9 @@ export function parseMarkdownToStructuredDocument(markdown: string, sourceFileKe
     }
   }
   
-  const cleanSections = (sections: any[]): ParsedSection[] => {
-    return sections.map(s => {
-        const { _internal_accumulatedPathForParent, ...rest } = s;
-        if (rest.subsections) {
-            rest.subsections = cleanSections(rest.subsections);
-        }
-        return rest;
-    });
-  };
-  
   return {
     documentTitle: documentTitle || (sourceFileKey ? createDisplayTitleFromHeadingText(sourceFileKey) : "Untitled Document"),
     preambleContent: preambleLines.join('\n').trim(),
-    sections: cleanSections(rootSections)
+    sections: rootSections
   };
 }

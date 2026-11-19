@@ -46,7 +46,7 @@ component the design targets is [`../DE/`](../DE/README.md).
 ## Related documentation
 
 - [`documentation-index.md`](documentation-index.md) — flat index of every long-lived document.
-- [`RUN_GUIDE.md`](RUN_GUIDE.md) — the gate arms and the checks that are known red.
+- [`RUN_GUIDE.md`](RUN_GUIDE.md) — the gate arms and the blocking frontend checks.
 - [`GATE_METRICS.md`](GATE_METRICS.md) — generated per-arm measurements.
 - [`../DE/docs/README.md`](../DE/docs/README.md) — the frontend's implementation documentation.
 - [`../path/README.md`](../path/README.md) — the Python network-analysis pipeline.

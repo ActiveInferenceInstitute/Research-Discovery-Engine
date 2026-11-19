@@ -8,7 +8,7 @@
 
 import { loadEnvironment } from './load-env';
 import { createKnowledgeService, createProviderService } from '../src/llm/utils/factory';
-import { KnowledgeProcessingLLMRequest } from '../src/llm/types';
+import { KnowledgeProcessingLLMRequest, KnowledgeProcessingResult } from '../src/llm/types';
 import * as fs from 'fs';
 import * as path from 'path';
 
@@ -16,8 +16,8 @@ interface CliOptions {
   text?: string;
   file?: string;
   domain?: string;
-  type?: 'extract_concepts' | 'find_relationships' | 'generate_questions' | 'summarize' | 'classify';
-  format?: 'structured' | 'narrative' | 'bullets' | 'json';
+  type?: KnowledgeProcessingLLMRequest['processingType'];
+  format?: KnowledgeProcessingLLMRequest['outputFormat'];
   headless?: boolean;
   headlessOutput?: string;
   verbose?: boolean;
@@ -41,18 +41,20 @@ function parseArgs(): CliOptions {
       case '--domain':
         options.domain = args[++i];
         break;
-      case '--type':
+      case '--type': {
         const type = args[++i];
         if (['extract_concepts', 'find_relationships', 'generate_questions', 'summarize', 'classify'].includes(type)) {
-          options.type = type as any;
+          options.type = type as CliOptions['type'];
         }
         break;
-      case '--format':
+      }
+      case '--format': {
         const format = args[++i];
         if (['structured', 'narrative', 'bullets', 'json'].includes(format)) {
-          options.format = format as any;
+          options.format = format as CliOptions['format'];
         }
         break;
+      }
       case '--headless':
         options.headless = true;
         break;
@@ -103,7 +105,7 @@ Examples:
 `);
 }
 
-async function processKnowledge(sourceText: string, options: CliOptions): Promise<any> {
+async function processKnowledge(sourceText: string, options: CliOptions) {
   if (options.verbose) {
     console.log(`🧠 Processing knowledge with LLM...`);
     console.log(`📝 Text length: ${sourceText.length} characters`);
@@ -125,14 +127,14 @@ async function processKnowledge(sourceText: string, options: CliOptions): Promis
       processingType,
       domain,
       outputFormat,
-      userPrompt: createUserPrompt(processingType, domain, sourceText),
+      userPrompt: createUserPrompt(processingType, domain),
       config: {
         maxTokens: 1500,
         temperature: 0.7
       }
     };
 
-    const result = await knowledgeService.processKnowledge(request);
+    const result: KnowledgeProcessingResult = await knowledgeService.processKnowledge(request);
 
     if (!result.success) {
       throw new Error(`Knowledge processing failed: ${result.error}`);
@@ -176,7 +178,7 @@ async function processKnowledge(sourceText: string, options: CliOptions): Promis
   }
 }
 
-function createUserPrompt(type: string, domain: string, text: string): string {
+function createUserPrompt(type: KnowledgeProcessingLLMRequest['processingType'], domain: string): string {
   const prompts = {
     extract_concepts: `Extract key scientific concepts from the following ${domain} text. Identify materials, mechanisms, processes, and theoretical concepts. Provide a structured list.`,
     find_relationships: `Analyze the following ${domain} text and identify relationships between different concepts, materials, and processes. Show how they connect and influence each other.`,
@@ -188,7 +190,9 @@ function createUserPrompt(type: string, domain: string, text: string): string {
   return prompts[type] || prompts.extract_concepts;
 }
 
-function formatOutput(data: any, format: string): string {
+type KnowledgeOutput = Awaited<ReturnType<typeof processKnowledge>>;
+
+function formatOutput(data: KnowledgeOutput, format: string): string {
   if (format === 'json') {
     return JSON.stringify(data, null, 2);
   }
@@ -224,7 +228,7 @@ ${formatExtractedData(data.processing.extractedData)}
 `;
 }
 
-function formatExtractedData(extractedData: any): string {
+function formatExtractedData(extractedData: Partial<KnowledgeProcessingResult['extractedData']>): string {
   if (!extractedData || Object.keys(extractedData).length === 0) {
     return 'No structured data extracted.';
   }
@@ -236,7 +240,7 @@ function formatExtractedData(extractedData: any): string {
   }
   
   if (extractedData.relationships) {
-    formatted += `\n### Relationships\n${extractedData.relationships.map((r: any) => `- ${r.source} ${r.relationship} ${r.target}`).join('\n')}`;
+    formatted += `\n### Relationships\n${extractedData.relationships.map(r => `- ${r.source} ${r.relationship} ${r.target}`).join('\n')}`;
   }
   
   if (extractedData.questions) {
@@ -250,7 +254,7 @@ function formatExtractedData(extractedData: any): string {
   return formatted || 'No specific data structure available.';
 }
 
-function saveHeadlessOutput(data: any, format: string, options: CliOptions): string {
+function saveHeadlessOutput(data: KnowledgeOutput, format: string, options: CliOptions): string {
   const baseDir = options.headlessOutput || './llm-knowledge-output';
   const timestamp = new Date().toISOString().replace(/[:.]/g, '-').slice(0, 19);
   const outputDir = path.join(baseDir, `llm-knowledge_${timestamp}`);

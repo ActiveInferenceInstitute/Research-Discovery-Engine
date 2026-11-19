@@ -1,3 +1,4 @@
+import type { TriggerAgent } from '../../types';
 // src/components/ContextPanel/ContextPanel.tsx
 import React from 'react';
 import { NodeObject, GraphData, ConceptDesignState } from '../../types';
@@ -14,7 +15,7 @@ interface ContextPanelProps {
   graphData: GraphData;
   onSelectNode: (node: NodeObject | null, sectionSlug?: string) => void;
   onStartDesign: (seedNodeId: string) => void;
-  onTriggerAgent: (action: string, payload?: any) => void;
+  onTriggerAgent: TriggerAgent;
   onNavigateToWikiSection: (fileKey: string, sectionSlug: string) => void; // Renamed in App.tsx to handleNavigateFromNodeView
 }
 

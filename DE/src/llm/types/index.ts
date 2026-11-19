@@ -4,6 +4,8 @@
  * Comprehensive types for flexible LLM integration with OpenAI API
  */
 
+import type { ChatCompletion } from 'openai/resources/chat/completions';
+
 // API Provider Types
 export type APIProvider = 'openai' | 'openrouter';
 
@@ -88,7 +90,7 @@ export interface LLMResult {
     duration: number;
     finishReason: string;
   };
-  rawResponse?: any;
+  rawResponse?: ChatCompletion;
 }
 
 // Error Types
@@ -98,7 +100,7 @@ export interface LLMError {
   code?: string;
   statusCode?: number;
   retryAfter?: number;
-  details?: any;
+  details?: unknown;
 }
 
 // Retry Policy
@@ -255,7 +257,7 @@ export interface PromptTemplate {
   systemPrompt: string;
   userPromptTemplate: string;
   variables: string[];
-  examples?: Array<{ input: Record<string, any>; output: string }>;
+  examples?: Array<{ input: Record<string, unknown>; output: string }>;
   defaultConfig?: LLMRequestConfig;
 }
 

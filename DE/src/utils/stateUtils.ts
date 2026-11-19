@@ -5,12 +5,12 @@
  * for complex state management without requiring external Redux dependencies.
  */
 
-import { useReducer, useCallback, useMemo, useContext, createContext, createElement, type Dispatch, type ReactNode } from 'react';
+import { useReducer, useCallback, useMemo, useState, useContext, createContext, createElement, type Dispatch, type ReactNode } from 'react';
 
 /**
  * Generic action interface for reducer patterns
  */
-export interface Action<T = string, P = any> {
+export interface Action<T = string, P = unknown> {
   type: T;
   payload?: P;
 }
@@ -28,8 +28,10 @@ export type Reducer<S, A> = (state: S, action: A) => S;
  * @returns Object with reducer function and action creators
  */
 export function createReducer<S, A extends Action>(
-  _initialState: S,
-  reducerMap: Record<string, (state: S, action: A) => S>
+  ...[, reducerMap]: [
+    initialState: S,
+    reducerMap: Record<string, (state: S, action: A) => S>
+  ]
 ) {
   const reducer: Reducer<S, A> = (state, action) => {
     const handler = reducerMap[action.type];
@@ -37,9 +39,9 @@ export function createReducer<S, A extends Action>(
   };
 
   const actionCreators = Object.keys(reducerMap).reduce((creators, type) => {
-    creators[type] = (payload?: any) => ({ type, payload } as A);
+    creators[type] = (payload?: A['payload']) => ({ type, payload } as A);
     return creators;
-  }, {} as Record<string, (payload?: any) => A>);
+  }, {} as Record<string, (payload?: A['payload']) => A>);
 
   return { reducer, actionCreators };
 }
@@ -57,12 +59,12 @@ export function useEnhancedReducer<S, A extends Action>(
 ) {
   const [state, dispatch] = useReducer(reducer, initialState);
 
-  const dispatchAction = useCallback((type: string, payload?: any) => {
+  const dispatchAction = useCallback((type: string, payload?: A['payload']) => {
     dispatch({ type, payload } as A);
   }, []);
 
   const createActionDispatcher = useCallback((type: string) => {
-    return (payload?: any) => dispatch({ type, payload } as A);
+    return (payload?: A['payload']) => dispatch({ type, payload } as A);
   }, []);
 
   return {
@@ -115,16 +117,28 @@ export function createStateProvider<S, A extends Action>(
  * Creates a selector hook for accessing specific parts of state
  * 
  * @param selector - Function to select data from state
- * @param _equalityFn - Reserved for a custom-equality memo; not applied yet
+ * @param equalityFn - Reserved for a custom-equality memo; not applied yet
  * @returns Selected data from state
  */
-export function createSelector<S, T>(
+export const createSelector: <S, T>(
   selector: (state: S) => T,
-  _equalityFn?: (a: T, b: T) => boolean
-) {
+  equalityFn?: (a: T, b: T) => boolean
+) => (state: S) => T = <S, T>(selector: (state: S) => T) => {
   return function useSelector(state: S): T {
     return useMemo(() => selector(state), [state]);
   };
+};
+
+// Dynamic dotted paths cannot express their leaf type in terms of S. Keep
+// traversal values unknown and preserve the root type at the public boundary.
+function updateIn<S>(state: S, path: string, update: (value: unknown) => unknown): S {
+  function visit(value: unknown, [key, ...tail]: string[]): Record<string, unknown> {
+    const object = (value || {}) as Record<string, unknown>;
+    const child = object[key];
+    return { ...object, [key]: tail.length ? visit(child, tail) : update(child) };
+  }
+
+  return visit(state, path.split('.')) as S;
 }
 
 /**
@@ -139,141 +153,70 @@ export const immer = {
    * @param value - New value
    * @returns New state with updated property
    */
-  setIn<S>(state: S, path: string, value: any): S {
-    const keys = path.split('.');
-    
-    function updateNested(obj: any, keys: string[], value: any): any {
-      if (keys.length === 1) {
-        return { ...obj, [keys[0]]: value };
-      }
-      
-      const [head, ...tail] = keys;
-      return {
-        ...obj,
-        [head]: updateNested(obj[head] || {}, tail, value)
-      };
-    }
-    
-    return updateNested(state, keys, value);
+  setIn<S>(state: S, path: string, value: unknown): S {
+    return updateIn(state, path, () => value);
   },
 
   /**
    * Updates an array item immutably
-   * 
+   *
    * @param state - Current state
    * @param arrayPath - Path to array
    * @param index - Index to update
    * @param value - New value or update function
    * @returns New state with updated array item
    */
-  updateArrayItem<S>(
+  updateArrayItem<S, T = unknown>(
     state: S,
     arrayPath: string,
     index: number,
-    value: any | ((item: any) => any)
+    value: T | ((item: T) => T)
   ): S {
-    const keys = arrayPath.split('.');
-    
-    function updateArray(obj: any, keys: string[], index: number, value: any): any {
-      if (keys.length === 1) {
-        const array = obj[keys[0]] || [];
-        const newArray = [...array];
-        newArray[index] = typeof value === 'function' ? value(array[index]) : value;
-        return { ...obj, [keys[0]]: newArray };
-      }
-      
-      const [head, ...tail] = keys;
-      return {
-        ...obj,
-        [head]: updateArray(obj[head] || {}, tail, index, value)
-      };
-    }
-    
-    return updateArray(state, keys, index, value);
+    return updateIn(state, arrayPath, current => {
+      const array = (current || []) as T[];
+      const next = [...array];
+      next[index] = typeof value === 'function' ? (value as (item: T) => T)(array[index]) : value;
+      return next;
+    });
   },
 
   /**
    * Adds item to array immutably
-   * 
+   *
    * @param state - Current state
    * @param arrayPath - Path to array
    * @param item - Item to add
    * @returns New state with item added to array
    */
-  addToArray<S>(state: S, arrayPath: string, item: any): S {
-    const keys = arrayPath.split('.');
-    
-    function addToNestedArray(obj: any, keys: string[], item: any): any {
-      if (keys.length === 1) {
-        const array = obj[keys[0]] || [];
-        return { ...obj, [keys[0]]: [...array, item] };
-      }
-      
-      const [head, ...tail] = keys;
-      return {
-        ...obj,
-        [head]: addToNestedArray(obj[head] || {}, tail, item)
-      };
-    }
-    
-    return addToNestedArray(state, keys, item);
+  addToArray<S>(state: S, arrayPath: string, item: unknown): S {
+    return updateIn(state, arrayPath, current => [...((current || []) as Iterable<unknown>), item]);
   },
 
   /**
    * Removes item from array immutably
-   * 
+   *
    * @param state - Current state
    * @param arrayPath - Path to array
    * @param predicate - Function to identify item to remove
    * @returns New state with item removed from array
    */
-  removeFromArray<S>(
-    state: S,
-    arrayPath: string,
-    predicate: (item: any, index: number) => boolean
-  ): S {
-    const keys = arrayPath.split('.');
-    
-    function removeFromNestedArray(obj: any, keys: string[], predicate: any): any {
-      if (keys.length === 1) {
-        const array = obj[keys[0]] || [];
-        return { ...obj, [keys[0]]: array.filter((item: any, index: number) => !predicate(item, index)) };
-      }
-      
-      const [head, ...tail] = keys;
-      return {
-        ...obj,
-        [head]: removeFromNestedArray(obj[head] || {}, tail, predicate)
-      };
-    }
-    
-    return removeFromNestedArray(state, keys, predicate);
+  removeFromArray<S, T = unknown>(state: S, arrayPath: string, predicate: (item: T, index: number) => boolean): S {
+    return updateIn(state, arrayPath, current => {
+      const array = (current || []) as T[];
+      return array.filter((item, index) => !predicate(item, index));
+    });
   },
 
   /**
    * Merges object properties immutably
-   * 
+   *
    * @param state - Current state
    * @param path - Path to object to merge
    * @param updates - Object with updates to merge
    * @returns New state with merged object
    */
-  merge<S>(state: S, path: string, updates: Record<string, any>): S {
-    const keys = path.split('.');
-    
-    function mergeNested(obj: any, keys: string[], updates: any): any {
-      if (keys.length === 1) {
-        return { ...obj, [keys[0]]: { ...(obj[keys[0]] || {}), ...updates } };
-      }
-      
-      const [head, ...tail] = keys;
-      return {
-        ...obj,
-        [head]: mergeNested(obj[head] || {}, tail, updates)
-      };
-    }
-    
-    return mergeNested(state, keys, updates);
+  merge<S>(state: S, path: string, updates: Record<string, unknown>): S {
+    return updateIn(state, path, current => ({ ...(current as object), ...updates }));
   }
 };
 
@@ -324,12 +267,13 @@ export const asyncMiddleware = <S, A extends Action>() =>
   (store: { getState: () => S; dispatch: React.Dispatch<A> }) =>
   (next: React.Dispatch<A>) =>
   (action: A) => {
-    if (action.payload && typeof action.payload.then === 'function') {
-      return action.payload
-        .then((result: any) => 
+    const { payload } = action;
+    if (payload && typeof (payload as Partial<PromiseLike<unknown>>).then === 'function') {
+      return Promise.resolve(payload)
+        .then(result =>
           store.dispatch({ ...action, payload: result } as A)
         )
-        .catch((error: any) => 
+        .catch((error: unknown) =>
           store.dispatch({ 
             type: `${action.type}_ERROR`, 
             payload: error 
@@ -362,7 +306,7 @@ export function usePersistentState<T>(
 
   const setPersistentState = useCallback((value: T | ((prev: T) => T)) => {
     setState(prevState => {
-      const newState = typeof value === 'function' ? (value as Function)(prevState) : value;
+      const newState = typeof value === 'function' ? (value as (previous: T) => T)(prevState) : value;
       try {
         localStorage.setItem(key, JSON.stringify(newState));
       } catch (error) {
@@ -433,6 +377,3 @@ export function useOptimisticState<T>(initialState: T) {
     hasPendingActions: pendingActions.size > 0
   };
 }
-
-// Add missing import for useState
-import { useState } from 'react'; 

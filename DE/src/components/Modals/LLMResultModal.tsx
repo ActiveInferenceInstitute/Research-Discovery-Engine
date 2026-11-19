@@ -112,17 +112,29 @@ const LLMResultModal: React.FC<LLMResultModalProps> = ({
                 components={{
                   a: markdownLinkRenderer,
                   // Add custom renderers for other elements if needed
-                  table: ({node, ...props}) => (
+                  table: (props) => {
+                    const domProps = { ...props };
+                    delete domProps.node;
+                    return (
                     <div className="overflow-x-auto">
-                      <table className="min-w-full divide-y divide-gray-300 dark:divide-gray-700" {...props} />
+                      <table className="min-w-full divide-y divide-gray-300 dark:divide-gray-700" {...domProps} />
                     </div>
-                  ),
-                  th: ({node, ...props}) => (
-                    <th className="px-3 py-2 text-left text-xs font-medium uppercase tracking-wider bg-gray-100 dark:bg-gray-800" {...props} />
-                  ),
-                  td: ({node, ...props}) => (
-                    <td className="px-3 py-2 whitespace-nowrap text-sm" {...props} />
-                  )
+                    );
+                  },
+                  th: (props) => {
+                    const domProps = { ...props };
+                    delete domProps.node;
+                    return (
+                    <th className="px-3 py-2 text-left text-xs font-medium uppercase tracking-wider bg-gray-100 dark:bg-gray-800" {...domProps} />
+                    );
+                  },
+                  td: (props) => {
+                    const domProps = { ...props };
+                    delete domProps.node;
+                    return (
+                    <td className="px-3 py-2 whitespace-nowrap text-sm" {...domProps} />
+                    );
+                  }
                 }}
               >
                 {content}

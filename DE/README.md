@@ -240,7 +240,7 @@ A dedicated LLM extraction template directly maps to the CNM schema defined in `
 *   **Testing**: Establishing comprehensive test coverage for critical components
 
 ### 🚧 **Known Technical Debt**
-*   **App.tsx Size**: Main component is 339 lines; an unreferenced 311-line `App.new.tsx` sits beside it
+*   **App.tsx Size**: The main component still owns layout and interaction wiring.
 *   **Agent Simulation**: AI functionalities are frontend-simulated, awaiting backend integration
 *   **React Warnings**: Minor `setState-in-render` issues being addressed through refactoring
 *   **Bundle Optimization**: Code splitting and lazy loading implementation pending
