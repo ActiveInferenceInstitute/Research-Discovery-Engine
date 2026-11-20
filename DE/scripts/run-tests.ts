@@ -20,6 +20,8 @@
  */
 
 import 'dotenv/config';
+import assert from 'node:assert/strict';
+import { analyzeUploadedDocument } from '../src/utils/analyzeUploadedDocument';
 import { 
   createMockGraphData,
   createMockConceptDesignState,
@@ -224,6 +226,65 @@ async function runUnitTests(component?: string): Promise<TestSuite> {
       if (parsed.linksConnectionsContent !== 'Coupled to the source') throw new Error('Missing connections');
       if (parsed.attributes[0]?.value !== 'Preserved') throw new Error('Missing custom attribute');
       return 'Inputs, outputs, connections, related-node links and custom attributes preserved';
+    }));
+  }
+
+  if (!component || component.toLowerCase() === 'uploader') {
+    for (const fileName of ['research.pdf', 'research.txt', 'research.MD']) {
+      results.push(await runTest(`Upload Analysis Produces Graph Data for ${fileName}`, async () => {
+        const file = new File(['Source document'], fileName);
+        const analysis = '## Key Mechanisms\nFeedback loop\n\n## Applications\nSystem design';
+        let requests = 0;
+        let pdfExtractions = 0;
+        const result = await analyzeUploadedDocument(
+          file,
+          async () => {
+            pdfExtractions++;
+            return 'Source document';
+          },
+          async ({ userPrompt }) => {
+            requests++;
+            assert.match(userPrompt, /Source document/);
+            return { success: true, content: analysis };
+          },
+        );
+        assert.equal(pdfExtractions, fileName.endsWith('.pdf') ? 1 : 0);
+        assert.equal(requests, 1);
+        assert.equal(result.analysis, analysis);
+        assert.equal(result.graph.nodes[0].description, analysis);
+        assert.deepEqual(result.graph.nodes.map(node => node.id), [
+          'Paper_research', 'Mechanism_research', 'Application_research',
+        ]);
+        assert.deepEqual(result.graph.links.map(link => [link.source, link.target]), [
+          ['Paper_research', 'Mechanism_research'], ['Paper_research', 'Application_research'],
+        ]);
+        return 'One request produced the paper and its analyzed sections';
+      }));
+    }
+
+    results.push(await runTest('Upload Analysis Surfaces Failed Reads', async () => {
+      const file = new File([], 'broken.pdf', { type: 'application/pdf' });
+      let requests = 0;
+      await assert.rejects(analyzeUploadedDocument(
+        file,
+        async () => { throw new Error('Invalid PDF'); },
+        async () => {
+          requests++;
+          return { success: true, content: 'Unexpected analysis' };
+        },
+      ), /Invalid PDF/);
+      assert.equal(requests, 0);
+      return 'Extraction failure stops analysis before the provider request';
+    }));
+
+    results.push(await runTest('Upload Analysis Surfaces Provider Failures', async () => {
+      const file = new File(['Source document'], 'research.txt');
+      await assert.rejects(analyzeUploadedDocument(
+        file,
+        async () => { throw new Error('Unexpected PDF extraction'); },
+        async () => ({ success: false, content: '', error: 'Provider unavailable' }),
+      ), /Provider unavailable/);
+      return 'Provider failure rejects without returning graph data';
     }));
   }
 
