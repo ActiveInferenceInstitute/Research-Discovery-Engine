@@ -84,7 +84,7 @@ The Discovery Engine embodies a human-AI co-creation process. It leverages the s
         *   `AgentConsole/`: UI for (simulated) AI agent interactions.
         *   `BreadcrumbPanel/`: Displays navigation path.
         *   `Layout/`: `AppLayout` and the layout barrel.
-        *   `Modals/`: `LLMResultModal` and `PDFUploader`.
+        *   `Modals/`: `LLMResultModal` and `PDFUploader`. The uploader reads PDF, plain text, and Markdown in the browser, then uses the configured LLM to analyze the text. It adds graph data after analysis succeeds and shows a retry option if reading or analysis fails.
         *   `WikiView/`: Wiki content view and utilities.
         *   `ErrorBoundary.tsx`: Top-level render-error boundary.
         *   `utils/markdownLinkRenderer.tsx`: Centralized component for rendering custom markdown links.
