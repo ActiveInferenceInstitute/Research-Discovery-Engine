@@ -4,4 +4,4 @@ python-dotenv==1.2.4
 supabase==2.34.1
 # api/routes/chat.py uses the 1.x client (`from mistralai import Mistral`,
 # `client.chat.stream`); 2.x and later moved `Mistral` to `mistralai.client`.
-mistralai>=1.0,<2
+mistralai>=3.7.0,<4
