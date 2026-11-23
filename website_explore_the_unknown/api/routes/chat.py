@@ -1,6 +1,6 @@
 from flask import Blueprint, request, jsonify, Response, stream_with_context
 import os
-from mistralai import Mistral  # Make sure to install mistralai via pip
+from mistralai.client import Mistral
 from dotenv import load_dotenv
 import logging
 import json
