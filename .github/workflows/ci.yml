@@ -97,8 +97,8 @@ jobs:
       - name: Python components
         run: ./run.sh python
 
-  # GNN pin: .github/gnn-pin.json (schema gnn-importer-pin/v1, v5.0.3,
-  # 8f293d9ba810e6eda5c09842d9c7ed9ffa5f92c1). What this job parses is
+  # GNN pin: .github/gnn-pin.json (schema gnn-importer-pin/v1, v5.1.0,
+  # 75c834bd8519dc7b5adc4d24f16bf393cfd1ecdf). What this job parses is
   # recorded in .github/GNN.md.
   gnn-conformance:
     name: gnn conformance (pinned)
